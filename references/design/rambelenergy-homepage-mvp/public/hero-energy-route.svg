@@ -1,0 +1,30 @@
+<svg width="760" height="620" viewBox="0 0 760 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="760" height="620" fill="#112A3E"/>
+  <g opacity="0.38" stroke="#355166">
+    <path d="M0 78H760"/><path d="M0 156H760"/><path d="M0 234H760"/><path d="M0 312H760"/><path d="M0 390H760"/><path d="M0 468H760"/><path d="M0 546H760"/>
+    <path d="M95 0V620"/><path d="M190 0V620"/><path d="M285 0V620"/><path d="M380 0V620"/><path d="M475 0V620"/><path d="M570 0V620"/><path d="M665 0V620"/>
+  </g>
+  <circle cx="566" cy="136" r="128" stroke="#1B695D" stroke-opacity="0.44"/>
+  <circle cx="566" cy="136" r="92" stroke="#B48842" stroke-opacity="0.24"/>
+  <path d="M123 492C197 418 244 380 306 320C367 261 429 249 487 192C530 150 589 123 650 81" stroke="#B48842" stroke-width="4" stroke-dasharray="12 12"/>
+  <circle cx="123" cy="492" r="10" fill="#B48842"/>
+  <circle cx="306" cy="320" r="10" fill="#13584D" stroke="#E9F3F0" stroke-width="3"/>
+  <circle cx="650" cy="81" r="10" fill="#B48842"/>
+  <g>
+    <rect x="91" y="434" width="108" height="34" rx="2" fill="#081A2C" fill-opacity="0.92"/>
+    <text x="107" y="456" fill="#F5F7F4" font-family="Arial, sans-serif" font-size="13" font-weight="700">Nigeria</text>
+  </g>
+  <g>
+    <rect x="321" y="282" width="106" height="34" rx="2" fill="#081A2C" fill-opacity="0.92"/>
+    <text x="337" y="304" fill="#F5F7F4" font-family="Arial, sans-serif" font-size="13" font-weight="700">Algeria</text>
+  </g>
+  <g>
+    <rect x="516" y="42" width="160" height="34" rx="2" fill="#081A2C" fill-opacity="0.92"/>
+    <text x="532" y="64" fill="#F5F7F4" font-family="Arial, sans-serif" font-size="13" font-weight="700">Italy / Spain</text>
+  </g>
+  <rect x="75" y="88" width="214" height="132" fill="#FFFDF9" fill-opacity="0.98"/>
+  <rect x="99" y="112" width="101" height="8" fill="#13584D"/>
+  <rect x="99" y="139" width="150" height="6" fill="#CFD7D5"/>
+  <rect x="99" y="161" width="120" height="6" fill="#CFD7D5"/>
+  <rect x="99" y="183" width="88" height="6" fill="#CFD7D5"/>
+</svg>
