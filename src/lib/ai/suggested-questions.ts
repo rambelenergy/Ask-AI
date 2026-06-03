@@ -11,12 +11,12 @@ export type SuggestedQuestionsLanguage = "en" | "fr" | "ar" | "es" | "it";
 
 const questions: Partial<Record<SuggestedQuestionsLanguage, string[]>> = {
   en: ["Ask about the Algeria–Spain energy partnership"],
+ 
+  ar: ["اسأل عن الشراكة الجزائرية الإسبانية في الطاقة"],
 
   fr: [
     "Demandez des informations sur le partenariat énergétique algéro-espagnol",
   ],
-
-  ar: ["اسأل عن الشراكة الجزائرية الإسبانية في الطاقة"],
 
   es: [
     "Pregunta sobre la asociación energética entre Argelia y España",
