@@ -111,9 +111,11 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
         <p className="whitespace-pre-wrap">{content}</p>
         <SourceCards sources={sources ?? []} />
         {/* Bottom toolbar: copy + summarize */}
-        <div className="mt-3 flex items-center gap-2 border-t border-[var(--line)] pt-3">
-          <CopyButton content={content} />
-          <SummaryBox text={content} />
+        <div className="mt-3 border-t border-[var(--line)] pt-3">
+          <div className="flex items-start gap-2">
+            <CopyButton content={content} />
+            <SummaryBox text={content} />
+          </div>
         </div>
       </div>
     </div>
