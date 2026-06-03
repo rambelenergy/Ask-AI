@@ -76,45 +76,6 @@ export default async function HomePage() {
       <HomeAssistantSection />
 
       {/* ═══════════════════════════════════════════════════════════
-          STRATEGIC FOCUS — Card grid with numbered items
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="section-py">
-        <div className="container-page">
-          <SectionHeading
-            eyebrow={strategicEyebrow}
-            title={strategicTitle}
-            description={strategicDesc}
-          />
-
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {(strategicItems?.length ? strategicItems : fallbackStrategic).map((item, index) => (
-              <article
-                key={item.title}
-                className="professional-card group flex flex-col p-6"
-              >
-                <span className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--gold)]">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="heading-sm text-[var(--navy)]">{item.title}</h3>
-                <p className="body-sm mt-3">{item.description}</p>
-                <div className="mt-auto pt-5">
-                  <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[var(--green)] opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:gap-2">
-                    <T k="home.strategic.learnMore" />
-                    <ArrowRight size={13} />
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SAHARA RENEWABLE
-          ═══════════════════════════════════════════════════════════ */}
-      <SaharaRenewableSection />
-
-      {/* ═══════════════════════════════════════════════════════════
           LATEST ANALYSIS — IFRI-style publication grid
           ═══════════════════════════════════════════════════════════ */}
       <section className="section-light section-py">
@@ -148,14 +109,53 @@ export default async function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
+          STRATEGIC FOCUS — Card grid with numbered items
+          ═══════════════════════════════════════════════════════════ */}
+      {/* <section className="section-py">
+        <div className="container-page">
+          <SectionHeading
+            eyebrow={strategicEyebrow}
+            title={strategicTitle}
+            description={strategicDesc}
+          />
+
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {(strategicItems?.length ? strategicItems : fallbackStrategic).map((item, index) => (
+              <article
+                key={item.title}
+                className="professional-card group flex flex-col p-6"
+              >
+                <span className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--gold)]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="heading-sm text-[var(--navy)]">{item.title}</h3>
+                <p className="body-sm mt-3">{item.description}</p>
+                <div className="mt-auto pt-5">
+                  <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[var(--green)] opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:gap-2">
+                    <T k="home.strategic.learnMore" />
+                    <ArrowRight size={13} />
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section> */}
+
+      {/* ═══════════════════════════════════════════════════════════
           GLOBAL SOLAR MAP
           ═══════════════════════════════════════════════════════════ */}
       <GlobalSolarMapCard />
 
       {/* ═══════════════════════════════════════════════════════════
+          SAHARA RENEWABLE
+          ═══════════════════════════════════════════════════════════ */}
+      <SaharaRenewableSection />
+
+      {/* ═══════════════════════════════════════════════════════════
           RESEARCH & PUBLICATIONS
           ═══════════════════════════════════════════════════════════ */}
-      <section className="section-py">
+      {/* <section className="section-py">
         <div className="container-page">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -183,7 +183,7 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ═══════════════════════════════════════════════════════════
           ABOUT THE ANALYST
