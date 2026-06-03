@@ -10,20 +10,20 @@
 export type SuggestedQuestionsLanguage = "en" | "fr" | "ar" | "es" | "it";
 
 const questions: Partial<Record<SuggestedQuestionsLanguage, string[]>> = {
-  en: ["Why is Algeria important for Europe's energy security?"],
+  en: ["Ask about the Algeria–Spain energy partnership"],
 
   fr: [
-    "Pourquoi l'Algérie est-elle importante pour la sécurité énergétique européenne ?",
+    "Demandez des informations sur le partenariat énergétique algéro-espagnol",
   ],
 
-  ar: ["لماذا تعتبر الجزائر مهمة لأمن الطاقة في أوروبا؟"],
+  ar: ["اسأل عن الشراكة الجزائرية الإسبانية في الطاقة"],
 
   es: [
-    "¿Por qué es importante Argelia para la seguridad energética de Europa?",
+    "Pregunta sobre la asociación energética entre Argelia y España",
   ],
 
   it: [
-    "Perché l'Algeria è importante per la sicurezza energetica dell'Europa?",
+    "Chiedi informazioni sul partenariato energetico tra Algeria e Spagna",
   ],
 };
 
@@ -35,6 +35,24 @@ export function getSuggestedQuestions(lang: string): string[] {
   const q = questions[lang as SuggestedQuestionsLanguage];
   if (q && q.length > 0) return q;
   return questions.en ?? [];
+}
+
+/**
+ * Return ALL suggested questions from every language.
+ */
+export function getAllSuggestedQuestions(): string[] {
+  const all: string[] = [];
+  const seen = new Set<string>();
+  for (const list of Object.values(questions)) {
+    for (const q of list ?? []) {
+      const trimmed = q.trim();
+      if (!seen.has(trimmed)) {
+        seen.add(trimmed);
+        all.push(q);
+      }
+    }
+  }
+  return all;
 }
 
 export default questions;

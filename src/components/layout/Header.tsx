@@ -9,6 +9,7 @@ import { navItems } from "@/data/homepage";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { SearchOverlay } from "@/components/layout/SearchOverlay";
 import { useLanguage } from "@/components/language/language-provider";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export function Header() {
   const { t } = useLanguage();
@@ -100,13 +101,14 @@ export function Header() {
         <div className="container-page flex h-9 items-center justify-between text-[11px] font-medium tracking-[0.03em] text-[var(--muted-soft)]">
           <span>{t("nav.topTagline")}</span>
           <div className="flex items-center gap-4">
+            {/* <ThemeToggle /> */}
             <Link href="/analysis" className="transition-colors hover:text-[var(--green)]">{t("nav.analysis")}</Link>
             <span className="text-[var(--line)]">|</span>
             <Link href="/research" className="transition-colors hover:text-[var(--green)]">{t("nav.research")}</Link>
             <span className="text-[var(--line)]">|</span>
             <Link href="/contact" className="transition-colors hover:text-[var(--green)]">{t("nav.contact")}</Link>
             <span className="text-[var(--line)]">|</span>
-            <LanguageSwitcher />
+            {/* <LanguageSwitcher /> */}
           </div>
         </div>
       </div>
@@ -122,7 +124,7 @@ export function Header() {
           <img
             src="/logo.png"
             alt="RamBelEnergy"
-            className="h-10 w-auto transition-transform duration-300 group-hover:scale-[1.02]"
+            className="site-logo h-10 w-auto transition-transform duration-300 group-hover:scale-[1.02]"
           />
           <span className="hidden text-lg font-bold tracking-[-0.03em] text-[var(--navy)] sm:block">
             RamBelEnergy
@@ -149,6 +151,8 @@ export function Header() {
 
         {/* Desktop right actions */}
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle />
+
           {/* Language switcher */}
           <LanguageSwitcher />
 
@@ -265,6 +269,19 @@ export function Header() {
               })}
 
               <div className="my-4 border-t border-[var(--line-soft)]" />
+
+              {/* Theme & language — mobile */}
+              <div className="mb-4 flex items-center justify-between px-1">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
+                  Appearance
+                </span>
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <LanguageSwitcher />
+                </div>
+              </div>
+
+              <div className="border-t border-[var(--line-soft)]" />
 
               {user ? (
                 <div className="space-y-2">

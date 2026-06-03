@@ -107,7 +107,7 @@ export function SummaryBox({ text }: SummaryBoxProps) {
             </div>
             <button
               onClick={handleCopySummary}
-              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-[var(--muted)] transition hover:bg-white hover:text-[var(--navy)]"
+              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-[var(--muted)] transition hover:bg-[var(--navy-light)] hover:text-[var(--navy)]"
               title="Copy summary"
             >
               {copied ? (

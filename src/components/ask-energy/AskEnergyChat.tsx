@@ -4,8 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Loader2, Send, Sparkles, Search } from "lucide-react";
 import { ChatMessage, hasArabic } from "./ChatMessage";
 import { SuggestedQuestions } from "./SuggestedQuestions";
-import { useLanguage } from "@/components/language/language-provider";
-import { getSuggestedQuestions } from "@/lib/ai/suggested-questions";
+import { getAllSuggestedQuestions } from "@/lib/ai/suggested-questions";
 
 const MAX_MESSAGE_LENGTH = 500;
 
@@ -42,9 +41,8 @@ export function AskEnergyChat() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
-  const { language } = useLanguage();
 
-  const suggestedQuestions = getSuggestedQuestions(language);
+  const suggestedQuestions = getAllSuggestedQuestions();
 
   const inputEmpty = input.trim().length === 0;
   const inputOverLimit = input.trim().length > MAX_MESSAGE_LENGTH;
@@ -248,7 +246,7 @@ export function AskEnergyChat() {
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
+    <div className="ask-energy-chat overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
       {/* Chat header — compact */}
       <div className="flex items-center justify-between border-b border-white/10 bg-[var(--navy)] px-4 py-2.5">
         <div className="flex items-center gap-2">
@@ -352,7 +350,7 @@ export function AskEnergyChat() {
       )}
 
       {/* Input area — compact */}
-      <div className="border-t border-[var(--line)] bg-white px-3 py-2">
+      <div className="ask-energy-input border-t border-[var(--line)] bg-white px-3 py-2">
         <div className="flex items-center gap-2">
           <input
             ref={inputRef}

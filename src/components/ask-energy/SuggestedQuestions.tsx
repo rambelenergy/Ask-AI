@@ -12,7 +12,7 @@ export function SuggestedQuestions({ questions, onSelect }: SuggestedQuestionsPr
         <button
           key={q}
           onClick={() => onSelect(q)}
-          className="rounded-full border border-[var(--line)] bg-white px-3.5 py-1.5 text-[12px] text-[var(--muted)] transition-all hover:border-[var(--green)] hover:text-[var(--green)] hover:shadow-sm"
+          className="ask-energy-chip rounded-full border border-[var(--line)] bg-white px-3.5 py-1.5 text-[12px] text-[var(--muted)] transition-all hover:border-[var(--green)] hover:text-[var(--green)] hover:shadow-sm"
         >
           <span className="font-bold text-[var(--gold)]">EXP:</span> {q.length > 70 ? q.slice(0, 70) + "…" : q}
         </button>

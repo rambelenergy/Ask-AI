@@ -99,7 +99,7 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
 
   return (
     <div className="mb-4 flex justify-start">
-      <div className={`max-w-[82%] rounded-2xl rounded-bl-md border border-[var(--line)] bg-white px-4 py-3 text-sm leading-relaxed text-[var(--navy)] shadow-sm ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
+      <div className={`ask-energy-assistant max-w-[82%] rounded-2xl rounded-bl-md border border-[var(--line)] bg-white px-4 py-3 text-sm leading-relaxed text-[var(--navy)] shadow-sm ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
         <div className="mb-1.5 flex items-center gap-1.5">
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--gold)]/20">
             <Sparkles size={10} className="text-[var(--gold)]" />
