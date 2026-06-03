@@ -92,7 +92,7 @@ export function Header() {
     <header
       className={`sticky top-0 z-50 transition-all duration-400 ${
         scrolled || !isHome
-          ? "border-b border-[var(--line)] bg-white/95 backdrop-blur-lg shadow-[0_1px_3px_rgba(7,26,46,0.04)]"
+          ? "border-b border-[var(--line)] bg-[var(--paper)] shadow-[0_1px_3px_rgba(7,26,46,0.04)]"
           : "border-b border-transparent bg-[var(--paper)]"
       }`}
     >
@@ -226,7 +226,7 @@ export function Header() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm lg:hidden"
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
@@ -235,7 +235,7 @@ export function Header() {
           <nav
             id="mobile-menu"
             aria-label="Mobile navigation"
-            className="fixed inset-y-0 right-0 z-50 w-[300px] max-w-[85vw] overflow-y-auto border-l border-[var(--line)] bg-white shadow-2xl lg:hidden"
+            className="fixed inset-y-0 right-0 z-[70] w-[300px] max-w-[85vw] overflow-y-auto border-l border-[var(--line)] bg-white shadow-2xl lg:hidden"
           >
             <div className="flex items-center justify-between border-b border-[var(--line)] px-5 py-4">
               <span className="text-sm font-bold text-[var(--navy)]">{t("nav.menu")}</span>
@@ -273,7 +273,7 @@ export function Header() {
               {/* Theme & language — mobile */}
               <div className="mb-4 flex items-center justify-between px-1">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
-                  Appearance
+                  Theme
                 </span>
                 <div className="flex items-center gap-2">
                   <ThemeToggle />

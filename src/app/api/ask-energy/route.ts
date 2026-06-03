@@ -1,5 +1,10 @@
 import { searchTrustedSources } from "@/lib/ask-energy/search-trusted-sources";
-import { buildAskEnergyPrompt } from "@/lib/ask-energy/build-answer-prompt";
+import {
+  buildAskEnergyPrompt,
+  getSearchUnavailableMessage,
+  getAiUnavailableMessage,
+  getBroadQueryMessage,
+} from "@/lib/ask-energy/build-answer-prompt";
 import { detectQuestionLanguage, type SupportedLanguage } from "@/lib/ask-energy/detect-language";
 
 const MAX_QUESTION_LENGTH = 500;
@@ -36,8 +41,28 @@ function sanitizeHistory(
 /** Development-only debug logging */
 function debugLog(label: string, data: unknown) {
   if (process.env.NODE_ENV === "development") {
-    console.log(`[AskEnergy] ${label}:`, data);
+    const preview =
+      typeof data === "string"
+        ? data.slice(0, 200)
+        : Array.isArray(data)
+          ? `[Array(${data.length})]`
+          : typeof data === "number"
+            ? String(data)
+            : typeof data === "object" && data !== null
+              ? JSON.stringify(data).slice(0, 200)
+              : String(data);
+    console.log(`[AskEnergy] ${label}:`, preview);
   }
+}
+
+/** Check if a question is too broad (short, no specific entity) */
+function isTooBroad(question: string): boolean {
+  const trimmed = question.trim();
+  const words = trimmed.split(/\s+/);
+  if (words.length <= 1) return true;
+  // Single word queries are almost always too broad
+  if (words.length === 1 && !/[A-Z]{3,}/.test(trimmed)) return true;
+  return false;
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -80,30 +105,52 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  // --- Detect language (async — uses liquid/lfm-2.5-1.2b-instruct:free via OpenRouter) ---
+  // --- Detect language ---
   const language: SupportedLanguage = await detectQuestionLanguage(question);
 
   // Dev logging
   debugLog("question", question);
   debugLog("language", language);
 
+  // --- Check for broad query ---
+  if (isTooBroad(question)) {
+    const broadMsg = getBroadQueryMessage(language);
+    return Response.json(
+      {
+        error: broadMsg,
+        language,
+      },
+      { status: 200 }
+    );
+  }
+
   const history = sanitizeHistory(body.history);
 
-  // --- Step 1: Search trusted sources (with language for English search expansion) ---
+  // --- Step 1: Search trusted sources ---
   let searchResult: Awaited<ReturnType<typeof searchTrustedSources>>;
   try {
+    const controller = new AbortController();
+    const searchTimeout = setTimeout(() => controller.abort(), 25_000);
     searchResult = await searchTrustedSources(question, language);
+    clearTimeout(searchTimeout);
   } catch (error) {
     debugLog("search error", error);
+    const msg = getSearchUnavailableMessage(language);
     return Response.json(
-      { error: "Trusted source search is temporarily unavailable. Please try again later." },
+      { error: msg },
       { status: 502 }
     );
   }
 
   const { results: searchResults, debug } = searchResult;
   debugLog("expanded queries", debug.expandedQueries);
-  debugLog("trusted results count", debug.trustedFilteredCount);
+  debugLog("raw results count", debug.rawResultsCount);
+  debugLog("trusted filtered count", debug.trustedFilteredCount);
+  debugLog("domains found", debug.domainsFound);
+
+  if (process.env.NODE_ENV === "development") {
+    debugLog("top domains", debug.domainsFound.slice(0, 5));
+  }
 
   // --- No results ---
   if (searchResults.length === 0) {
@@ -116,6 +163,11 @@ export async function POST(request: Request): Promise<Response> {
 
   // --- Step 2: Build prompt ---
   const { system, user } = buildAskEnergyPrompt(question, searchResults, language);
+
+  if (process.env.NODE_ENV === "development") {
+    debugLog("system prompt length", system.length);
+    debugLog("user prompt length", user.length);
+  }
 
   // --- Step 3: Map sources for response ---
   const sources = searchResults.map((r) => ({
@@ -161,10 +213,10 @@ export async function POST(request: Request): Promise<Response> {
     });
 
     if (!upstream.ok || !upstream.body) {
+      const msg = getAiUnavailableMessage(language);
       return Response.json(
         {
-          error:
-            "AI response generation is temporarily unavailable, but the search system is working.",
+          error: msg,
           sources,
         },
         { status: 502 }
@@ -246,10 +298,10 @@ export async function POST(request: Request): Promise<Response> {
         { status: 504 }
       );
     }
+    const msg = getAiUnavailableMessage(language);
     return Response.json(
       {
-        error:
-          "AI response generation is temporarily unavailable, but the search system is working.",
+        error: msg,
         sources,
       },
       { status: 502 }

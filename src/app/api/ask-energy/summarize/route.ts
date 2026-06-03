@@ -9,32 +9,30 @@ interface SummarizeRequest {
   language?: string;
 }
 
-function detectLanguageFromText(text: string): string {
-  // Quick check: Arabic Unicode
-  if (/[\u0600-\u06FF]/.test(text)) return "Arabic";
-  // French accents
-  if (/[éèêëàâçùûîïœ]/i.test(text)) return "French";
-  // Spanish markers
-  if (text.includes("¿") || text.includes("ñ")) return "Spanish";
-  // Italian patterns
-  if (/\b(perché|qualsiasi|dell[a'])\b/i.test(text)) return "Italian";
-  return "English";
-}
+const SYSTEM_PROMPT = `You are an editorial assistant for RamBelEnergy.com.
 
-const SYSTEM_PROMPT = `You are an editorial assistant for RamBelEnergy.com. Summarize the provided Ask Energy response into a shorter, clear, and professional version.
+Your task: summarize the provided Ask Energy answer into a shorter, concise version.
 
 CRITICAL RULES:
-- Keep the SAME language as the original text.
-- Do NOT add new facts or information.
-- Do NOT change the meaning.
-- Do NOT add source claims or invent statistics.
-- Preserve important warnings, caveats, or uncertainty if present.
+- Keep the SAME language as the original text. Do NOT translate.
+- Do NOT add new facts, statistics, or information not present in the original.
+- Do NOT change the topic, meaning, or conclusions.
+- Do NOT introduce new source claims or references.
+- Preserve important warnings, caveats, and uncertainty statements.
 - Keep the summary concise and useful.
 
 FORMAT:
-- For long analytical answers: use 3-5 bullet points.
+- For long analytical answers (3+ paragraphs): use 3-5 bullet points.
 - For moderately long answers: use 1 short paragraph.
-- Do not use markdown headers — just bullets or paragraphs.`;
+- Do not use markdown headers — just bullets (•) or plain paragraphs.`;
+
+const SUMMARIZE_UNAVAILABLE_MESSAGES: Record<string, string> = {
+  English: "Unable to summarize this response right now. Please try again.",
+  French: "Impossible de résumer cette réponse pour le moment. Veuillez réessayer.",
+  Arabic: "تعذر تلخيص هذا الرد حاليًا. يرجى المحاولة مرة أخرى.",
+  Spanish: "No se puede resumir esta respuesta en este momento. Inténtelo de nuevo.",
+  Italian: "Impossibile riassumere questa risposta al momento. Riprova.",
+};
 
 export async function POST(request: Request): Promise<Response> {
   const aiApiKey = process.env.OPENROUTER_API_KEY;
@@ -70,8 +68,9 @@ export async function POST(request: Request): Promise<Response> {
     text = text.slice(0, MAX_TEXT_LENGTH) + "...";
   }
 
-  // Detect language from the text
-  const language = detectLanguageFromText(text);
+  // Detect language from the original text (fast, no API call needed)
+  const language: SupportedLanguage = await detectQuestionLanguage(text);
+  const langName = language === "Unknown" ? "English" : language;
 
   const model = process.env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
   const baseUrl = process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
@@ -94,7 +93,7 @@ export async function POST(request: Request): Promise<Response> {
           { role: "system", content: SYSTEM_PROMPT },
           {
             role: "user",
-            content: `Summarize the following response in ${language}. Keep the same language. Do not add information not present in the original.\n\nText:\n${text}`,
+            content: `Summarize the following Ask Energy response. Keep the same language: ${langName}. Do NOT add information not present in the original.\n\nTEXT TO SUMMARIZE:\n${text}`,
           },
         ],
         max_tokens: MAX_SUMMARY_TOKENS,
@@ -104,8 +103,9 @@ export async function POST(request: Request): Promise<Response> {
     });
 
     if (!upstream.ok) {
+      const msg = SUMMARIZE_UNAVAILABLE_MESSAGES[langName] ?? SUMMARIZE_UNAVAILABLE_MESSAGES.English;
       return Response.json(
-        { error: "Unable to summarize this response right now. Please try again." },
+        { error: msg },
         { status: 502 }
       );
     }
@@ -114,8 +114,9 @@ export async function POST(request: Request): Promise<Response> {
     const summary = data.choices?.[0]?.message?.content?.trim() ?? "";
 
     if (!summary) {
+      const msg = SUMMARIZE_UNAVAILABLE_MESSAGES[langName] ?? SUMMARIZE_UNAVAILABLE_MESSAGES.English;
       return Response.json(
-        { error: "Unable to generate a summary. Please try again." },
+        { error: msg },
         { status: 500 }
       );
     }

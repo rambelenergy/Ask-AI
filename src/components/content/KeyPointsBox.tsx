@@ -15,7 +15,7 @@ export function KeyPointsBox() {
         {keyPoints.map((point) => (
           <div key={point} className="flex gap-3 border-b border-slate-100 pb-4 last:border-b-0 last:pb-0">
             <CheckCircle2 size={18} className="mt-1 shrink-0 text-[var(--green)]" />
-            <p className="text-sm leading-6 text-slate-700" dangerouslySetInnerHTML={{ __html: point }} />
+            <p className="text-sm leading-6 text-slate-700 break-words" dangerouslySetInnerHTML={{ __html: point }} />
           </div>
         ))}
       </div>

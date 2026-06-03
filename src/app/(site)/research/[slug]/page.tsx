@@ -55,7 +55,7 @@ export default async function ResearchDetailPage({ params }: Props) {
             <span className="text-slate-300">/</span>
             <Link href="/research" className="transition hover:text-[var(--navy)]">Research</Link>
             <span className="text-slate-300">/</span>
-            <span aria-current="page" className="text-[var(--muted)] line-clamp-1">{pub.title}</span>
+            <span aria-current="page" className="text-[var(--muted)] break-words">{pub.title}</span>
           </nav>
 
           {/* Type badge */}
@@ -69,7 +69,7 @@ export default async function ResearchDetailPage({ params }: Props) {
           )}
 
           {/* Title */}
-          <h1 className="max-w-[860px] text-[2.2rem] font-bold leading-[1.08] tracking-[-0.035em] text-[var(--navy)] sm:text-[2.8rem]">
+          <h1 className="max-w-[860px] break-words text-[1.7rem] font-bold leading-[1.12] tracking-[-0.03em] text-[var(--navy)] sm:text-[2.2rem] lg:text-[2.8rem]">
             {pub.title}
           </h1>
 
@@ -139,22 +139,22 @@ export default async function ResearchDetailPage({ params }: Props) {
       {/* Cover image */}
       {pub.cover_image_url && (
         <div className="container-page py-10">
-          <div className="overflow-hidden rounded-xl border border-[var(--line)] img-zoom shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-[var(--line)] shadow-sm">
             <img
               src={pub.cover_image_url}
               alt={pub.title}
-              className="h-[340px] w-full object-cover sm:h-[420px]"
+              className="h-[200px] w-full object-cover sm:h-[340px] lg:h-[420px]"
             />
           </div>
         </div>
       )}
 
       {/* Content + sidebar layout */}
-      <section className="container-page grid gap-12 pb-20 pt-8 lg:grid-cols-12">
+      <section className="container-page grid gap-8 pb-16 pt-6 sm:pt-8 lg:grid-cols-12 lg:gap-12 lg:pb-20">
         <div className="lg:col-span-8">
           {pub.body_html && (
             <div
-              className="article-body text-[17px] leading-[1.85] text-slate-700"
+              className="article-body mt-8 text-[16px] leading-[1.8] text-slate-700 sm:mt-10 sm:text-[17px]"
               dangerouslySetInnerHTML={{ __html: pub.body_html }}
             />
           )}

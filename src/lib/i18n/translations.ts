@@ -765,6 +765,750 @@ const translations: Record<Language, TranslationMap> = {
     "common.contact": "اتصل بنا",
     "common.language": "اللغة",
   },
+
+  de: {
+    // Navigation
+    "nav.home": "Startseite",
+    "nav.askEnergy": "Ask Energy",
+    "nav.articles": "Artikel",
+    "nav.algerianSahara": "Algerische Sahara",
+    "nav.globalMap": "Weltkarte",
+    "nav.about": "Über uns",
+    "nav.analysis": "Analyse",
+    "nav.research": "Forschung",
+    "nav.energyFocus": "Energiefokus",
+    "nav.aiAssistant": "KI-Assistent",
+    "nav.contact": "Kontakt",
+    "nav.login": "Anmelden",
+    "nav.menu": "Menü",
+    "nav.search": "Suche",
+    "nav.dashboard": "Dashboard",
+    "nav.signOut": "Abmelden",
+    "nav.signedInAs": "Angemeldet als",
+    "nav.topTagline": "Energie-Intelligence Algerien–Europa",
+
+    // Home Hero
+    "home.hero.eyebrow": "Energie-Intelligence Algerien–Europa",
+    "home.hero.title": "Unabhängige Analyse der Energiebeziehungen zwischen Algerien und Europa",
+    "home.hero.subtitle":
+      "Eine professionelle Plattform für Energieanalyse, Nachhaltigkeits-Intelligence und strategische Einblicke, die Algerien, Afrika und Europa verbindet.",
+    "home.hero.ctaAnalysis": "Neueste Analysen lesen",
+    "home.hero.ctaExplore": "Energiefokus entdecken",
+
+    // Home AI Assistant
+    "home.ai.eyebrow": "ASK Energy",
+    "home.ai.title": "ASK Energy",
+    "home.ai.description":
+      "Der KI-gestützte Energie-Intelligence-Assistent. Fügen Sie beliebige Inhalte ein und stellen Sie eine Frage — der Assistent antwortet ausschließlich auf Grundlage des von Ihnen bereitgestellten Textes.",
+    "home.ai.exampleLabel": "Beispielfrage",
+    "home.ai.exampleQuestion":
+      "Welche Rolle spielt Algerien für die Energiesicherheit Europas laut diesem Inhalt?",
+    "home.ai.disclaimer":
+      "Phase 1 — Dieser Assistent antwortet nur auf Grundlage der von Ihnen eingefügten Inhalte. Er sucht nicht in externen Quellen, ruft keine Dokumente ab und lernt nicht aus früheren Gesprächen.",
+    "home.ai.contextLabel": "Kontext",
+    "home.ai.contextPlaceholder": "Fügen Sie den Inhalt ein, auf den sich der Assistent beziehen soll…",
+    "home.ai.contextOverLimit": "Der Inhalt überschreitet die Grenze von {max} Zeichen.",
+    "home.ai.questionLabel": "Frage",
+    "home.ai.questionPlaceholder": "Stellen Sie eine Frage basierend auf dem obigen Kontext…",
+    "home.ai.questionOverLimit": "Die Frage überschreitet die Grenze von {max} Zeichen.",
+    "home.ai.submit": "Fragen",
+    "home.ai.analyzing": "Analyse läuft…",
+    "home.ai.clear": "Löschen",
+    "home.ai.responseLabel": "Antwort",
+    "home.ai.responseDisclaimer":
+      "Diese Antwort basiert ausschließlich auf dem von Ihnen bereitgestellten Inhalt. Bitte überprüfen Sie sie, bevor Sie sich darauf verlassen.",
+    "home.ai.errorTitle": "KI-Dienst nicht erreichbar. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "home.ai.noContent": "Bitte geben Sie sowohl Inhalt als auch eine Frage an.",
+    "home.ai.poweredBy": "KI-Prototyp Phase 1",
+
+    // Home Strategic
+    "home.strategic.eyebrow": "Strategischer Fokus",
+    "home.strategic.title": "Nigeria–Algerien–Europa-Gaspipeline",
+    "home.strategic.desc":
+      "Der vorgeschlagene Korridor stellt eine strategische Verbindung zwischen afrikanischen Energieressourcen und europäischen Energiesicherheitsbedürfnissen dar, mit Italien und Spanien als wichtigen Zielen.",
+    "home.strategic.learnMore": "Mehr erfahren",
+
+    // Home Analysis
+    "home.analysis.eyebrow": "Neueste Analysen",
+    "home.analysis.heading": "Aktuelle Einblicke und Kommentare",
+    "home.analysis.viewAll": "Alle Analysen anzeigen",
+    "home.analysis.readMore": "Weiterlesen",
+
+    // Home Sahara
+    "home.sahara.eyebrow": "Solar & Grüner Wasserstoff",
+    "home.sahara.title": "Algeriens Chance auf Solarenergie und erneuerbare Energien",
+    "home.sahara.desc":
+      "Algerien verfügt über eine der höchsten Sonneneinstrahlungen weltweit, insbesondere in seinen weiten Sahara-Gebieten. Dieser natürliche Vorteil positioniert das Land als potenziellen zukünftigen Knotenpunkt für die Erzeugung von Solarstrom und die Produktion von grünem Wasserstoff und trägt sowohl zur nationalen Energiewende als auch zur euro-afrikanischen Energiekooperation bei.",
+    "home.sahara.cta": "Erneuerbare Quellen entdecken",
+
+    // Home Renewable Sources
+    "home.renewable.eyebrow": "Ausgewählte Externe Referenzen",
+    "home.renewable.heading": "Ausgewählte Erneuerbare Energiequellen",
+    "home.renewable.desc":
+      "Ausgewählte externe Referenzen zu erneuerbaren Energien in Algerien, Kooperation im Bereich grüner Wasserstoff und nachhaltige Entwicklungsmöglichkeiten.",
+    "home.renewable.viewSource": "Quelle anzeigen",
+
+    // Home Solar Map
+    "home.solarMap.eyebrow": "Solarpotenzial erkunden",
+    "home.solarMap.heading": "Globale Solarkarte",
+    "home.solarMap.desc":
+      "Erkunden Sie Daten zu Solarressourcen und Photovoltaik-Potenzial für Algerien und andere Regionen über den Global Solar Atlas.",
+    "home.solarMap.open": "Globale Solarkarte öffnen",
+
+    // Home Research
+    "home.research.eyebrow": "Forschung & Publikationen",
+    "home.research.heading": "Kurzberichte, Reports und Forschungsnotizen",
+    "home.research.browse": "Publikationen durchsuchen",
+    "home.research.viewPublication": "Publikation anzeigen",
+
+    // Home About
+    "home.about.eyebrow": "Über den Gründer",
+    "home.about.heading": "Ramdane Belamri",
+    "home.about.viewProfile": "Vollständiges Profil anzeigen",
+    "home.about.researchPub": "Forschung & Publikationen",
+
+    // Home Focus
+    "home.focus.eyebrow": "Schwerpunkte",
+    "home.focus.heading": "Energiethemen, die RamBelEnergy abdeckt",
+
+    // Home CTA
+    "home.cta.eyebrow": "Kontakt / Zusammenarbeit",
+    "home.cta.title": "Forschung, Medien & Strategische Energiezusammenarbeit",
+    "home.cta.desc":
+      "Für Forschungsanfragen, institutionelle Gespräche oder strategische Energiezusammenarbeit kontaktieren Sie RamBelEnergy.",
+    "home.cta.button": "Kontakt",
+
+    // Footer
+    "footer.tagline":
+      "Professionelle Energieanalyse und Nachhaltigkeits-Intelligence mit Fokus auf die Beziehungen Algerien–Europa und die Energiesicherheit im Mittelmeerraum.",
+    "footer.copyright": "RamBelEnergy. Alle Rechte vorbehalten.",
+    "footer.navHeading": "Navigation",
+    "footer.focusHeading": "Schwerpunkte",
+    "footer.contactHeading": "Kontakt",
+    "footer.location": "Algerien & Europa",
+    "footer.inquiries": "Institutionelle Anfragen\nForschungskooperation",
+    "footer.getInTouch": "Kontakt aufnehmen",
+
+    // About
+    "about.hero.eyebrow": "Über die Plattform",
+    "about.hero.title": "Professionelle Energieanalyse\nund Strategische Intelligence",
+    "about.hero.subtitle":
+      "Eine unabhängige Plattform für redaktionelle Analysen, Forschungsperspektiven und Energie-Intelligence in Algerien, Afrika und Europa.",
+    "about.hero.note":
+      "Eine professionelle Plattform, die redaktionelle Analysen, Forschungsperspektiven und strategische Energie-Intelligence in Algerien, Afrika und Europa präsentiert.",
+    "about.hero.visualLabel": "Forschung & strategischer Kontext",
+    "about.hero.visualDesc":
+      "Energierouten, politisches Material und mediterrane Zusammenarbeit, dargestellt durch eine zurückhaltende institutionelle Visualisierung.",
+    "about.profile.eyebrow": "Über den Gründer",
+    "about.profile.title": "Beruflicher Hintergrund & Identität",
+    "about.mission.eyebrow": "Mission",
+    "about.mission.title": "Zweck und redaktionelle Mission",
+    "about.values.eyebrow": "Redaktionelle Werte",
+    "about.values.heading": "Leitprinzipien der Plattform",
+    "about.future.eyebrow": "Zukunftsvision",
+    "about.future.title": "Von der Analyseplattform zu Wissensfähigkeiten",
+    "about.future.aiNote":
+      "Nur vorläufige Aussage. Vollständige KI- oder RAG-Funktionalität ist im Umfang der Phase 1 nicht verfügbar.",
+    "about.future.aiPreview": "KI-Assistenten anzeigen",
+    "about.future.viewAi": "KI-Assistenten anzeigen",
+    "about.cta.title": "Zusammenarbeit & Anfragen",
+    "about.cta.desc":
+      "Für Forschungs-, Medien-, institutionelle oder strategische Energiegespräche kontaktieren Sie RamBelEnergy.",
+    "about.cta.button": "Kontakt",
+
+    // Analysis Listing
+    "analysis.pageTitle": "Nachrichten & Analyse",
+    "analysis.heading": "Analyse & Kommentar",
+    "analysis.subtitle":
+      "Unabhängige Analyse der Energiebeziehungen zwischen Algerien und Europa, Nachhaltigkeit und Energiesicherheit im Mittelmeerraum.",
+    "analysis.featured": "Vorgestellte Analyse",
+    "analysis.latest": "Neueste",
+    "analysis.allAnalysis": "Alle Analysen",
+    "analysis.noArticles": "Es wurden noch keine Artikel veröffentlicht.",
+    "analysis.filterCategory": "Nach Kategorie filtern",
+    "analysis.filterAll": "Alle",
+    "analysis.readMore": "Weiterlesen",
+    "analysis.published": "Veröffentlicht",
+    "analysis.category": "Kategorie",
+    "analysis.aiPreview": "KI-Vorschau",
+    "analysis.viewAll": "Alle anzeigen",
+
+    // Article Detail
+    "article.backToAnalysis": "Zurück zur Analyse",
+    "article.published": "Veröffentlicht",
+    "article.category": "Kategorie",
+    "article.summarize.title": "Diesen Artikel zusammenfassen",
+    "article.summarize.button": "Artikel zusammenfassen",
+    "article.summarize.summarizing": "Wird zusammengefasst…",
+    "article.summarize.loading": "Wird geladen…",
+    "article.summarize.error": "Zusammenfassung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+    "article.summarize.retry": "Erneut versuchen",
+    "article.summarize.disclaimer":
+      "KI-generierte Zusammenfassung zu Vorschauzwecken. Bitte lesen Sie stets den vollständigen Artikel für den gesamten Kontext.",
+    "article.related.title": "Verwandte Analysen",
+    "article.contact.title": "Forschung & Zusammenarbeit",
+    "article.contact.desc":
+      "Für Forschungsanfragen, institutionelle Gespräche oder strategische Energiezusammenarbeit.",
+    "article.contact.button": "Kontakt",
+
+    // Research Listing
+    "research.pageTitle": "Forschung & Publikationen",
+    "research.heading": "Forschung & Publikationen",
+    "research.subtitle":
+      "Kurzberichte, Reports und Forschungsnotizen zu den Energiebeziehungen Algerien–Europa und der Energiesicherheit im Mittelmeerraum.",
+    "research.allPublications": "Alle Publikationen",
+    "research.noPublications": "Es wurden noch keine Publikationen veröffentlicht.",
+    "research.filterType": "Nach Typ filtern",
+    "research.filterAll": "Alle",
+    "research.filterCategory": "Nach Kategorie filtern",
+    "research.viewPublication": "Publikation anzeigen",
+    "research.published": "Veröffentlicht",
+    "research.type": "Typ",
+    "research.focusHeading": "Forschungsschwerpunkte",
+    "research.aiPreview": "KI-Forschungsvorschau",
+    "research.sourceApproach": "Quellenansatz",
+
+    // Contact
+    "contact.eyebrow": "Kontaktieren Sie uns",
+    "contact.title": "Kontakt",
+    "contact.subtitle":
+      "Für Forschungsanfragen, institutionelle Gespräche oder strategische Energiezusammenarbeit wenden Sie sich bitte an RamBelEnergy.",
+    "contact.email": "contact@rambelenergy.com",
+    "contact.location": "Algerien & Europa",
+    "contact.inquiries": "Institutionelle Anfragen\nForschungskooperation",
+    "contact.cta.title": "Zusammenarbeit & Anfragen",
+    "contact.cta.desc":
+      "Für Forschungs-, Medien-, institutionelle oder strategische Energiegespräche kontaktieren Sie RamBelEnergy.",
+    "contact.cta.button": "Kontakt",
+
+    // Energy Focus
+    "energyFocus.pageTitle": "Energiefokus",
+    "energyFocus.heading": "Energiefokus",
+    "energyFocus.subtitle":
+      "Die wichtigsten Energiethemen und strategischen Schwerpunkte, die RamBelEnergy in Algerien, Afrika, dem Mittelmeerraum und Europa abdeckt.",
+    "energyFocus.cta": "Analysen entdecken",
+
+    // AI Assistant Page
+    "ai.pageTitle": "KI-Assistent",
+    "ai.prototypeBadge": "Eingeschränkter Prototyp",
+    "ai.heading": "KI-Forschungsassistent",
+    "ai.subtitle":
+      "Fügen Sie Inhalte ein und stellen Sie Fragen. Der Assistent antwortet ausschließlich auf Grundlage des von Ihnen bereitgestellten Textes.",
+    "ai.tryAssistant": "Assistenten ausprobieren",
+    "ai.howItWorks": "So funktioniert es",
+    "ai.useCases": "Anwendungsfälle",
+    "ai.sourceTrust": "Quellenvertrauen",
+    "ai.disclaimer": "Haftungsausschluss",
+
+    // Common
+    "common.home": "Startseite",
+    "common.breadcrumb": "Breadcrumb",
+    "common.readMore": "Weiterlesen",
+    "common.loading": "Wird geladen…",
+    "common.error": "Ein Fehler ist aufgetreten.",
+    "common.retry": "Erneut versuchen",
+    "common.back": "Zurück",
+    "common.viewAll": "Alle anzeigen",
+    "common.noResults": "Keine Ergebnisse gefunden.",
+    "common.contact": "Kontakt",
+    "common.language": "Sprache",
+  },
+
+  es: {
+    // Navigation
+    "nav.home": "Inicio",
+    "nav.askEnergy": "Ask Energy",
+    "nav.articles": "Artículos",
+    "nav.algerianSahara": "Sahara Argelino",
+    "nav.globalMap": "Mapa global",
+    "nav.about": "Acerca de",
+    "nav.analysis": "Análisis",
+    "nav.research": "Investigación",
+    "nav.energyFocus": "Enfoque Energético",
+    "nav.aiAssistant": "Asistente IA",
+    "nav.contact": "Contacto",
+    "nav.login": "Iniciar sesión",
+    "nav.menu": "Menú",
+    "nav.search": "Buscar",
+    "nav.dashboard": "Panel",
+    "nav.signOut": "Cerrar sesión",
+    "nav.signedInAs": "Conectado como",
+    "nav.topTagline": "Inteligencia Energética Argelia–Europa",
+
+    // Home Hero
+    "home.hero.eyebrow": "Inteligencia Energética Argelia–Europa",
+    "home.hero.title": "Análisis Independiente sobre las Relaciones Energéticas Argelia–Europa",
+    "home.hero.subtitle":
+      "Una plataforma profesional de análisis energético, inteligencia de sostenibilidad y visión estratégica que conecta Argelia, África y Europa.",
+    "home.hero.ctaAnalysis": "Leer el Último Análisis",
+    "home.hero.ctaExplore": "Explorar Enfoque Energético",
+
+    // Home AI Assistant
+    "home.ai.eyebrow": "ASK Energy",
+    "home.ai.title": "ASK Energy",
+    "home.ai.description":
+      "El Asistente de Inteligencia Energética impulsado por IA. Pegue cualquier contenido y pregunte — el asistente responde basándose únicamente en el texto que proporcione.",
+    "home.ai.exampleLabel": "Pregunta de ejemplo",
+    "home.ai.exampleQuestion":
+      "¿Qué papel desempeña Argelia en la seguridad energética de Europa según este contenido?",
+    "home.ai.disclaimer":
+      "Fase 1 — Este asistente responde solo a partir del contenido que pegue. No busca fuentes externas, no recupera documentos ni aprende de conversaciones anteriores.",
+    "home.ai.contextLabel": "Contexto",
+    "home.ai.contextPlaceholder": "Pegue el contenido que desea que el asistente referencie…",
+    "home.ai.contextOverLimit": "El contenido supera el límite de {max} caracteres.",
+    "home.ai.questionLabel": "Pregunta",
+    "home.ai.questionPlaceholder": "Haga una pregunta basada en el contexto anterior…",
+    "home.ai.questionOverLimit": "La pregunta supera el límite de {max} caracteres.",
+    "home.ai.submit": "Preguntar",
+    "home.ai.analyzing": "Analizando…",
+    "home.ai.clear": "Limpiar",
+    "home.ai.responseLabel": "Respuesta",
+    "home.ai.responseDisclaimer":
+      "Esta respuesta se basa únicamente en el contenido que proporcionó. Revísela antes de confiar en ella.",
+    "home.ai.errorTitle": "No se puede acceder al servicio de IA. Verifique su conexión e intente de nuevo.",
+    "home.ai.noContent": "Proporcione tanto el contenido como una pregunta.",
+    "home.ai.poweredBy": "Prototipo IA Fase 1",
+
+    // Home Strategic
+    "home.strategic.eyebrow": "Enfoque Estratégico Destacado",
+    "home.strategic.title": "Gasoducto Nigeria–Argelia–Europa",
+    "home.strategic.desc":
+      "El corredor propuesto representa una conexión estratégica entre los recursos energéticos africanos y las necesidades de seguridad energética europea, con Italia y España como destinos importantes.",
+    "home.strategic.learnMore": "Más información",
+
+    // Home Analysis
+    "home.analysis.eyebrow": "Último Análisis",
+    "home.analysis.heading": "Perspectivas y comentarios recientes",
+    "home.analysis.viewAll": "Ver todo el análisis",
+    "home.analysis.readMore": "Leer más",
+
+    // Home Sahara
+    "home.sahara.eyebrow": "Solar e Hidrógeno Verde",
+    "home.sahara.title": "La Oportunidad Solar y Renovable de Argelia",
+    "home.sahara.desc":
+      "Argelia posee uno de los niveles de irradiación solar más altos del mundo, especialmente en sus vastos territorios saharianos. Esta ventaja natural posiciona al país como un futuro centro potencial para la generación de electricidad solar y la producción de hidrógeno verde, contribuyendo tanto a la transición energética nacional como a la cooperación energética euroafricana.",
+    "home.sahara.cta": "Explorar fuentes renovables",
+
+    // Home Renewable Sources
+    "home.renewable.eyebrow": "Referencias Externas Seleccionadas",
+    "home.renewable.heading": "Fuentes de Energía Renovable Seleccionadas",
+    "home.renewable.desc":
+      "Referencias externas seleccionadas relacionadas con la energía renovable de Argelia, la cooperación en hidrógeno verde y las oportunidades de desarrollo sostenible.",
+    "home.renewable.viewSource": "Ver Fuente",
+
+    // Home Solar Map
+    "home.solarMap.eyebrow": "Explorar el Potencial Solar",
+    "home.solarMap.heading": "Mapa Solar Global",
+    "home.solarMap.desc":
+      "Explore los datos de recursos solares y potencial de energía fotovoltaica para Argelia y otras regiones a través del Global Solar Atlas.",
+    "home.solarMap.open": "Abrir Mapa Solar Global",
+
+    // Home Research
+    "home.research.eyebrow": "Investigación y Publicaciones",
+    "home.research.heading": "Informes, reportes y notas de investigación",
+    "home.research.browse": "Explorar publicaciones",
+    "home.research.viewPublication": "Ver publicación",
+
+    // Home About
+    "home.about.eyebrow": "Sobre el Fundador",
+    "home.about.heading": "Ramdane Belamri",
+    "home.about.viewProfile": "Ver Perfil Completo",
+    "home.about.researchPub": "Investigación y Publicaciones",
+
+    // Home Focus
+    "home.focus.eyebrow": "Áreas de Enfoque",
+    "home.focus.heading": "Temas energéticos cubiertos por RamBelEnergy",
+
+    // Home CTA
+    "home.cta.eyebrow": "Contacto / Colaboración",
+    "home.cta.title": "Investigación, Medios y Colaboración Energética Estratégica",
+    "home.cta.desc":
+      "Para consultas de investigación, debates institucionales o colaboración energética estratégica, contacte con RamBelEnergy.",
+    "home.cta.button": "Contacto",
+
+    // Footer
+    "footer.tagline":
+      "Análisis energético profesional e inteligencia de sostenibilidad centrados en las relaciones Argelia–Europa y la seguridad energética del Mediterráneo.",
+    "footer.copyright": "RamBelEnergy. Todos los derechos reservados.",
+    "footer.navHeading": "Navegación",
+    "footer.focusHeading": "Áreas de Enfoque",
+    "footer.contactHeading": "Contacto",
+    "footer.location": "Argelia y Europa",
+    "footer.inquiries": "Consultas institucionales\nColaboración en investigación",
+    "footer.getInTouch": "Contactar",
+
+    // About
+    "about.hero.eyebrow": "Acerca de la Plataforma",
+    "about.hero.title": "Análisis Energético Profesional\ne Inteligencia Estratégica",
+    "about.hero.subtitle":
+      "Una plataforma independiente que ofrece análisis editorial, perspectiva de investigación e inteligencia energética en Argelia, África y Europa.",
+    "about.hero.note":
+      "Una plataforma profesional que presenta análisis editorial, perspectiva de investigación e inteligencia energética estratégica en Argelia, África y Europa.",
+    "about.hero.visualLabel": "Investigación y contexto estratégico",
+    "about.hero.visualDesc":
+      "Rutas energéticas, material político y cooperación mediterránea representados a través de una imagen institucional sobria.",
+    "about.profile.eyebrow": "Sobre el Fundador",
+    "about.profile.title": "Trayectoria Profesional e Identidad",
+    "about.mission.eyebrow": "Misión",
+    "about.mission.title": "Propósito y Misión Editorial",
+    "about.values.eyebrow": "Valores Editoriales",
+    "about.values.heading": "Principios que guían la plataforma",
+    "about.future.eyebrow": "Visión de Futuro",
+    "about.future.title": "De plataforma de análisis a capacidades de conocimiento",
+    "about.future.aiNote":
+      "Solo declaración preliminar. La capacidad completa de IA o RAG no está disponible en el alcance de la Fase 1.",
+    "about.future.aiPreview": "Ver Asistente IA",
+    "about.future.viewAi": "Ver Asistente IA",
+    "about.cta.title": "Colaboración y Consultas",
+    "about.cta.desc":
+      "Para debates de investigación, medios, institucionales o estratégicos sobre energía, contacte con RamBelEnergy.",
+    "about.cta.button": "Contacto",
+
+    // Analysis Listing
+    "analysis.pageTitle": "Noticias y Análisis",
+    "analysis.heading": "Análisis y Comentarios",
+    "analysis.subtitle":
+      "Análisis independiente sobre las relaciones energéticas Argelia–Europa, la sostenibilidad y la seguridad energética del Mediterráneo.",
+    "analysis.featured": "Análisis Destacado",
+    "analysis.latest": "Más Reciente",
+    "analysis.allAnalysis": "Todo el Análisis",
+    "analysis.noArticles": "Aún no se han publicado artículos.",
+    "analysis.filterCategory": "Filtrar por categoría",
+    "analysis.filterAll": "Todos",
+    "analysis.readMore": "Leer más",
+    "analysis.published": "Publicado",
+    "analysis.category": "Categoría",
+    "analysis.aiPreview": "Vista Previa IA",
+    "analysis.viewAll": "Ver todo",
+
+    // Article Detail
+    "article.backToAnalysis": "Volver a Análisis",
+    "article.published": "Publicado",
+    "article.category": "Categoría",
+    "article.summarize.title": "Resumir Este Artículo",
+    "article.summarize.button": "Resumir Artículo",
+    "article.summarize.summarizing": "Resumiendo…",
+    "article.summarize.loading": "Cargando…",
+    "article.summarize.error": "No se pudo generar el resumen. Inténtelo de nuevo.",
+    "article.summarize.retry": "Intentar de nuevo",
+    "article.summarize.disclaimer":
+      "Resumen generado por IA con fines de vista previa. Consulte siempre el artículo completo para el contexto íntegro.",
+    "article.related.title": "Análisis Relacionado",
+    "article.contact.title": "Investigación y Colaboración",
+    "article.contact.desc":
+      "Para consultas de investigación, debates institucionales o colaboración energética estratégica.",
+    "article.contact.button": "Contacto",
+
+    // Research Listing
+    "research.pageTitle": "Investigación y Publicaciones",
+    "research.heading": "Investigación y Publicaciones",
+    "research.subtitle":
+      "Informes, reportes y notas de investigación sobre las relaciones energéticas Argelia–Europa y la seguridad energética del Mediterráneo.",
+    "research.allPublications": "Todas las Publicaciones",
+    "research.noPublications": "Aún no se han publicado publicaciones.",
+    "research.filterType": "Filtrar por tipo",
+    "research.filterAll": "Todos",
+    "research.filterCategory": "Filtrar por categoría",
+    "research.viewPublication": "Ver publicación",
+    "research.published": "Publicado",
+    "research.type": "Tipo",
+    "research.focusHeading": "Áreas de Investigación",
+    "research.aiPreview": "Vista Previa de Investigación IA",
+    "research.sourceApproach": "Enfoque de Fuentes",
+
+    // Contact
+    "contact.eyebrow": "Contactar",
+    "contact.title": "Contacto",
+    "contact.subtitle":
+      "Para consultas de investigación, debates institucionales o colaboración energética estratégica, contacte con RamBelEnergy.",
+    "contact.email": "contact@rambelenergy.com",
+    "contact.location": "Argelia y Europa",
+    "contact.inquiries": "Consultas institucionales\nColaboración en investigación",
+    "contact.cta.title": "Colaboración y Consultas",
+    "contact.cta.desc":
+      "Para debates de investigación, medios, institucionales o estratégicos sobre energía, contacte con RamBelEnergy.",
+    "contact.cta.button": "Contacto",
+
+    // Energy Focus
+    "energyFocus.pageTitle": "Enfoque Energético",
+    "energyFocus.heading": "Enfoque Energético",
+    "energyFocus.subtitle":
+      "Los temas energéticos clave y los asuntos estratégicos cubiertos por RamBelEnergy en Argelia, África, el Mediterráneo y Europa.",
+    "energyFocus.cta": "Explorar análisis",
+
+    // AI Assistant Page
+    "ai.pageTitle": "Asistente IA",
+    "ai.prototypeBadge": "Prototipo limitado",
+    "ai.heading": "Asistente de Investigación IA",
+    "ai.subtitle":
+      "Pegue contenido y haga preguntas. El asistente responde basándose únicamente en el texto que proporcione.",
+    "ai.tryAssistant": "Probar el Asistente",
+    "ai.howItWorks": "Cómo Funciona",
+    "ai.useCases": "Casos de Uso",
+    "ai.sourceTrust": "Fiabilidad de Fuentes",
+    "ai.disclaimer": "Aviso Legal",
+
+    // Common
+    "common.home": "Inicio",
+    "common.breadcrumb": "Ruta de navegación",
+    "common.readMore": "Leer más",
+    "common.loading": "Cargando…",
+    "common.error": "Se produjo un error.",
+    "common.retry": "Intentar de nuevo",
+    "common.back": "Volver",
+    "common.viewAll": "Ver todo",
+    "common.noResults": "No se encontraron resultados.",
+    "common.contact": "Contacto",
+    "common.language": "Idioma",
+  },
+
+  it: {
+    // Navigation
+    "nav.home": "Home",
+    "nav.askEnergy": "Ask Energy",
+    "nav.articles": "Articoli",
+    "nav.algerianSahara": "Sahara Algerino",
+    "nav.globalMap": "Mappa globale",
+    "nav.about": "Chi siamo",
+    "nav.analysis": "Analisi",
+    "nav.research": "Ricerca",
+    "nav.energyFocus": "Focus Energia",
+    "nav.aiAssistant": "Assistente IA",
+    "nav.contact": "Contatti",
+    "nav.login": "Accedi",
+    "nav.menu": "Menu",
+    "nav.search": "Cerca",
+    "nav.dashboard": "Dashboard",
+    "nav.signOut": "Esci",
+    "nav.signedInAs": "Accesso come",
+    "nav.topTagline": "Intelligence Energetica Algeria–Europa",
+
+    // Home Hero
+    "home.hero.eyebrow": "Intelligence Energetica Algeria–Europa",
+    "home.hero.title": "Analisi Indipendente sulle Relazioni Energetiche Algeria–Europa",
+    "home.hero.subtitle":
+      "Una piattaforma professionale per l'analisi energetica, l'intelligence sulla sostenibilità e la visione strategica che collega Algeria, Africa ed Europa.",
+    "home.hero.ctaAnalysis": "Leggi le Ultime Analisi",
+    "home.hero.ctaExplore": "Esplora il Focus Energia",
+
+    // Home AI Assistant
+    "home.ai.eyebrow": "ASK Energy",
+    "home.ai.title": "ASK Energy",
+    "home.ai.description":
+      "L'Assistente di Intelligence Energetica basato su IA. Incolla qualsiasi contenuto e fai una domanda — l'assistente risponde solo in base al testo fornito.",
+    "home.ai.exampleLabel": "Esempio di domanda",
+    "home.ai.exampleQuestion":
+      "Qual è il ruolo dell'Algeria nella sicurezza energetica europea secondo questo contenuto?",
+    "home.ai.disclaimer":
+      "Fase 1 — Questo assistente risponde solo in base al contenuto che incolli. Non cerca fonti esterne, non recupera documenti né apprende dalle conversazioni passate.",
+    "home.ai.contextLabel": "Contesto",
+    "home.ai.contextPlaceholder": "Incolla il contenuto a cui l'assistente deve fare riferimento…",
+    "home.ai.contextOverLimit": "Il contenuto supera il limite di {max} caratteri.",
+    "home.ai.questionLabel": "Domanda",
+    "home.ai.questionPlaceholder": "Fai una domanda basata sul contesto sopra…",
+    "home.ai.questionOverLimit": "La domanda supera il limite di {max} caratteri.",
+    "home.ai.submit": "Chiedi",
+    "home.ai.analyzing": "Analisi in corso…",
+    "home.ai.clear": "Cancella",
+    "home.ai.responseLabel": "Risposta",
+    "home.ai.responseDisclaimer":
+      "Questa risposta si basa solo sul contenuto fornito. Verificala prima di farvi affidamento.",
+    "home.ai.errorTitle": "Impossibile raggiungere il servizio IA. Verifica la connessione e riprova.",
+    "home.ai.noContent": "Fornisci sia il contenuto che una domanda.",
+    "home.ai.poweredBy": "Prototipo IA Fase 1",
+
+    // Home Strategic
+    "home.strategic.eyebrow": "Focus Strategico in Evidenza",
+    "home.strategic.title": "Gasdotto Nigeria–Algeria–Europa",
+    "home.strategic.desc":
+      "Il corridoio proposto rappresenta una connessione strategica tra le risorse energetiche africane e le esigenze di sicurezza energetica europea, con Italia e Spagna come destinazioni importanti.",
+    "home.strategic.learnMore": "Scopri di più",
+
+    // Home Analysis
+    "home.analysis.eyebrow": "Ultime Analisi",
+    "home.analysis.heading": "Approfondimenti e commenti recenti",
+    "home.analysis.viewAll": "Vedi tutte le analisi",
+    "home.analysis.readMore": "Leggi di più",
+
+    // Home Sahara
+    "home.sahara.eyebrow": "Solare e Idrogeno Verde",
+    "home.sahara.title": "L'Opportunità Solare e Rinnovabile dell'Algeria",
+    "home.sahara.desc":
+      "L'Algeria possiede uno dei livelli di irradiazione solare più elevati al mondo, specialmente nei suoi vasti territori sahariani. Questo vantaggio naturale posiziona il paese come futuro hub potenziale per la generazione di elettricità solare e la produzione di idrogeno verde, contribuendo sia alla transizione energetica nazionale che alla cooperazione energetica euro-africana.",
+    "home.sahara.cta": "Esplora le fonti rinnovabili",
+
+    // Home Renewable Sources
+    "home.renewable.eyebrow": "Riferimenti Esterni Selezionati",
+    "home.renewable.heading": "Fonti di Energia Rinnovabile Selezionate",
+    "home.renewable.desc":
+      "Riferimenti esterni selezionati relativi all'energia rinnovabile in Algeria, alla cooperazione sull'idrogeno verde e alle opportunità di sviluppo sostenibile.",
+    "home.renewable.viewSource": "Visualizza Fonte",
+
+    // Home Solar Map
+    "home.solarMap.eyebrow": "Esplora il Potenziale Solare",
+    "home.solarMap.heading": "Mappa Solare Globale",
+    "home.solarMap.desc":
+      "Esplora i dati sulle risorse solari e il potenziale di energia fotovoltaica per l'Algeria e altre regioni attraverso il Global Solar Atlas.",
+    "home.solarMap.open": "Apri la Mappa Solare Globale",
+
+    // Home Research
+    "home.research.eyebrow": "Ricerca e Pubblicazioni",
+    "home.research.heading": "Brief, rapporti e note di ricerca",
+    "home.research.browse": "Sfoglia le pubblicazioni",
+    "home.research.viewPublication": "Visualizza pubblicazione",
+
+    // Home About
+    "home.about.eyebrow": "Il Fondatore",
+    "home.about.heading": "Ramdane Belamri",
+    "home.about.viewProfile": "Visualizza Profilo Completo",
+    "home.about.researchPub": "Ricerca e Pubblicazioni",
+
+    // Home Focus
+    "home.focus.eyebrow": "Aree di Focus",
+    "home.focus.heading": "Temi energetici trattati da RamBelEnergy",
+
+    // Home CTA
+    "home.cta.eyebrow": "Contatti / Collaborazione",
+    "home.cta.title": "Ricerca, Media e Collaborazione Energetica Strategica",
+    "home.cta.desc":
+      "Per richieste di ricerca, discussioni istituzionali o collaborazione energetica strategica, contatta RamBelEnergy.",
+    "home.cta.button": "Contatti",
+
+    // Footer
+    "footer.tagline":
+      "Analisi energetica professionale e intelligence sulla sostenibilità focalizzate sulle relazioni Algeria–Europa e sulla sicurezza energetica del Mediterraneo.",
+    "footer.copyright": "RamBelEnergy. Tutti i diritti riservati.",
+    "footer.navHeading": "Navigazione",
+    "footer.focusHeading": "Aree di Focus",
+    "footer.contactHeading": "Contatti",
+    "footer.location": "Algeria ed Europa",
+    "footer.inquiries": "Richieste istituzionali\nCollaborazione di ricerca",
+    "footer.getInTouch": "Contattaci",
+
+    // About
+    "about.hero.eyebrow": "La Piattaforma",
+    "about.hero.title": "Analisi Energetica Professionale\ne Intelligence Strategica",
+    "about.hero.subtitle":
+      "Una piattaforma indipendente che fornisce analisi editoriali, prospettive di ricerca e intelligence energetica in Algeria, Africa ed Europa.",
+    "about.hero.note":
+      "Una piattaforma professionale che presenta analisi editoriali, prospettive di ricerca e intelligence energetica strategica in Algeria, Africa ed Europa.",
+    "about.hero.visualLabel": "Ricerca e contesto strategico",
+    "about.hero.visualDesc":
+      "Rotte energetiche, materiali politici e cooperazione mediterranea rappresentati attraverso un'immagine istituzionale sobria.",
+    "about.profile.eyebrow": "Il Fondatore",
+    "about.profile.title": "Background Professionale e Identità",
+    "about.mission.eyebrow": "Missione",
+    "about.mission.title": "Scopo e Missione Editoriale",
+    "about.values.eyebrow": "Valori Editoriali",
+    "about.values.heading": "Principi che guidano la piattaforma",
+    "about.future.eyebrow": "Visione Futura",
+    "about.future.title": "Da piattaforma di analisi a capacità di conoscenza",
+    "about.future.aiNote":
+      "Solo dichiarazione preliminare. La piena capacità IA o RAG non è disponibile nell'ambito della Fase 1.",
+    "about.future.aiPreview": "Visualizza Assistente IA",
+    "about.future.viewAi": "Visualizza Assistente IA",
+    "about.cta.title": "Collaborazione e Richieste",
+    "about.cta.desc":
+      "Per discussioni di ricerca, media, istituzionali o strategiche sull'energia, contatta RamBelEnergy.",
+    "about.cta.button": "Contatti",
+
+    // Analysis Listing
+    "analysis.pageTitle": "Notizie e Analisi",
+    "analysis.heading": "Analisi e Commenti",
+    "analysis.subtitle":
+      "Analisi indipendente sulle relazioni energetiche Algeria–Europa, la sostenibilità e la sicurezza energetica del Mediterraneo.",
+    "analysis.featured": "Analisi in Evidenza",
+    "analysis.latest": "Recenti",
+    "analysis.allAnalysis": "Tutte le Analisi",
+    "analysis.noArticles": "Nessun articolo è stato ancora pubblicato.",
+    "analysis.filterCategory": "Filtra per categoria",
+    "analysis.filterAll": "Tutti",
+    "analysis.readMore": "Leggi di più",
+    "analysis.published": "Pubblicato",
+    "analysis.category": "Categoria",
+    "analysis.aiPreview": "Anteprima IA",
+    "analysis.viewAll": "Vedi tutti",
+
+    // Article Detail
+    "article.backToAnalysis": "Torna alle Analisi",
+    "article.published": "Pubblicato",
+    "article.category": "Categoria",
+    "article.summarize.title": "Riassumi Questo Articolo",
+    "article.summarize.button": "Riassumi Articolo",
+    "article.summarize.summarizing": "Riassunto in corso…",
+    "article.summarize.loading": "Caricamento…",
+    "article.summarize.error": "Impossibile generare il riassunto. Riprova.",
+    "article.summarize.retry": "Riprova",
+    "article.summarize.disclaimer":
+      "Riassunto generato dall'IA a scopo di anteprima. Consulta sempre l'articolo completo per il contesto integrale.",
+    "article.related.title": "Analisi Correlate",
+    "article.contact.title": "Ricerca e Collaborazione",
+    "article.contact.desc":
+      "Per richieste di ricerca, discussioni istituzionali o collaborazione energetica strategica.",
+    "article.contact.button": "Contatti",
+
+    // Research Listing
+    "research.pageTitle": "Ricerca e Pubblicazioni",
+    "research.heading": "Ricerca e Pubblicazioni",
+    "research.subtitle":
+      "Brief, rapporti e note di ricerca sulle relazioni energetiche Algeria–Europa e la sicurezza energetica del Mediterraneo.",
+    "research.allPublications": "Tutte le Pubblicazioni",
+    "research.noPublications": "Nessuna pubblicazione è stata ancora pubblicata.",
+    "research.filterType": "Filtra per tipo",
+    "research.filterAll": "Tutti",
+    "research.filterCategory": "Filtra per categoria",
+    "research.viewPublication": "Visualizza pubblicazione",
+    "research.published": "Pubblicato",
+    "research.type": "Tipo",
+    "research.focusHeading": "Aree di Ricerca",
+    "research.aiPreview": "Anteprima Ricerca IA",
+    "research.sourceApproach": "Approccio alle Fonti",
+
+    // Contact
+    "contact.eyebrow": "Contattaci",
+    "contact.title": "Contatti",
+    "contact.subtitle":
+      "Per richieste di ricerca, discussioni istituzionali o collaborazione energetica strategica, contatta RamBelEnergy.",
+    "contact.email": "contact@rambelenergy.com",
+    "contact.location": "Algeria ed Europa",
+    "contact.inquiries": "Richieste istituzionali\nCollaborazione di ricerca",
+    "contact.cta.title": "Collaborazione e Richieste",
+    "contact.cta.desc":
+      "Per discussioni di ricerca, media, istituzionali o strategiche sull'energia, contatta RamBelEnergy.",
+    "contact.cta.button": "Contatti",
+
+    // Energy Focus
+    "energyFocus.pageTitle": "Focus Energia",
+    "energyFocus.heading": "Focus Energia",
+    "energyFocus.subtitle":
+      "I temi energetici chiave e gli argomenti strategici trattati da RamBelEnergy in Algeria, Africa, Mediterraneo ed Europa.",
+    "energyFocus.cta": "Esplora le analisi",
+
+    // AI Assistant Page
+    "ai.pageTitle": "Assistente IA",
+    "ai.prototypeBadge": "Prototipo limitato",
+    "ai.heading": "Assistente di Ricerca IA",
+    "ai.subtitle":
+      "Incolla il contenuto e fai domande. L'assistente risponde solo in base al testo fornito.",
+    "ai.tryAssistant": "Prova l'Assistente",
+    "ai.howItWorks": "Come Funziona",
+    "ai.useCases": "Casi d'Uso",
+    "ai.sourceTrust": "Affidabilità delle Fonti",
+    "ai.disclaimer": "Avvertenza",
+
+    // Common
+    "common.home": "Home",
+    "common.breadcrumb": "Briciole di pane",
+    "common.readMore": "Leggi di più",
+    "common.loading": "Caricamento…",
+    "common.error": "Si è verificato un errore.",
+    "common.retry": "Riprova",
+    "common.back": "Indietro",
+    "common.viewAll": "Vedi tutti",
+    "common.noResults": "Nessun risultato trovato.",
+    "common.contact": "Contatti",
+    "common.language": "Lingua",
+  },
 };
 
 export function getTranslations(lang: Language): TranslationMap {

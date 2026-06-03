@@ -1,9 +1,12 @@
-export type Language = "en" | "fr" | "ar";
+export type Language = "en" | "fr" | "ar" | "es" | "it" | "de";
 
 export const LANGUAGES: { code: Language; label: string; nativeLabel: string; dir: "ltr" | "rtl" }[] = [
   { code: "en", label: "English", nativeLabel: "English", dir: "ltr" },
   { code: "fr", label: "French", nativeLabel: "Français", dir: "ltr" },
   { code: "ar", label: "Arabic", nativeLabel: "العربية", dir: "rtl" },
+  { code: "es", label: "Spanish", nativeLabel: "Español", dir: "ltr" },
+  { code: "it", label: "Italian", nativeLabel: "Italiano", dir: "ltr" },
+  { code: "de", label: "German", nativeLabel: "Deutsch", dir: "ltr" },
 ];
 
 export const DEFAULT_LANGUAGE: Language = "en";

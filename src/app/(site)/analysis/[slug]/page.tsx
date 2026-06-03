@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArticleVisual } from "@/components/content/ArticleVisual";
 import { KeyPointsBox } from "@/components/content/KeyPointsBox";
 import { SourcesBox } from "@/components/content/SourcesBox";
 import { SummarizeBox } from "@/components/content/SummarizeBox";
@@ -57,9 +56,9 @@ export default async function AnalysisArticlePage({ params }: Props) {
 
   return (
     <>
-      <ArticleVisual />
+      {/* <ArticleVisual /> */}
 
-      <section className="container-page grid gap-12 pb-20 pt-8 lg:grid-cols-12">
+      <section className="container-page grid gap-8 pb-16 pt-6 sm:pt-8 lg:grid-cols-12 lg:gap-12 lg:pb-20">
         <div className="lg:col-span-8">
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-[13px] font-medium text-[var(--green)]">
@@ -67,16 +66,16 @@ export default async function AnalysisArticlePage({ params }: Props) {
             <span className="text-slate-300">/</span>
             <Link href="/analysis" className="transition hover:text-[var(--navy)]">Analysis</Link>
             <span className="text-slate-300">/</span>
-            <span aria-current="page" className="text-[var(--muted)] line-clamp-1">{article.title}</span>
+            <span aria-current="page" className="text-[var(--muted)] break-words">{article.title}</span>
           </nav>
 
           {/* Cover Image */}
           {article.cover_image_url && (
-            <div className="mb-8 overflow-hidden rounded-xl border border-[var(--line)] img-zoom shadow-sm">
+            <div className="mb-8 overflow-hidden rounded-xl border border-[var(--line)] shadow-sm">
               <img
                 src={article.cover_image_url}
                 alt={article.title}
-                className="h-[340px] w-full object-cover sm:h-[400px]"
+                className="h-[200px] w-full object-cover sm:h-[340px] lg:h-[400px]"
               />
             </div>
           )}
@@ -90,19 +89,19 @@ export default async function AnalysisArticlePage({ params }: Props) {
           </div>
 
           {/* Title */}
-          <h1 className="text-[2.2rem] font-bold leading-[1.08] tracking-[-0.035em] text-[var(--navy)] sm:text-[2.8rem]">
+          <h1 className="break-words text-[1.7rem] font-bold leading-[1.12] tracking-[-0.03em] text-[var(--navy)] sm:text-[2.2rem] lg:text-[2.8rem]">
             {article.title}
           </h1>
 
           {/* Excerpt */}
           {article.excerpt && (
-            <p className="mt-5 text-lg leading-[1.7] text-[var(--muted)] sm:text-xl">
+            <p className="mt-5 break-words text-base leading-[1.7] text-[var(--muted)] sm:text-lg lg:text-xl">
               {article.excerpt}
             </p>
           )}
 
           {/* Author & Date */}
-          <div className="mt-6 flex flex-wrap items-center gap-5 border-y border-[var(--line)] py-4 text-[13px] text-[var(--muted)]">
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-[var(--line)] py-4 text-[13px] text-[var(--muted)]">
             {article.author && (
               <div className="flex items-center gap-2">
                 <User size={14} className="text-slate-400" />
@@ -130,7 +129,7 @@ export default async function AnalysisArticlePage({ params }: Props) {
           {/* Body */}
           {article.body_html && (
             <div
-              className="article-body mt-10 text-[17px] leading-[1.85] text-slate-700"
+              className="article-body mt-8 text-[16px] leading-[1.8] text-slate-700 sm:mt-10 sm:text-[17px]"
               dangerouslySetInnerHTML={{ __html: article.body_html }}
             />
           )}
@@ -148,7 +147,7 @@ export default async function AnalysisArticlePage({ params }: Props) {
 
         {/* Sidebar */}
         <div className="space-y-6 lg:col-span-4">
-          <div className="sticky top-24 space-y-6">
+          <div className="lg:sticky lg:top-24 space-y-6">
             <KeyPointsBox />
             <SourcesBox />
             {article.summarize && <SummarizeBox summarize={article.summarize} />}

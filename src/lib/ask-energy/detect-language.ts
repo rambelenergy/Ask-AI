@@ -12,6 +12,7 @@ export type SupportedLanguage =
   | "Arabic"
   | "Spanish"
   | "Italian"
+  | "German"
   | "Unknown";
 
 const DETECTION_MODEL = "liquid/lfm-2.5-1.2b-instruct:free";
@@ -43,6 +44,13 @@ const ITALIAN_INDICATORS = [
   "è ", "sono", "europeo", "europea",
 ];
 
+const GERMAN_INDICATORS = [
+  "warum", "was ist", "welche", "welcher", "welches",
+  "energie", "sicherheit", "zusammenarbeit", "rolle",
+  "die ", "der ", "das ", "und ", "mit ", "von ", "für ",
+  "algerien", "europa", "deutschland", "gas", "pipeline",
+];
+
 function hasArabic(text: string): boolean {
   return /[\u0600-\u06FF]/.test(text);
 }
@@ -70,6 +78,9 @@ function detectHeuristic(text: string): SupportedLanguage {
 
   const italianScore = countMatches(trimmed, ITALIAN_INDICATORS);
   if (italianScore >= 3) return "Italian";
+
+  const germanScore = countMatches(trimmed, GERMAN_INDICATORS);
+  if (germanScore >= 3) return "German";
 
   const frenchScore = countMatches(trimmed, FRENCH_INDICATORS);
   const hasFrenchAccents = /[éèêëàâçùûîïœ]/i.test(trimmed);
@@ -135,6 +146,7 @@ export async function detectQuestionLanguage(text: string): Promise<SupportedLan
       arabic: "Arabic", العربية: "Arabic", arab: "Arabic",
       spanish: "Spanish", español: "Spanish", espanol: "Spanish",
       italian: "Italian", italiano: "Italian",
+      german: "German", deutsch: "German",
     };
 
     return valid[lang] ?? heuristic;

@@ -16,7 +16,7 @@ export function SummarizeBox({ summarize }: SummarizeBoxProps) {
         <FileText size={22} className="text-[var(--green)]" />
         <h3 className="text-xl font-bold text-[var(--navy)]"><T k="article.summarize.title" /></h3>
       </div>
-      <p className="text-sm leading-7 text-slate-600 whitespace-pre-wrap">{summarize}</p>
+      <p className="text-sm leading-7 text-slate-600 whitespace-pre-wrap break-words">{summarize}</p>
     </aside>
   );
 }

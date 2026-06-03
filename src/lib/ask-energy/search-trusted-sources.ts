@@ -2,6 +2,7 @@ import { searchWithLangSearch, type LangSearchResult } from "./langsearch";
 import { isApprovedDomain, getPriorityGroupByUrl } from "./trusted-sources";
 import { expandEnergyQuery } from "./expand-query";
 import { rerankByEmbedding } from "./embed";
+import { getGlossaryTerms } from "./energy-glossary";
 import type { SupportedLanguage } from "./detect-language";
 
 export interface TrustedSearchResult {
@@ -21,6 +22,45 @@ function extractDomain(url: string): string {
   } catch {
     return url;
   }
+}
+
+/**
+ * Keywords that indicate high relevance for Algeria-Europe energy topics.
+ * Used to boost ranking — more matched keywords = higher relevance score.
+ */
+const RELEVANCE_KEYWORDS = [
+  "Algeria", "algeria", "Algérie", "algérie",
+  "Europe", "europe", "European", "european",
+  "Italy", "italy", "Italia", "italia",
+  "Spain", "spain", "España", "españa",
+  "France", "france",
+  "MEDGAZ", "medgaz", "Medgaz",
+  "NIGAL", "nigal",
+  "TRANSMED", "transmed",
+  "Sonatrach", "sonatrach", "SONATRACH",
+  "ENI", "eni",
+  "Naturgy", "naturgy",
+  "gas", "Gas", "gaz", "Gaz",
+  "natural gas", "Natural gas", "Natural Gas",
+  "pipeline", "Pipeline", "gazoduc",
+  "solar", "Solar", "solaire", "Solaire",
+  "hydrogen", "Hydrogen", "hydrogène",
+  "renewable", "Renewable",
+  "energy security", "Energy security",
+  "Sahara", "sahara",
+  "cooperation", "Cooperation", "coopération",
+  "partnership", "Partnership", "partenariat",
+  "export", "Export",
+];
+
+/** Score a result by keyword relevance — more matched keywords = higher score */
+function relevanceScore(result: TrustedSearchResult): number {
+  const text = `${result.title} ${result.snippet ?? ""} ${result.summary ?? ""}`;
+  let score = 0;
+  for (const kw of RELEVANCE_KEYWORDS) {
+    if (text.includes(kw)) score += 1;
+  }
+  return score;
 }
 
 /** Deduplicate results by URL, keeping the one with more content (summary > snippet) */
@@ -120,11 +160,15 @@ export async function searchTrustedSources(
   // Step 5: Deduplicate by URL
   const deduped = deduplicateByUrl(mapped);
 
-  // Step 6: Sort trusted first, then by priority group
+  // Step 6: Sort by: trusted first → relevance score → priority group
   deduped.sort((a, b) => {
     // Trusted sources first
     if (a.trusted !== b.trusted) return a.trusted ? -1 : 1;
-    // Then by priority
+    // Then by relevance keyword match count (descending)
+    const relA = relevanceScore(a);
+    const relB = relevanceScore(b);
+    if (relA !== relB) return relB - relA;
+    // Then by priority group (lower = better)
     if (a.priority !== b.priority) return a.priority - b.priority;
     return 0;
   });

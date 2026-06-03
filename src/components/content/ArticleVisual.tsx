@@ -2,7 +2,7 @@ import { Route } from "lucide-react";
 
 export function ArticleVisual() {
   return (
-    <div className="relative h-[520px] overflow-hidden border border-slate-200 bg-[var(--navy)]">
+    <div className="relative z-0 h-[280px] overflow-hidden border border-slate-200 bg-[var(--navy)] sm:h-[400px] lg:h-[520px]">
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1296 520" fill="none">
         <defs>
           <pattern id="article-grid" width="56" height="56" patternUnits="userSpaceOnUse">
@@ -31,10 +31,10 @@ export function ArticleVisual() {
         <path d="M820 370 H1040" stroke="var(--gold)" strokeWidth="3" />
       </svg>
 
-      <div className="absolute left-8 top-8 rounded-sm bg-white/95 px-4 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--navy)]">
+      <div className="absolute left-4 top-4 rounded-sm bg-white/95 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--navy)] sm:left-8 sm:top-8 sm:px-4 sm:py-3 sm:text-xs sm:tracking-[0.16em]">
         Abstract pipeline and Mediterranean route visual
       </div>
-      <div className="absolute bottom-8 left-8 max-w-[620px] border border-white/10 bg-white/[0.06] p-6 backdrop-blur-sm">
+      <div className="absolute bottom-4 left-4 right-4 max-w-[620px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm sm:bottom-8 sm:left-8 sm:p-6">
         <div className="mb-3 flex items-center gap-3 text-sm font-semibold text-[var(--gold)]">
           <Route size={19} /> Strategic energy corridor
         </div>

@@ -3,60 +3,117 @@ import type { SupportedLanguage } from "./detect-language";
 
 const SYSTEM_PROMPT_TRUSTED = `You are Ask Energy, an experimental energy intelligence assistant for RamBelEnergy.com.
 
-CRITICAL — You must answer in the same language as the user's question.
-- If the user wrote in French, answer in French.
-- If the user wrote in Arabic, answer in Arabic.
-- If the user wrote in Spanish, answer in Spanish.
-- If the user wrote in Italian, answer in Italian.
-- If the user wrote in English, answer in English.
+CRITICAL RULES:
+1. Answer ONLY using the trusted search results provided in the context below.
+2. Stay strictly aligned with the user's question — do NOT change the subject.
+3. If the question is about Algeria-Spain, do NOT answer about Algeria-Italy.
+4. If the question is about MEDGAZ, focus on MEDGAZ, not general pipelines.
+5. Do NOT invent statistics, facts, or numbers not present in the sources.
+6. If the trusted results are limited or insufficient, say that clearly.
+7. Keep the answer concise, professional, and analytical.
+8. Mention relevant source names where appropriate (e.g., "according to IEA...", "IRENA data shows...").
+9. At the end of your response, include a short "Sources" section listing the numbered sources you actually used.
+
+CRITICAL — Answer in the SAME LANGUAGE as the user's question:
+- English question → English answer
+- French question → French answer
+- Arabic question → Arabic answer
+- Spanish question → Spanish answer
+- Italian question → Italian answer
+- German question → German answer
 - Do NOT switch languages mid-response.
-- Do NOT only translate the question — provide a real answer.
-- Do NOT summarize without answering.
-
-Use only the trusted search results provided in the context.
-Focus on Algeria-Europe energy relations, natural gas, energy security, renewables, solar energy, green hydrogen, investment, geopolitics, and related economic topics.
-
-If the results are limited or insufficient, say that clearly in the answer language.
-Do not invent facts or use external knowledge beyond the provided context.
-Keep the answer concise, analytical, and professional.
-Mention relevant source names where appropriate (e.g., "according to IEA...", "IRENA data shows...").
-
-At the end of your response, always include a short "Sources" section listing the numbered sources you actually used.`;
+- Do NOT just translate the question — provide a real analytical answer.`;
 
 const SYSTEM_PROMPT_FALLBACK = `You are Ask Energy, an experimental energy intelligence assistant for RamBelEnergy.com.
 
-CRITICAL — You must answer in the same language as the user's question.
-- If the user wrote in French, answer in French.
-- If the user wrote in Arabic, answer in Arabic.
-- If the user wrote in Spanish, answer in Spanish.
-- If the user wrote in Italian, answer in Italian.
-- If the user wrote in English, answer in English.
-- Do NOT switch languages mid-response.
-- Do NOT only translate the question — provide a real answer.
+IMPORTANT: The sources below come from a GENERAL WEB SEARCH and are NOT from verified/approved energy sources. Use them carefully.
 
-Use the search results provided below. These come from a general web search and are NOT from verified/approved energy sources. Use them carefully.
+CRITICAL RULES:
+1. Answer ONLY using the search results provided in the context below.
+2. Stay strictly aligned with the user's question — do NOT change the subject.
+3. Do NOT invent statistics, facts, or numbers not present in the sources.
+4. Keep the answer concise, professional, and analytical.
+5. Include a short disclaimer that these sources are from general web search and have not been verified by RamBelEnergy.
+6. At the end, include a short "Sources" section with brief warnings.
 
-Focus on Algeria-Europe energy relations, energy security, natural gas, solar energy, green hydrogen, renewable energy, investment, geopolitics, and related economic topics.
-
-Important: The sources below are from general web search — include a short disclaimer in your answer that these sources have not been verified by RamBelEnergy.
-Do not invent facts. Keep the answer concise, analytical, and professional.
-
-At the end of your response, always include a short "Sources" section listing the numbered sources you actually used.`;
+CRITICAL — Answer in the SAME LANGUAGE as the user's question:
+- English question → English answer
+- French question → French answer
+- Arabic question → Arabic answer
+- Spanish question → Spanish answer
+- Italian question → Italian answer
+- German question → German answer`;
 
 /** Language-aware fallback messages */
 const NO_RESULTS_MESSAGES: Record<SupportedLanguage, string> = {
   English:
-    "I could not find enough relevant information from the approved trusted sources for this question. Please try a more specific energy-related question, for example: \"Algeria Italy gas cooperation\", \"Sonatrach ENI energy partnership\", \"Algeria Europe energy security\", or \"Algerian Sahara solar energy potential\".",
+    "I could not find enough relevant information from the approved trusted sources for this question.\n\nPlease try a more specific energy-related question, for example:\n• \"Algeria Italy gas cooperation\"\n• \"Sonatrach ENI energy partnership\"\n• \"MEDGAZ Algeria Spain pipeline\"\n• \"Algerian Sahara solar energy potential\"",
   French:
-    "Je n'ai pas trouvé suffisamment d'informations pertinentes dans les sources approuvées pour cette question. Essayez de poser une question plus précise liée à l'énergie, par exemple: \"coopération gazière Algérie Italie\", \"partenariat énergétique Sonatrach ENI\", \"sécurité énergétique Algérie Europe\", ou \"potentiel solaire du Sahara algérien\".",
+    "Je n'ai pas trouvé suffisamment d'informations pertinentes dans les sources approuvées pour cette question.\n\nEssayez de poser une question plus précise liée à l'énergie, par exemple :\n• \"Coopération gazière Algérie Italie\"\n• \"Partenariat énergétique Sonatrach ENI\"\n• \"Gazoduc MEDGAZ Algérie Espagne\"\n• \"Potentiel solaire du Sahara algérien\"",
   Arabic:
-    "لم أجد معلومات كافية من المصادر الموثوقة المعتمدة للإجابة على هذا السؤال. يرجى طرح سؤال أكثر تحديدًا في مجال الطاقة، على سبيل المثال: \"تعاون الغاز بين الجزائر وإيطاليا\"، \"شراكة الطاقة بين سوناطراك وإيني\"، \"أمن الطاقة بين الجزائر وأوروبا\"، أو \"إمكانات الطاقة الشمسية في الصحراء الجزائرية\".",
+    "لم أجد معلومات كافية من المصادر الموثوقة المعتمدة للإجابة على هذا السؤال.\n\nيرجى طرح سؤال أكثر تحديدًا في مجال الطاقة، على سبيل المثال:\n• \"تعاون الغاز بين الجزائر وإيطاليا\"\n• \"شراكة الطاقة بين سوناطراك وإيني\"\n• \"خط أنابيب ميدغاز بين الجزائر وإسبانيا\"\n• \"إمكانات الطاقة الشمسية في الصحراء الجزائرية\"",
   Spanish:
-    "No encontré suficiente información relevante en las fuentes aprobadas para esta pregunta. Intente hacer una pregunta más específica relacionada con la energía, por ejemplo: \"cooperación gasística Argelia Italia\", \"asociación energética Sonatrach ENI\", \"seguridad energética Argelia Europa\", o \"potencial solar del Sáhara argelino\".",
+    "No encontré suficiente información relevante en las fuentes aprobadas para esta pregunta.\n\nIntente hacer una pregunta más específica relacionada con la energía, por ejemplo:\n• \"Cooperación gasística Argelia Italia\"\n• \"Asociación energética Sonatrach ENI\"\n• \"Gasoducto MEDGAZ Argelia España\"\n• \"Potencial solar del Sáhara argelino\"",
   Italian:
-    "Non ho trovato informazioni sufficienti nelle fonti approvate per rispondere a questa domanda. Prova a fare una domanda più specifica legata all'energia, ad esempio: \"cooperazione gas Algeria Italia\", \"partnership energetica Sonatrach ENI\", \"sicurezza energetica Algeria Europa\", o \"potenziale solare del Sahara algerino\".",
+    "Non ho trovato informazioni sufficienti nelle fonti approvate per rispondere a questa domanda.\n\nProva a fare una domanda più specifica legata all'energia, ad esempio:\n• \"Cooperazione gas Algeria Italia\"\n• \"Partnership energetica Sonatrach ENI\"\n• \"Gasdotto MEDGAZ Algeria Spagna\"\n• \"Potenziale solare del Sahara algerino\"",
+  German:
+    "Ich konnte nicht genügend relevante Informationen aus den genehmigten vertrauenswürdigen Quellen für diese Frage finden.\n\nBitte stellen Sie eine spezifischere energiebezogene Frage, zum Beispiel:\n• \"Erdgas-Kooperation Algerien Italien\"\n• \"Energiepartnerschaft Sonatrach ENI\"\n• \"MEDGAZ-Pipeline Algerien Spanien\"\n• \"Solarenergiepotenzial der algerischen Sahara\"",
   Unknown:
-    "I could not find enough relevant information from the approved trusted sources for this question. Please try a more specific energy-related question.",
+    "I could not find enough relevant information from the approved trusted sources for this question.\n\nPlease try a more specific energy-related question, for example:\n• \"Algeria Italy gas cooperation\"\n• \"Sonatrach ENI energy partnership\"\n• \"MEDGAZ Algeria Spain pipeline\"",
+};
+
+/** Search unavailable messages */
+const SEARCH_UNAVAILABLE_MESSAGES: Record<SupportedLanguage, string> = {
+  English:
+    "Trusted source search is temporarily unavailable. Please try again later.",
+  French:
+    "La recherche de sources fiables est temporairement indisponible. Veuillez réessayer plus tard.",
+  Arabic:
+    "البحث في المصادر الموثوقة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى لاحقًا.",
+  Spanish:
+    "La búsqueda en fuentes confiables no está disponible temporalmente. Inténtelo de nuevo más tarde.",
+  Italian:
+    "La ricerca nelle fonti affidabili è temporaneamente non disponibile. Riprova più tardi.",
+  German:
+    "Die Suche in vertrauenswürdigen Quellen ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
+  Unknown:
+    "Trusted source search is temporarily unavailable. Please try again later.",
+};
+
+/** AI unavailable messages */
+const AI_UNAVAILABLE_MESSAGES: Record<SupportedLanguage, string> = {
+  English:
+    "AI response generation is temporarily unavailable. Please try again later.",
+  French:
+    "La génération de réponse IA est temporairement indisponible. Veuillez réessayer plus tard.",
+  Arabic:
+    "توليد الرد بالذكاء الاصطناعي غير متاح مؤقتًا. يرجى المحاولة مرة أخرى لاحقًا.",
+  Spanish:
+    "La generación de respuestas de IA no está disponible temporalmente. Inténtelo de nuevo más tarde.",
+  Italian:
+    "La generazione della risposta AI è temporaneamente non disponibile. Riprova più tardi.",
+  German:
+    "Die KI-Antwortgenerierung ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
+  Unknown:
+    "AI response generation is temporarily unavailable. Please try again later.",
+};
+
+/** Broad query suggestions — shown when query is too broad */
+const BROAD_QUERY_MESSAGES: Record<SupportedLanguage, string> = {
+  English:
+    "This question is broad. Try asking more specifically, for example:\n• \"Algeria Italy gas cooperation\"\n• \"Sonatrach ENI partnership\"\n• \"MEDGAZ Algeria Spain pipeline\"",
+  French:
+    "Cette question est large. Essayez de demander plus précisément, par exemple :\n• \"Coopération gazière Algérie Italie\"\n• \"Partenariat Sonatrach ENI\"\n• \"Gazoduc MEDGAZ Algérie Espagne\"",
+  Arabic:
+    "هذا السؤال واسع. حاول أن تسأل بشكل أكثر تحديدًا، على سبيل المثال:\n• \"تعاون الغاز بين الجزائر وإيطاليا\"\n• \"شراكة سوناطراك وإيني\"\n• \"خط أنابيب ميدغاز بين الجزائر وإسبانيا\"",
+  Spanish:
+    "Esta pregunta es amplia. Intente preguntar más específicamente, por ejemplo:\n• \"Cooperación gasística Argelia Italia\"\n• \"Asociación Sonatrach ENI\"\n• \"Gasoducto MEDGAZ Argelia España\"",
+  Italian:
+    "Questa domanda è ampia. Prova a chiedere in modo più specifico, ad esempio:\n• \"Cooperazione gas Algeria Italia\"\n• \"Partnership Sonatrach ENI\"\n• \"Gasdotto MEDGAZ Algeria Spagna\"",
+  German:
+    "Diese Frage ist sehr allgemein. Bitte stellen Sie eine spezifischere Frage, zum Beispiel:\n• \"Erdgas-Kooperation Algerien Italien\"\n• \"Sonatrach ENI Partnerschaft\"\n• \"MEDGAZ-Pipeline Algerien Spanien\"",
+  Unknown:
+    "This question is broad. Try asking more specifically, for example:\n• \"Algeria Italy gas cooperation\"\n• \"Sonatrach ENI partnership\"\n• \"MEDGAZ Algeria Spain pipeline\"",
 };
 
 const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
@@ -65,8 +122,21 @@ const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   Arabic: "Arabic (العربية)",
   Spanish: "Spanish (Español)",
   Italian: "Italian (Italiano)",
+  German: "German (Deutsch)",
   Unknown: "English",
 };
+
+export function getSearchUnavailableMessage(language: SupportedLanguage): string {
+  return SEARCH_UNAVAILABLE_MESSAGES[language] ?? SEARCH_UNAVAILABLE_MESSAGES.Unknown;
+}
+
+export function getAiUnavailableMessage(language: SupportedLanguage): string {
+  return AI_UNAVAILABLE_MESSAGES[language] ?? AI_UNAVAILABLE_MESSAGES.Unknown;
+}
+
+export function getBroadQueryMessage(language: SupportedLanguage): string {
+  return BROAD_QUERY_MESSAGES[language] ?? BROAD_QUERY_MESSAGES.Unknown;
+}
 
 export function buildAskEnergyPrompt(
   question: string,
@@ -79,7 +149,7 @@ export function buildAskEnergyPrompt(
   if (results.length === 0) {
     return {
       system: SYSTEM_PROMPT_FALLBACK,
-      user: `Question: ${question}\nDetected language: ${langName}\n\nNo search results were found.\n\nPlease tell the user you couldn't find enough relevant information. Use this exact message in your response language: "${noResultsMessage}". Be helpful and encouraging.`,
+      user: `Question: ${question}\n\nNo search results were found.\n\nPlease tell the user you couldn't find enough relevant information. Use the exact wording from the noResultsMessage in the user's language. Be helpful and encouraging.`,
       noResultsMessage,
     };
   }
@@ -95,14 +165,14 @@ export function buildAskEnergyPrompt(
     .join("\n\n");
 
   const instruction = allTrusted
-    ? `Answer the question in ${langName}. Do NOT translate the question — give a real answer. Use only the above trusted sources. If the sources are limited, say that clearly in ${langName}. Include a "Sources" section at the end. Do not invent facts.`
-    : `Answer the question in ${langName}. Do NOT translate the question — give a real answer. Use the above search results. Include a disclaimer that these are from general web search. Include a "Sources" section at the end. Do not invent facts.`;
+    ? `Answer the question in ${langName}. Use ONLY the trusted sources above. Stay on topic. If sources are limited, say so clearly in ${langName}. Include a "Sources" section at the end referencing the sources you actually used. Do NOT invent facts. Do NOT change the subject.`
+    : `Answer the question in ${langName}. Use ONLY the search results above. Include a disclaimer that these are from general web search. Include a "Sources" section at the end. Do NOT invent facts. Do NOT change the subject.`;
 
   const sourceLabel = allTrusted ? "Trusted Source Results" : "General Web Search Results";
 
   return {
     system,
-    user: `User question: ${question}\nDetected language: ${langName}\n\n${sourceLabel}:\n\n${sourcesText}\n\n---\n\nInstructions: ${instruction}`,
+    user: `User question: ${question}\n\n${sourceLabel}:\n\n${sourcesText}\n\n---\n\nInstructions: ${instruction}`,
     noResultsMessage,
   };
 }

@@ -1,4 +1,5 @@
 import type { SupportedLanguage } from "./detect-language";
+import { matchGlossaryEntries, getGlossaryExpansions, getGlossaryTerms } from "./energy-glossary";
 
 /**
  * Expand short/broad user questions into energy-focused search queries.
@@ -58,6 +59,20 @@ export function expandEnergyQuery(userQuestion: string, language?: SupportedLang
       queries.push(q);
     }
   };
+
+  // Step 0: Check glossary for known energy terms (pipelines, companies, etc.)
+  const glossaryMatches = matchGlossaryEntries(trimmed);
+  if (glossaryMatches.length > 0) {
+    const expansions = getGlossaryExpansions(trimmed);
+    const terms = getGlossaryTerms(trimmed);
+    for (const exp of expansions) {
+      addUnique(exp);
+    }
+    // If it was a short glossary-only query (like "MEDGAZ"), we're done
+    if (trimmed.split(/\s+/).length <= 2 && terms.length >= 1) {
+      return queries.slice(0, 7);
+    }
+  }
 
   // Check if the question already has specific intent words
   const lower = trimmed.toLowerCase();
