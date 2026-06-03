@@ -110,6 +110,11 @@ export default async function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
+          GLOBAL SOLAR MAP
+          ═══════════════════════════════════════════════════════════ */}
+      <GlobalSolarMapCard />
+
+      {/* ═══════════════════════════════════════════════════════════
           SAHARA RENEWABLE
           ═══════════════════════════════════════════════════════════ */}
       <SaharaRenewableSection />
@@ -117,7 +122,7 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           LATEST ANALYSIS — IFRI-style publication grid
           ═══════════════════════════════════════════════════════════ */}
-      <section className="section-light section-py">
+      {/* <section className="section-light section-py">
         <div className="container-page">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -145,17 +150,12 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          GLOBAL SOLAR MAP
-          ═══════════════════════════════════════════════════════════ */}
-      <GlobalSolarMapCard />
+      </section> */}
 
       {/* ═══════════════════════════════════════════════════════════
           RESEARCH & PUBLICATIONS
           ═══════════════════════════════════════════════════════════ */}
-      <section className="section-py">
+      {/* <section className="section-py">
         <div className="container-page">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -183,7 +183,7 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ═══════════════════════════════════════════════════════════
           ABOUT THE ANALYST

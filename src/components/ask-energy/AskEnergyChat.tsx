@@ -4,6 +4,8 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Loader2, Send, Sparkles, Search } from "lucide-react";
 import { ChatMessage, hasArabic } from "./ChatMessage";
 import { SuggestedQuestions } from "./SuggestedQuestions";
+import { useLanguage } from "@/components/language/language-provider";
+import { getSuggestedQuestions } from "@/lib/ai/suggested-questions";
 
 const MAX_MESSAGE_LENGTH = 500;
 
@@ -28,9 +30,7 @@ interface Message {
   suggestions?: string[];
 }
 
-const SUGGESTED_QUESTIONS = [
-  "Why is Algeria important for Europe's energy security?",
-];
+
 
 export function AskEnergyChat() {
   const [input, setInput] = useState("");
@@ -42,6 +42,9 @@ export function AskEnergyChat() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const { language } = useLanguage();
+
+  const suggestedQuestions = getSuggestedQuestions(language);
 
   const inputEmpty = input.trim().length === 0;
   const inputOverLimit = input.trim().length > MAX_MESSAGE_LENGTH;
@@ -345,7 +348,7 @@ export function AskEnergyChat() {
 
       {/* Suggested questions */}
       {messages.length === 0 && (
-        <SuggestedQuestions questions={SUGGESTED_QUESTIONS} onSelect={handleSuggested} />
+        <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
       )}
 
       {/* Input area — compact */}
