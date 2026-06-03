@@ -29,7 +29,7 @@ export default function ContactPage() {
             <ContactCard
               icon={Mail}
               title="Email"
-              details={["contact@rambelenergy.com", "research@rambelenergy.com"]}
+              details={["contact@rambelenergy.com"]}
             />
             <ContactCard
               icon={Globe}
