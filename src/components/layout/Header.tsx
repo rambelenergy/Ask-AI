@@ -115,11 +115,12 @@ export function Header() {
 
       {/* Main nav bar */}
       <div className="container-page flex h-[72px] items-center justify-between gap-6">
-        {/* Logo */}
+        {/* Logo — full refresh when on homepage */}
         <Link
           href="/"
           aria-label="RamBelEnergy — Home"
           className="group flex shrink-0 items-center gap-3 transition-opacity hover:opacity-85"
+          onClick={isHome ? (e) => { e.preventDefault(); window.location.href = "/"; } : undefined}
         >
           <img
             src="/logo.png"
