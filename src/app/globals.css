@@ -866,10 +866,10 @@ html.dark header .bg-\[var\(--surface\)\] {
 
 /* Logo visibility in dark mode */
 html.dark .site-logo {
-  background: rgba(255, 255, 255, 0.08);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  padding: 2px 4px;
+  border-radius: 8px;
+  padding: 6px 8px;
 }
 
 /* Tag overrides — hardcoded colors */
