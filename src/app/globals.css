@@ -566,6 +566,9 @@ a {
    ══════════════════════════════════════ */
 
 .rich-editor-wrapper .ql-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   border-bottom: 1px solid var(--line) !important;
   border-top: none !important;
   border-left: none !important;
@@ -1171,16 +1174,6 @@ html.dark .hover\:border-slate-400:hover {
 /* Admin placeholder text */
 html.dark .placeholder\:text-slate-400::placeholder {
   color: var(--muted-soft);
-}
-
-/* Admin rich text editor toolbar bg */
-html.dark .rich-editor-wrapper .ql-toolbar {
-  background: var(--surface) !important;
-}
-
-/* Admin rich text editor body color */
-html.dark .rich-editor-wrapper .ql-editor {
-  color: var(--foreground);
 }
 
 /* Admin form elements focus shadow */
