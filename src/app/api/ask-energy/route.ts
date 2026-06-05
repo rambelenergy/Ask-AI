@@ -68,7 +68,7 @@ function isTooBroad(question: string): boolean {
 export async function POST(request: Request): Promise<Response> {
   // --- Config checks ---
   const langsearchKey = process.env.LANGSEARCH_API_KEY;
-  const aiApiKey = process.env.OPENROUTER_API_KEY;
+  const aiApiKey = process.env.OPENAI_API_KEY;
 
   if (!langsearchKey) {
     return Response.json(
@@ -126,12 +126,12 @@ export async function POST(request: Request): Promise<Response> {
 
   const history = sanitizeHistory(body.history);
 
-  // --- Step 1: Search trusted sources ---
+  // --- Step 1: Search trusted sources (with wired timeout) ---
   let searchResult: Awaited<ReturnType<typeof searchTrustedSources>>;
   try {
-    const controller = new AbortController();
-    const searchTimeout = setTimeout(() => controller.abort(), 25_000);
-    searchResult = await searchTrustedSources(question, language);
+    const searchController = new AbortController();
+    const searchTimeout = setTimeout(() => searchController.abort(), 22_000);
+    searchResult = await searchTrustedSources(question, language, searchController.signal);
     clearTimeout(searchTimeout);
   } catch (error) {
     debugLog("search error", error);
@@ -177,9 +177,9 @@ export async function POST(request: Request): Promise<Response> {
     priorityGroup: r.priorityGroup,
   }));
 
-  // --- Step 4: Call AI ---
-  const model = process.env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
-  const baseUrl = process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
+  // --- Step 4: Call AI (OpenAI) ---
+  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
+  const baseUrl = process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1";
 
   const messages = [
     { role: "system" as const, content: system },
@@ -199,8 +199,6 @@ export async function POST(request: Request): Promise<Response> {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${aiApiKey}`,
-        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-        "X-Title": "RamBelEnergy - Ask Energy",
       },
       body: JSON.stringify({
         model,

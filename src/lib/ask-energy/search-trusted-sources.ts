@@ -98,27 +98,25 @@ export interface SearchDebugInfo {
 
 export async function searchTrustedSources(
   question: string,
-  language?: SupportedLanguage
+  language?: SupportedLanguage,
+  signal?: AbortSignal
 ): Promise<{ results: TrustedSearchResult[]; debug: SearchDebugInfo }> {
   // Step 1: Expand query (pass language for non-English English keyword injection)
   const expandedQueries = expandEnergyQuery(question, language);
 
-  // Step 2: Search all expanded queries (max 5 beyond original)
-  const searchQueries = expandedQueries.slice(0, 6);
+  // Step 2: Search with the original question only (single query, fast)
+  const searchQueries = expandedQueries.slice(0, 1);
   const allRawResults: LangSearchResult[] = [];
   const domainsFound = new Set<string>();
 
-  for (const query of searchQueries) {
-    try {
-      const results = await searchWithLangSearch(query);
-      for (const r of results) {
-        allRawResults.push(r);
-        domainsFound.add(extractDomain(r.url));
-      }
-    } catch {
-      // Continue with other queries if one fails
-      continue;
+  try {
+    const results = await searchWithLangSearch(searchQueries[0], signal);
+    for (const r of results) {
+      allRawResults.push(r);
+      domainsFound.add(extractDomain(r.url));
     }
+  } catch {
+    // Graceful: return empty if search fails
   }
 
   // If ALL queries failed, return empty

@@ -14,7 +14,15 @@ const SYSTEM_PROMPT = `You are an editorial assistant for RamBelEnergy.com.
 Your task: summarize the provided Ask Energy answer into a shorter, concise version.
 
 CRITICAL RULES:
-- Keep the SAME language as the original text. Do NOT translate.
+- The summary MUST be in the EXACT SAME language as the original text. This is the #1 rule.
+  If the original is in English, summarize in English.
+  If the original is in French, summarize in French.
+  If the original is in Arabic, summarize in Arabic.
+  If the original is in Spanish, summarize in Spanish.
+  If the original is in Italian, summarize in Italian.
+  If the original is in German, summarize in German.
+- NEVER translate the content into another language.
+- NEVER mix languages — the entire summary must be in one language.
 - Do NOT add new facts, statistics, or information not present in the original.
 - Do NOT change the topic, meaning, or conclusions.
 - Do NOT introduce new source claims or references.
@@ -35,7 +43,7 @@ const SUMMARIZE_UNAVAILABLE_MESSAGES: Record<string, string> = {
 };
 
 export async function POST(request: Request): Promise<Response> {
-  const aiApiKey = process.env.OPENROUTER_API_KEY;
+  const aiApiKey = process.env.OPENAI_API_KEY;
 
   if (!aiApiKey) {
     return Response.json(
@@ -68,12 +76,13 @@ export async function POST(request: Request): Promise<Response> {
     text = text.slice(0, MAX_TEXT_LENGTH) + "...";
   }
 
-  // Detect language from the original text (fast, no API call needed)
-  const language: SupportedLanguage = await detectQuestionLanguage(text);
+  // Detect language from the original text — force AI check for accuracy
+  // (heuristic alone is unreliable on long analytical energy text)
+  const language: SupportedLanguage = await detectQuestionLanguage(text, { forceAi: true });
   const langName = language === "Unknown" ? "English" : language;
 
-  const model = process.env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
-  const baseUrl = process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
+  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
+  const baseUrl = process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1";
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30_000);
@@ -84,8 +93,6 @@ export async function POST(request: Request): Promise<Response> {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${aiApiKey}`,
-        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-        "X-Title": "RamBelEnergy - Summarize",
       },
       body: JSON.stringify({
         model,
@@ -93,7 +100,7 @@ export async function POST(request: Request): Promise<Response> {
           { role: "system", content: SYSTEM_PROMPT },
           {
             role: "user",
-            content: `Summarize the following Ask Energy response. Keep the same language: ${langName}. Do NOT add information not present in the original.\n\nTEXT TO SUMMARIZE:\n${text}`,
+            content: `IMPORTANT: The text below is written in ${langName}. You MUST write your summary in ${langName} — the same language as the original. Do NOT translate into any other language.\n\nSummarize the following Ask Energy response concisely:\n\nTEXT TO SUMMARIZE:\n${text}`,
           },
         ],
         max_tokens: MAX_SUMMARY_TOKENS,

@@ -15,7 +15,9 @@ export type SupportedLanguage =
   | "German"
   | "Unknown";
 
-const DETECTION_MODEL = "liquid/lfm-2.5-1.2b-instruct:free";
+function getDetectionModel(): string {
+  return process.env.OPENAI_MODEL ?? "gpt-4o-mini";
+}
 
 // ---------------------------------------------------------------------------
 // Heuristic fallback (used if OpenRouter is unreachable)
@@ -59,7 +61,10 @@ function countMatches(text: string, indicators: string[]): number {
   const lower = text.toLowerCase();
   let score = 0;
   for (const word of indicators) {
-    if (lower.includes(word)) score++;
+    // Use word-boundary matching to avoid false positives from substrings
+    // e.g. "le" must be a standalone word, not matching inside "article" or "possible"
+    const re = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    if (re.test(lower)) score++;
   }
   return score;
 }
@@ -96,19 +101,23 @@ function detectHeuristic(text: string): SupportedLanguage {
 // Heuristic detection (fast, reliable for accents/Arabic) runs first.
 // ---------------------------------------------------------------------------
 
-export async function detectQuestionLanguage(text: string): Promise<SupportedLanguage> {
+export async function detectQuestionLanguage(
+  text: string,
+  opts?: { forceAi?: boolean }
+): Promise<SupportedLanguage> {
   // Fast heuristic first — reliable for accented languages and Arabic
   const heuristic = detectHeuristic(text);
 
-  // If heuristic is confident (not English, not Unknown), use it directly
-  if (heuristic !== "English" && heuristic !== "Unknown") {
+  // If heuristic is confident and AI not forced, use it directly
+  if (!opts?.forceAi && heuristic !== "English" && heuristic !== "Unknown") {
     return heuristic;
   }
 
-  // For English/Unknown: confirm via AI model to catch false negatives
-  // (e.g. unaccented Italian like "Algeria Italia energia")
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  const baseUrl = process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
+  // For English/Unknown, or when forceAi is set: confirm via AI model
+  // (e.g. unaccented Italian like "Algeria Italia energia",
+  //  or long analytical text where heuristic may be unreliable)
+  const apiKey = process.env.OPENAI_API_KEY;
+  const baseUrl = process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1";
 
   if (!apiKey) return heuristic;
 
@@ -121,13 +130,12 @@ export async function detectQuestionLanguage(text: string): Promise<SupportedLan
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
       },
       body: JSON.stringify({
-        model: DETECTION_MODEL,
+        model: getDetectionModel(),
         messages: [
-          { role: "system", content: "Detect the language. Reply with EXACTLY ONE WORD: English, French, Arabic, Spanish, or Italian. Do NOT reply in any other language. Just the word." },
-          { role: "user", content: `"${text.slice(0, 300)}"` },
+          { role: "system", content: "Detect the language. Reply with EXACTLY ONE WORD: English, French, Arabic, Spanish, Italian, or German. Do NOT reply in any other language. Just the word." },
+          { role: "user", content: `"${text.slice(0, 600)}"` },
         ],
         max_tokens: 5,
         temperature: 0,

@@ -1,22 +1,24 @@
 /**
- * Embedding utility using OpenRouter (nvidia/llama-nemotron-embed-vl-1b-v2:free).
+ * Embedding utility using OpenAI text-embedding-3-small.
  *
  * Used to re-rank trusted search results by semantic similarity to the user question,
  * improving result quality beyond simple priority-group sorting.
  *
- * Model: nvidia/llama-nemotron-embed-vl-1b-v2:free
- * Produces 1024-dimensional normalized embeddings.
+ * Model: text-embedding-3-small (default)
+ * Produces 1536-dimensional normalized embeddings.
  */
 
-const EMBEDDING_MODEL = "nvidia/llama-nemotron-embed-vl-1b-v2:free";
+function getEmbeddingModel(): string {
+  return process.env.OPENAI_EMBEDDING_MODEL ?? "text-embedding-3-small";
+}
 
 /**
  * Get a single embedding vector for a text.
  * Returns null if the API is unavailable.
  */
 export async function embedText(text: string): Promise<number[] | null> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  const baseUrl = process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
+  const apiKey = process.env.OPENAI_API_KEY;
+  const baseUrl = process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1";
 
   if (!apiKey) return null;
 
@@ -29,10 +31,9 @@ export async function embedText(text: string): Promise<number[] | null> {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
       },
       body: JSON.stringify({
-        model: EMBEDDING_MODEL,
+        model: getEmbeddingModel(),
         input: text.slice(0, 2048), // reasonable truncation
       }),
       signal: controller.signal,
