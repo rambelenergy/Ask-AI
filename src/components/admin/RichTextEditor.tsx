@@ -46,10 +46,10 @@ export function RichTextEditor({ value, onChange, placeholder, label, height = "
     return (
       <div className="space-y-2">
         {label && (
-          <div className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{label}</div>
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted-soft)]">{label}</div>
         )}
         <div
-          className="flex items-center justify-center rounded-lg border border-slate-200 bg-[#f8faf9] text-sm text-slate-400"
+          className="flex items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--muted-soft)]"
           style={{ height }}
         >
           Loading editor...
@@ -61,9 +61,9 @@ export function RichTextEditor({ value, onChange, placeholder, label, height = "
   return (
     <div className="space-y-2">
       {label && (
-        <div className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{label}</div>
+        <div className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted-soft)]">{label}</div>
       )}
-      <div className="rich-editor-wrapper rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="rich-editor-wrapper rounded-lg border border-[var(--line)] bg-[var(--paper)] overflow-hidden">
         <QuillEditor
           theme="snow"
           value={value}
@@ -78,7 +78,7 @@ export function RichTextEditor({ value, onChange, placeholder, label, height = "
           style={{ height }}
         />
       </div>
-      <p className="text-[11px] text-slate-400">
+      <p className="text-[11px] text-[var(--muted-soft)]">
         Use the toolbar to format text. Supports headings, lists, links, and basic styling.
       </p>
     </div>

@@ -1115,3 +1115,117 @@ html.dark .section-light {
 html.dark .section-muted {
   background: var(--surface);
 }
+
+/* ══════════════════════════════════════
+   Admin Panel — Dark Mode Overrides
+   ══════════════════════════════════════ */
+
+/* Admin layout background */
+html.dark .bg-\[\#f1f3f2\] {
+  background: var(--background);
+}
+
+/* Admin heading color */
+html.dark .text-\[\#07152a\] {
+  color: var(--navy);
+}
+
+/* Admin body text */
+html.dark .text-slate-900 {
+  color: var(--foreground);
+}
+
+/* Admin surface backgrounds */
+html.dark .bg-slate-50 {
+  background: var(--navy-light);
+}
+
+/* Admin thin dividers */
+html.dark .border-slate-50 {
+  border-color: var(--line-soft);
+}
+
+/* Admin table row dividers */
+html.dark .divide-slate-50 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--line-soft);
+}
+
+/* Admin hover on row / action items */
+html.dark .hover\:bg-slate-100:hover {
+  background: var(--navy-light);
+}
+
+/* Admin topbar border */
+html.dark .border-slate-200\/70 {
+  border-color: rgba(39, 53, 69, 0.7);
+}
+
+/* Admin dashed / light borders */
+html.dark .border-slate-300 {
+  border-color: var(--line);
+}
+html.dark .hover\:border-slate-400:hover {
+  border-color: var(--muted);
+}
+
+/* Admin placeholder text */
+html.dark .placeholder\:text-slate-400::placeholder {
+  color: var(--muted-soft);
+}
+
+/* Admin rich text editor toolbar bg */
+html.dark .rich-editor-wrapper .ql-toolbar {
+  background: var(--surface) !important;
+}
+
+/* Admin rich text editor body color */
+html.dark .rich-editor-wrapper .ql-editor {
+  color: var(--foreground);
+}
+
+/* Admin form elements focus shadow */
+html.dark .cms-input:focus {
+  box-shadow: 0 0 0 3px rgba(92, 196, 168, 0.12);
+}
+
+/* Admin kbd element */
+html.dark kbd {
+  background: var(--navy-light);
+  border-color: var(--line);
+  color: var(--muted-soft);
+}
+
+/* Admin table row hover */
+html.dark .table-row-hover:hover {
+  background: var(--navy-light);
+}
+
+/* Admin emerald/amber status badges — ensure contrast */
+html.dark .bg-emerald-50 {
+  background: #0a2820;
+}
+html.dark .text-emerald-700 {
+  color: #5cc4a8;
+}
+html.dark .ring-emerald-200 {
+  --tw-ring-color: rgba(92, 196, 168, 0.25);
+}
+
+/* Admin CmsTopBar search box */
+html.dark .bg-\[\#f8faf9\] {
+  background: var(--surface);
+}
+
+/* Admin login page link color */
+html.dark .hover\:text-slate-600:hover {
+  color: var(--foreground);
+}
+
+/* Admin shadow adjustments for cards */
+html.dark .shadow-\[0_8px_32px_rgba\(8\,26\,44\,0\.06\)\] {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}

@@ -29,18 +29,18 @@ export function CmsTopBar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/95 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-[var(--line)] bg-[var(--paper)]/95 backdrop-blur-md">
       <div className="flex h-[68px] items-center justify-between pl-14 pr-4 md:px-8">
         <div className="flex items-center gap-2 md:gap-4">
-          <h1 className="text-base font-bold tracking-tight text-[#07152a] md:text-xl">{getPageTitle()}</h1>
+          <h1 className="text-base font-bold tracking-tight text-[var(--navy)] md:text-xl">{getPageTitle()}</h1>
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
           {/* Search */}
-          <div className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-[#f8faf9] px-3 py-2 text-sm text-slate-400 md:flex">
+          <div className="hidden items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--muted-soft)] md:flex">
             <Search size={15} />
             <span className="text-[13px]">Search content...</span>
-            <kbd className="ml-2 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-mono text-slate-400">⌘K</kbd>
+            <kbd className="ml-2 rounded border border-[var(--line)] bg-[var(--paper)] px-1.5 py-0.5 text-[10px] font-mono text-[var(--muted-soft)]">⌘K</kbd>
           </div>
 
           {newButton && (
@@ -54,11 +54,11 @@ export function CmsTopBar() {
             </Link>
           )}
 
-          <div className="flex items-center gap-1.5 border-l border-slate-200 pl-2 md:gap-2 md:pl-4">
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+          <div className="flex items-center gap-1.5 border-l border-[var(--line)] pl-2 md:gap-2 md:pl-4">
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted-soft)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]">
               <Bell size={16} className="md:size-[17px]" />
             </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted-soft)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]">
               <Settings size={16} className="md:size-[17px]" />
             </button>
           </div>

@@ -63,11 +63,19 @@ export function CmsSidebar() {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 border-b border-white/8 px-6 py-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--green)] to-[#0e4b40]">
-            <span className="text-sm font-bold">R</span>
-          </div>
+          <Link
+            href="/"
+            onClick={() => setMobileOpen(false)}
+            className="shrink-0 transition-transform hover:scale-105"
+            aria-label="Back to homepage"
+          >
+            <img
+              src="/logo.png"
+              alt="RamBelEnergy"
+              className="h-9 w-auto bg-[#eef2ef] rounded-sm p-1"
+            />
+          </Link>
           <div className="flex-1 min-w-0">
-            <div className="text-[15px] font-bold tracking-tight">RamBelEnergy</div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">Content Management</div>
           </div>
           <button

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { ArticleCard } from "@/components/content/ArticleCard";
+import { ArticleCarousel } from "@/components/content/ArticleCarousel";
 import { SaharaRenewableSection } from "@/components/home/SaharaRenewableSection";
+import { EnergyDevelopmentAfricaSection } from "@/components/home/EnergyDevelopmentAfricaSection";
 import { GlobalSolarMapCard } from "@/components/resources/GlobalSolarMapCard";
 import { CTASection } from "@/components/content/CTASection";
 import { FocusAreaCard } from "@/components/content/FocusAreaCard";
@@ -91,19 +92,8 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {articles.slice(0, 4).map((article) => (
-              <ArticleCard
-                key={article.id}
-                article={{
-                  category: article.category || "",
-                  title: article.title,
-                  excerpt: article.excerpt || "",
-                  date: formatDate(article.published_at) || "Draft",
-                  href: `/analysis/${article.slug}`,
-                }}
-              />
-            ))}
+          <div className="mt-12">
+            <ArticleCarousel articles={articles.slice(0, 4)} />
           </div>
         </div>
       </section>
@@ -151,6 +141,11 @@ export default async function HomePage() {
           SAHARA RENEWABLE
           ═══════════════════════════════════════════════════════════ */}
       <SaharaRenewableSection />
+
+      {/* ═══════════════════════════════════════════════════════════
+          ENERGY & DEVELOPMENT IN AFRICA
+          ═══════════════════════════════════════════════════════════ */}
+      <EnergyDevelopmentAfricaSection />
 
       {/* ═══════════════════════════════════════════════════════════
           RESEARCH & PUBLICATIONS

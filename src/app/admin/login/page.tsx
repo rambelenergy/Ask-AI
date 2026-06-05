@@ -32,10 +32,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[var(--background)] to-[#f0f1ee] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4">
       <div className="w-full max-w-[420px]">
         {/* Card */}
-        <div className="rounded-2xl border border-[var(--line)] bg-white p-8 shadow-[0_8px_32px_rgba(8,26,44,0.06)]">
+        <div className="rounded-2xl border border-[var(--line)] bg-[var(--paper)] p-8 shadow-[0_8px_32px_rgba(8,26,44,0.06)]">
           {/* Logo */}
           <div className="mb-8 text-center">
             <div className="mb-4 flex justify-center">
@@ -60,21 +60,21 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+              <label htmlFor="email" className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-soft)]">
                 Email
               </label>
               <input
                 id="email" type="email" required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="cms-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-[14px] text-slate-700 placeholder:text-slate-400 focus:border-[var(--green)] focus:outline-none"
+                className="cms-input w-full rounded-lg border border-[var(--line)] bg-[var(--paper)] px-4 py-2.5 text-[14px] text-[var(--foreground)] placeholder:text-[var(--muted-soft)] focus:border-[var(--green)] focus:outline-none"
                 placeholder="admin@rambelenergy.com"
                 autoComplete="email"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+              <label htmlFor="password" className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-soft)]">
                 Password
               </label>
               <div className="relative">
@@ -82,14 +82,14 @@ export default function LoginPage() {
                   id="password" type={showPassword ? "text" : "password"} required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="cms-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 pr-10 text-[14px] text-slate-700 placeholder:text-slate-400 focus:border-[var(--green)] focus:outline-none"
+                  className="cms-input w-full rounded-lg border border-[var(--line)] bg-[var(--paper)] px-4 py-2.5 pr-10 text-[14px] text-[var(--foreground)] placeholder:text-[var(--muted-soft)] focus:border-[var(--green)] focus:outline-none"
                   placeholder="Enter your password"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted-soft)] transition hover:text-[var(--foreground)]"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -116,7 +116,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="mt-5 text-center text-[11px] text-slate-400">
+        <p className="mt-5 text-center text-[11px] text-[var(--muted-soft)]">
           Restricted to authorized administrators only.
         </p>
       </div>

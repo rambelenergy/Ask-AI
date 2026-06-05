@@ -11,7 +11,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#f1f3f2] font-sans text-slate-900">
+    <div className="min-h-screen bg-[var(--background)] font-sans text-[var(--foreground)]">
       <CmsSidebar />
       <div className="min-h-screen md:ml-[260px]">
         <CmsTopBar />
