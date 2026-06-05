@@ -92,7 +92,7 @@ export function EnergyDevelopmentAfricaSection() {
               <img
                 src="/mission300latestebanner.webp"
                 alt="Mission 300 — Energy access and development in Africa"
-                className="h-[180px] w-full object-cover"
+                className="w-full"
               />
               <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
