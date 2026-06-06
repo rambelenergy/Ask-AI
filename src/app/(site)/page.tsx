@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ArticleCarousel } from "@/components/content/ArticleCarousel";
+import { HomeSlogan } from "@/components/home/HomeSlogan";
 import { SaharaRenewableSection } from "@/components/home/SaharaRenewableSection";
 import { EnergyDevelopmentAfricaSection } from "@/components/home/EnergyDevelopmentAfricaSection";
 import { GlobalSolarMapCard } from "@/components/resources/GlobalSolarMapCard";
@@ -75,6 +76,11 @@ export default async function HomePage() {
           ASK ENERGY
           ═══════════════════════════════════════════════════════════ */}
       <HomeAssistantSection />
+
+      {/* ═══════════════════════════════════════════════════════════
+          BRAND SLOGAN
+          ═══════════════════════════════════════════════════════════ */}
+      <HomeSlogan />
 
       {/* ═══════════════════════════════════════════════════════════
           LATEST ANALYSIS — IFRI-style publication grid
