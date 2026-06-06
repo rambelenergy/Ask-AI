@@ -123,7 +123,7 @@ export function SummaryBox({ text }: SummaryBoxProps) {
               )}
             </button>
           </div>
-          <div className="whitespace-pre-wrap text-[12px] leading-relaxed text-[var(--navy)]">
+          <div className="whitespace-pre-wrap break-words overflow-hidden text-[12px] leading-relaxed text-[var(--navy)]">
             {summary}
           </div>
         </div>

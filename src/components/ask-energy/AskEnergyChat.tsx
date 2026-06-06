@@ -304,7 +304,7 @@ export function AskEnergyChat() {
           const isArabic = hasArabic(streamingContent);
           return (
           <div className="mb-4 flex justify-start">
-            <div className={`max-w-[85%] rounded-2xl rounded-bl-md border border-white/10 bg-white/95 px-3.5 py-2.5 text-sm leading-relaxed text-[var(--navy)] shadow-sm backdrop-blur ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
+            <div className={`max-w-[85%] rounded-2xl rounded-bl-md border border-white/10 bg-white/95 px-3.5 py-2.5 text-sm leading-relaxed text-[var(--navy)] shadow-sm backdrop-blur overflow-hidden break-words ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
               <div className="mb-1 flex items-center gap-1.5">
                 <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--gold)]/20">
                   <Sparkles size={9} className="text-[var(--gold)]" />

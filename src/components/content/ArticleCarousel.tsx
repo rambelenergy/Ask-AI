@@ -113,10 +113,10 @@ export function ArticleCarousel({ articles }: ArticleCarouselProps) {
             return (
               <div
                 key={a.id}
-                className="grid h-[440px] w-full shrink-0 md:grid-cols-[1fr_1fr]"
+                className="grid h-auto w-full shrink-0 md:h-[440px] md:grid-cols-[1fr_1fr]"
               >
                 {/* ═══ LEFT: Text content ═══ */}
-                <div className="relative flex flex-col justify-center overflow-hidden px-8 py-10 sm:px-10 md:px-14 md:py-12">
+                <div className="relative flex flex-col justify-start overflow-hidden px-5 py-6 sm:px-10 md:justify-center md:px-14 md:py-12">
                   {/* Subtle left accent line */}
                   <div className="absolute bottom-8 left-0 top-8 w-[3px] rounded-r-full bg-[var(--green-muted)]" />
 
@@ -134,7 +134,7 @@ export function ArticleCarousel({ articles }: ArticleCarouselProps) {
                   </div>
 
                   {/* Title */}
-                  <h3 className="line-clamp-3 text-balance text-[1.45rem] font-bold leading-[1.2] tracking-[-0.02em] text-[var(--navy)] sm:text-[1.75rem]">
+                  <h3 className="line-clamp-3 text-balance text-[1.2rem] font-bold leading-[1.2] tracking-[-0.02em] text-[var(--navy)] sm:text-[1.45rem] md:text-[1.75rem]">
                     <Link
                       href={`/analysis/${a.slug}`}
                       className="transition-colors duration-300 hover:text-[var(--green)]"
@@ -145,16 +145,16 @@ export function ArticleCarousel({ articles }: ArticleCarouselProps) {
 
                   {/* Excerpt */}
                   {a.excerpt && (
-                    <p className="mt-4 line-clamp-3 text-[15px] leading-[1.8] text-[var(--muted)]">
+                    <p className="mt-3 line-clamp-2 text-[13px] leading-[1.7] text-[var(--muted)] sm:text-[15px] sm:leading-[1.8] sm:line-clamp-3">
                       {a.excerpt}
                     </p>
                   )}
 
                   {/* Read more */}
-                  <div className="mt-6">
+                  <div className="mt-4 sm:mt-6">
                     <Link
                       href={`/analysis/${a.slug}`}
-                      className="group/link inline-flex items-center gap-2 rounded-lg border border-[var(--green)]/20 bg-[var(--green-soft)] px-4 py-2.5 text-[13px] font-semibold text-[var(--green)] transition-all duration-300 hover:border-[var(--green)] hover:bg-[var(--green)] hover:text-white hover:shadow-md hover:shadow-[var(--green)]/20"
+                      className="group/link inline-flex items-center gap-2 rounded-lg border border-[var(--green)]/20 bg-[var(--green-soft)] px-3 py-2 text-[12px] font-semibold text-[var(--green)] transition-all duration-300 hover:border-[var(--green)] hover:bg-[var(--green)] hover:text-white hover:shadow-md hover:shadow-[var(--green)]/20 sm:px-4 sm:py-2.5 sm:text-[13px]"
                     >
                       Read full analysis
                       <ArrowRight
@@ -203,16 +203,16 @@ export function ArticleCarousel({ articles }: ArticleCarouselProps) {
         <button
           onClick={goPrev}
           aria-label="Previous article"
-          className="absolute left-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/80 text-[var(--navy)] shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-white/40 hover:bg-white hover:shadow-xl"
+          className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--paper)] text-[var(--navy)] shadow-lg backdrop-blur transition-all duration-300 hover:scale-110 hover:border-[var(--green-muted)] hover:bg-[var(--surface)] hover:shadow-xl sm:left-4 sm:h-11 sm:w-11"
         >
-          <ChevronLeft size={19} />
+          <ChevronLeft size={16} className="sm:size-[19px]" />
         </button>
         <button
           onClick={goNext}
           aria-label="Next article"
-          className="absolute right-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/80 text-[var(--navy)] shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-white/40 hover:bg-white hover:shadow-xl"
+          className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--paper)] text-[var(--navy)] shadow-lg backdrop-blur transition-all duration-300 hover:scale-110 hover:border-[var(--green-muted)] hover:bg-[var(--surface)] hover:shadow-xl sm:right-4 sm:h-11 sm:w-11"
         >
-          <ChevronRight size={19} />
+          <ChevronRight size={16} className="sm:size-[19px]" />
         </button>
       </div>
 
