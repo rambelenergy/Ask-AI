@@ -70,7 +70,7 @@ export function EnergyDevelopmentAfricaSection() {
             </p>
           </div>
 
-          {/* ═══ RIGHT: Source cards + image ═══ */}
+          {/* ═══ RIGHT: Source cards ═══ */}
           <div>
             {/* Selected source cards */}
             <div className="grid gap-4 sm:grid-cols-1 xl:grid-cols-1">
@@ -86,22 +86,39 @@ export function EnergyDevelopmentAfricaSection() {
                 available
               </p>
             )}
+          </div>
+        </div>
 
-            {/* Sahara visual */}
-            <div className="mt-6 overflow-hidden rounded-lg border border-[var(--line)]">
-              <img
+        {/* Dual images — full width below text */}
+        <div className="mt-12 grid gap-4 sm:grid-cols-2">
+          <div className="overflow-hidden rounded-lg border border-[var(--line)]">
+            <img
+                src="/mission300Banner.webp"
+                alt="Mission 300 — Energy access and development in Africa"
+                className="w-full"
+              />
+            <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
+                Energy for People
+              </span>
+              <span className="text-[11px] font-medium text-[var(--green)]">
+                Human Impact
+              </span>
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-lg border border-[var(--line)]">
+            <img
                 src="/mission300latestebanner.webp"
                 alt="Mission 300 — Energy access and development in Africa"
                 className="w-full"
               />
-              <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
-                  Energy &amp; Development Context
-                </span>
-                <span className="text-[11px] font-medium text-[var(--green)]">
-                  Africa &amp; Sahel
-                </span>
-              </div>
+            <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
+                Energy &amp; Development Context
+              </span>
+              <span className="text-[11px] font-medium text-[var(--green)]">
+                Africa &amp; Sahel
+              </span>
             </div>
           </div>
         </div>

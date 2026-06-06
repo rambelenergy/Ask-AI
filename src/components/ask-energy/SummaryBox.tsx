@@ -94,10 +94,10 @@ export function SummaryBox({ text }: SummaryBoxProps) {
 
       {/* Summary result */}
       {summary && (
-        <div className="rounded-xl border border-[var(--line)] bg-[var(--paper)] p-3.5">
-          <div className="mb-2 flex items-center justify-between">
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--paper)] p-3.5 min-w-0">
+          <div className="mb-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5">
-              <ListChecks size={11} className="text-[var(--gold)]" />
+              <ListChecks size={11} className="shrink-0 text-[var(--gold)]" />
               <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">
                 Short Summary
               </span>
@@ -105,9 +105,11 @@ export function SummaryBox({ text }: SummaryBoxProps) {
                 AI-generated
               </span>
             </div>
+          </div>
+          <div className="mb-2 border-b border-[var(--line)] pb-2">
             <button
               onClick={handleCopySummary}
-              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-[var(--muted)] transition hover:bg-[var(--navy-light)] hover:text-[var(--navy)]"
+              className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium text-[var(--muted)] transition hover:bg-[var(--navy-light)] hover:text-[var(--navy)]"
               title="Copy summary"
             >
               {copied ? (
@@ -123,7 +125,7 @@ export function SummaryBox({ text }: SummaryBoxProps) {
               )}
             </button>
           </div>
-          <div className="whitespace-pre-wrap break-words overflow-hidden text-[12px] leading-relaxed text-[var(--navy)]">
+          <div className="whitespace-pre-wrap break-words text-[12px] leading-relaxed text-[var(--navy)]">
             {summary}
           </div>
         </div>

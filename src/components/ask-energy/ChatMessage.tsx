@@ -99,7 +99,7 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
 
   return (
     <div className="mb-4 flex justify-start">
-      <div className={`ask-energy-assistant max-w-[82%] rounded-2xl rounded-bl-md border border-[var(--line)] bg-white px-4 py-3 text-sm leading-relaxed text-[var(--navy)] shadow-sm overflow-hidden break-words ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
+      <div className={`ask-energy-assistant max-w-[82%] rounded-2xl rounded-bl-md border border-[var(--line)] bg-white px-4 py-3 text-sm leading-relaxed text-[var(--navy)] shadow-sm break-words ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
         <div className="mb-1.5 flex items-center gap-1.5">
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--gold)]/20">
             <Sparkles size={10} className="text-[var(--gold)]" />
@@ -112,9 +112,11 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
         <SourceCards sources={sources ?? []} />
         {/* Bottom toolbar: copy + summarize */}
         <div className="mt-3 border-t border-[var(--line)] pt-3">
-          <div className="flex items-start gap-2">
+          <div className="min-w-0">
             <CopyButton content={content} />
-            <SummaryBox text={content} />
+            <div className="mt-2">
+              <SummaryBox text={content} />
+            </div>
           </div>
         </div>
       </div>
