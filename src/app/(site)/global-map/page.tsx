@@ -26,11 +26,11 @@ export default function GlobalMapPage() {
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--green)]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[var(--green)]">
                 <Sun size={13} />
-                External Interactive Resource
+                <T k="globalMap.interactiveBadge" />
               </div>
-              <h1 className="heading-xl"><T k="nav.globalMap" /></h1>
+              <h1 className="heading-xl"><T k="globalMap.heading" /></h1>
               <p className="body-lg mt-5 max-w-[620px]">
-                Explore solar resource and photovoltaic power potential data for Algeria and other regions through the Global Solar Atlas — an interactive tool by the World Bank Group.
+                <T k="globalMap.description" />
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
@@ -40,7 +40,7 @@ export default function GlobalMapPage() {
                   className="inline-flex items-center gap-2.5 rounded-lg bg-[var(--green)] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#0e4d42] hover:shadow-md"
                 >
                   <ExternalLink size={16} />
-                  Open Global Solar Map
+                  <T k="globalMap.openMap" />
                 </a>
                 <a
                   href="https://globalsolaratlas.info"
@@ -49,7 +49,7 @@ export default function GlobalMapPage() {
                   className="inline-flex items-center gap-2.5 rounded-lg border border-[var(--line)] bg-white px-6 py-3.5 text-sm font-semibold text-[var(--navy)] transition hover:border-slate-300 hover:shadow-sm"
                 >
                   <Map size={16} />
-                  Visit Global Solar Atlas Home
+                  <T k="globalMap.homeLink" />
                 </a>
               </div>
             </div>
@@ -60,10 +60,12 @@ export default function GlobalMapPage() {
                 src="/global-map.jpeg"
                 alt="Global Solar Atlas — solar resource mapping"
                 className="h-[260px] w-full object-cover sm:h-[320px]"
+                loading="lazy"
+                decoding="async"
               />
               {/* Bottom bar */}
               <div className="border-t border-[var(--line)] bg-white px-5 py-3 text-center text-xs text-[var(--muted)]">
-                Algeria coordinates: 30.45°N, 0.23°E
+                <T k="globalMap.coordinatesLabel" />
               </div>
             </div>
           </div>
@@ -75,21 +77,21 @@ export default function GlobalMapPage() {
         <div className="container-page">
           <div className="grid gap-6 sm:grid-cols-3">
             <div className="professional-card p-7">
-              <h3 className="text-lg font-bold text-[var(--navy)]">Solar Resource Data</h3>
+              <h3 className="text-lg font-bold text-[var(--navy)]"><T k="globalMap.solarDataTitle" /></h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                Access global horizontal irradiation (GHI), direct normal irradiation (DNI), and photovoltaic power potential.
+                <T k="globalMap.solarDataDesc" />
               </p>
             </div>
             <div className="professional-card p-7">
-              <h3 className="text-lg font-bold text-[var(--navy)]">Interactive Map</h3>
+              <h3 className="text-lg font-bold text-[var(--navy)]"><T k="globalMap.interactiveTitle" /></h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                Zoom, pan, and click anywhere on the map to get site-specific solar data and annual PV output estimates.
+                <T k="globalMap.interactiveDesc" />
               </p>
             </div>
             <div className="professional-card p-7">
-              <h3 className="text-lg font-bold text-[var(--navy)]">Algeria Focus</h3>
+              <h3 className="text-lg font-bold text-[var(--navy)]"><T k="globalMap.algeriaFocusTitle" /></h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                Map pre-centered on Algeria at 30.45°N, 0.23°E — ready to explore the Sahara&apos;s world-class solar potential.
+                <T k="globalMap.algeriaFocusDesc" />
               </p>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CTASection } from "@/components/content/CTASection";
-import { Mail, Globe, MapPin, MessageSquare } from "lucide-react";
+import { Mail, Globe, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -43,23 +43,26 @@ export default function ContactPage() {
             />
           </div>
 
-          {/* Placeholder form area */}
+          {/* Contact email card */}
           <div className="mt-16 rounded-2xl border border-[var(--line)] bg-white p-8 sm:p-12">
             <div className="mx-auto max-w-xl text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--green-soft)] text-[var(--green)]">
-                <MessageSquare size={22} />
+                <Mail size={22} />
               </div>
               <h2 className="text-2xl font-bold tracking-tight text-[var(--navy)]">Send a Message</h2>
               <p className="mt-3 text-[15px] leading-7 text-[var(--muted)]">
-                The contact form will be implemented in a forthcoming update. For now, please reach out via email.
+                Reach out directly via email for research inquiries, institutional discussions, or strategic energy collaboration.
               </p>
               <a
                 href="mailto:contact@rambelenergy.com"
-                className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[var(--green)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0e4b40]"
+                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[var(--green)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0e4b40]"
               >
                 <Mail size={16} />
-                Email us directly
+                contact@rambelenergy.com
               </a>
+              <p className="mt-4 text-[12px] text-[var(--muted-soft)]">
+                We typically respond within 1–2 business days.
+              </p>
             </div>
           </div>
         </div>

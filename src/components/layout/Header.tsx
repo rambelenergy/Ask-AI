@@ -126,6 +126,7 @@ export function Header() {
             src="/logo.png"
             alt="RamBelEnergy"
             className="site-logo h-10 w-auto transition-transform duration-300 group-hover:scale-[1.02]"
+            fetchPriority="high"
           />
           <span className="hidden text-lg font-bold tracking-[-0.03em] text-[var(--navy)] sm:block">
             RamBelEnergy

@@ -59,6 +59,8 @@ export function GlobalSolarMapCard() {
           alt="Global solar map visualization"
           className="hidden rounded-xl border border-[var(--line)] object-cover shadow-sm lg:block"
           style={{ width: "320px", height: "100%", maxHeight: "200px" }}
+          loading="lazy"
+          decoding="async"
         />
       </div>
     </section>

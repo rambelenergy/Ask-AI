@@ -8,54 +8,36 @@ import { GlobalSolarMapCard } from "@/components/resources/GlobalSolarMapCard";
 import { CTASection } from "@/components/content/CTASection";
 import { FocusAreaCard } from "@/components/content/FocusAreaCard";
 import { HomeAssistantSection } from "@/components/content/HomeAssistantSection";
-import { PublicationCard } from "@/components/content/PublicationCard";
-import { SectionHeading } from "@/components/content/SectionHeading";
 import { T } from "@/components/language/t";
 import { getSiteContentByKey } from "@/lib/site-content";
 import { getAboutSectionByKey } from "@/lib/about-sections";
 import { getPublishedArticles } from "@/lib/articles";
-import { getPublishedPublications } from "@/lib/publications";
 import {
-  strategicItems as fallbackStrategic,
   focusAreas as fallbackFocusAreas,
 } from "@/data/homepage";
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("en-GB", { month: "short", year: "numeric" });
-}
-
 export default async function HomePage() {
-  const [pipelineBlock, missionBlock, focusBlock, ctaBlock, strategicBlock, profileSection] =
+  const [pipelineBlock, missionBlock, focusBlock, ctaBlock, profileSection] =
     await Promise.all([
       getSiteContentByKey("homepage_pipeline_highlight"),
       getSiteContentByKey("homepage_mission"),
       getSiteContentByKey("homepage_energy_focus"),
       getSiteContentByKey("contact_cta"),
-      getSiteContentByKey("strategic_priorities"),
       getAboutSectionByKey("profile"),
     ]);
 
-  const [articles, publications] = await Promise.all([
+  const [articles] = await Promise.all([
     getPublishedArticles(),
-    getPublishedPublications(),
   ]);
 
   const pipeline = pipelineBlock?.content_json as Record<string, string> | undefined;
   const mission = missionBlock?.content_json as Record<string, string> | undefined;
   const focusAreas = focusBlock?.content_json as Array<{ title: string; description: string }> | undefined;
   const cta = ctaBlock?.content_json as Record<string, string> | undefined;
-  const strategicItems = strategicBlock?.content_json as Array<{ title: string; description: string }> | undefined;
   const summarize =
     profileSection?.content_json && typeof profileSection.content_json.summarize === "string"
       ? profileSection.content_json.summarize
       : "";
-
-  const strategicTitle = pipeline?.title || "Nigeria–Algeria–Europe Gas Pipeline";
-  const strategicEyebrow = pipeline?.eyebrow || "Featured Strategic Focus";
-  const strategicDesc =
-    pipeline?.description ||
-    "The proposed corridor represents a strategic connection between African energy resources and European energy security needs, with Italy and Spain as important destinations.";
 
   const focusList = focusAreas?.length ? focusAreas : fallbackFocusAreas;
 
@@ -105,40 +87,6 @@ export default async function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          STRATEGIC FOCUS — Card grid with numbered items
-          ═══════════════════════════════════════════════════════════ */}
-      {/* <section className="section-py">
-        <div className="container-page">
-          <SectionHeading
-            eyebrow={strategicEyebrow}
-            title={strategicTitle}
-            description={strategicDesc}
-          />
-
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {(strategicItems?.length ? strategicItems : fallbackStrategic).map((item, index) => (
-              <article
-                key={item.title}
-                className="professional-card group flex flex-col p-6"
-              >
-                <span className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--gold)]">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="heading-sm text-[var(--navy)]">{item.title}</h3>
-                <p className="body-sm mt-3">{item.description}</p>
-                <div className="mt-auto pt-5">
-                  <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[var(--green)] opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:gap-2">
-                    <T k="home.strategic.learnMore" />
-                    <ArrowRight size={13} />
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      {/* ═══════════════════════════════════════════════════════════
           GLOBAL SOLAR MAP
           ═══════════════════════════════════════════════════════════ */}
       <GlobalSolarMapCard />
@@ -154,39 +102,6 @@ export default async function HomePage() {
       <EnergyDevelopmentAfricaSection />
 
       {/* ═══════════════════════════════════════════════════════════
-          RESEARCH & PUBLICATIONS
-          ═══════════════════════════════════════════════════════════ */}
-      {/* <section className="section-py">
-        <div className="container-page">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="eyebrow mb-3"><T k="home.research.eyebrow" /></p>
-              <h2 className="heading-lg"><T k="home.research.heading" /></h2>
-            </div>
-            <Link href="/research" className="btn-ghost">
-              <T k="home.research.browse" />
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {publications.slice(0, 3).map((pub) => (
-              <PublicationCard
-                key={pub.id}
-                publication={{
-                  type: pub.pub_type || "Publication",
-                  title: pub.title,
-                  description: pub.excerpt || "",
-                  date: formatDate(pub.published_at) || "Draft",
-                  href: `/research/${pub.slug}`,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      {/* ═══════════════════════════════════════════════════════════
           ABOUT THE ANALYST
           ═══════════════════════════════════════════════════════════ */}
       <section className="section-light section-py">
@@ -197,6 +112,8 @@ export default async function HomePage() {
               src="/about.jpeg"
               alt="Professional portrait of Ramdane Belamri"
               className="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
 

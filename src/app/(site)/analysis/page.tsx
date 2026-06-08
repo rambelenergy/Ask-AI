@@ -74,6 +74,8 @@ export default async function AnalysisPage() {
                     src={featured.cover_image_url}
                     alt={featured.title}
                     className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
               ) : (
@@ -159,6 +161,8 @@ export default async function AnalysisPage() {
                     src={article.cover_image_url}
                     alt={article.title}
                     className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
               )}

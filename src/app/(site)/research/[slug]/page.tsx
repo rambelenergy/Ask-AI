@@ -144,6 +144,8 @@ export default async function ResearchDetailPage({ params }: Props) {
               src={pub.cover_image_url}
               alt={pub.title}
               className="h-[200px] w-full object-cover sm:h-[340px] lg:h-[420px]"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>

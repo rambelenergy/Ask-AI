@@ -227,6 +227,25 @@ const translations: Record<Language, TranslationMap> = {
       "The key energy themes and strategic topics covered by RamBelEnergy across Algeria, Africa, the Mediterranean, and Europe.",
     "energyFocus.cta": "Explore analysis",
 
+    // Global Map
+    "globalMap.pageTitle": "Global Solar Map",
+    "globalMap.interactiveBadge": "External Interactive Resource",
+    "globalMap.heading": "Global Solar Map",
+    "globalMap.description":
+      "Explore solar resource and photovoltaic power potential data for Algeria and other regions through the Global Solar Atlas — an interactive tool by the World Bank Group.",
+    "globalMap.openMap": "Open Global Solar Map",
+    "globalMap.homeLink": "Visit Global Solar Atlas Home",
+    "globalMap.coordinatesLabel": "Algeria coordinates: 30.45°N, 0.23°E",
+    "globalMap.solarDataTitle": "Solar Resource Data",
+    "globalMap.solarDataDesc":
+      "Access global horizontal irradiation (GHI), direct normal irradiation (DNI), and photovoltaic power potential.",
+    "globalMap.interactiveTitle": "Interactive Map",
+    "globalMap.interactiveDesc":
+      "Zoom, pan, and click anywhere on the map to get site-specific solar data and annual PV output estimates.",
+    "globalMap.algeriaFocusTitle": "Algeria Focus",
+    "globalMap.algeriaFocusDesc":
+      "Map pre-centered on Algeria at 30.45°N, 0.23°E — ready to explore the Sahara's world-class solar potential.",
+
     // AI Assistant Page
     "ai.pageTitle": "AI Assistant",
     "ai.prototypeBadge": "Limited prototype",
@@ -491,6 +510,25 @@ const translations: Record<Language, TranslationMap> = {
       "Les thèmes énergétiques clés et les sujets stratégiques couverts par RamBelEnergy à travers l'Algérie, l'Afrique, la Méditerranée et l'Europe.",
     "energyFocus.cta": "Explorer les analyses",
 
+    // Global Map
+    "globalMap.pageTitle": "Carte Solaire Mondiale",
+    "globalMap.interactiveBadge": "Ressource Interactive Externe",
+    "globalMap.heading": "Carte Solaire Mondiale",
+    "globalMap.description":
+      "Explorez les données de ressource solaire et de potentiel photovoltaïque pour l'Algérie et d'autres régions via le Global Solar Atlas — un outil interactif du Groupe de la Banque Mondiale.",
+    "globalMap.openMap": "Ouvrir la Carte Solaire Mondiale",
+    "globalMap.homeLink": "Visiter la Page d'Accueil du Global Solar Atlas",
+    "globalMap.coordinatesLabel": "Coordonnées Algérie : 30.45°N, 0.23°E",
+    "globalMap.solarDataTitle": "Données de Ressource Solaire",
+    "globalMap.solarDataDesc":
+      "Accédez à l'irradiation horizontale globale (GHI), l'irradiation normale directe (DNI) et le potentiel photovoltaïque.",
+    "globalMap.interactiveTitle": "Carte Interactive",
+    "globalMap.interactiveDesc":
+      "Zoomez, déplacez et cliquez n'importe où sur la carte pour obtenir des données solaires spécifiques au site et des estimations de production PV annuelle.",
+    "globalMap.algeriaFocusTitle": "Focus Algérie",
+    "globalMap.algeriaFocusDesc":
+      "Carte pré-centrée sur l'Algérie à 30.45°N, 0.23°E — prête à explorer le potentiel solaire de classe mondiale du Sahara.",
+
     // AI Assistant Page
     "ai.pageTitle": "Assistant IA",
     "ai.prototypeBadge": "Prototype limité",
@@ -746,6 +784,25 @@ const translations: Record<Language, TranslationMap> = {
       "المواضيع الطاقوية الرئيسية والموضوعات الاستراتيجية التي تغطيها RamBelEnergy عبر الجزائر وأفريقيا والمتوسط وأوروبا.",
     "energyFocus.cta": "استكشف التحليلات",
 
+    // Global Map
+    "globalMap.pageTitle": "الخريطة الشمسية العالمية",
+    "globalMap.interactiveBadge": "مورد تفاعلي خارجي",
+    "globalMap.heading": "الخريطة الشمسية العالمية",
+    "globalMap.description":
+      "استكشف بيانات الموارد الشمسية وإمكانات الطاقة الكهروضوئية للجزائر والمناطق الأخرى من خلال الأطلس الشمسي العالمي — أداة تفاعلية من مجموعة البنك الدولي.",
+    "globalMap.openMap": "افتح الخريطة الشمسية العالمية",
+    "globalMap.homeLink": "زيارة الصفحة الرئيسية للأطلس الشمسي العالمي",
+    "globalMap.coordinatesLabel": "إحداثيات الجزائر: 30.45°N, 0.23°E",
+    "globalMap.solarDataTitle": "بيانات الموارد الشمسية",
+    "globalMap.solarDataDesc":
+      "الوصول إلى الإشعاع الأفقي العالمي (GHI) والإشعاع العمودي المباشر (DNI) وإمكانات الطاقة الكهروضوئية.",
+    "globalMap.interactiveTitle": "خريطة تفاعلية",
+    "globalMap.interactiveDesc":
+      "تكبير، تحريك، والنقر في أي مكان على الخريطة للحصول على بيانات شمسية محددة للموقع وتقديرات الإنتاج الكهروضوئي السنوي.",
+    "globalMap.algeriaFocusTitle": "التركيز على الجزائر",
+    "globalMap.algeriaFocusDesc":
+      "الخريطة ممركزة مسبقًا على الجزائر عند 30.45°N, 0.23°E — جاهزة لاستكشاف الإمكانات الشمسية العالمية للصحراء.",
+
     // AI Assistant Page
     "ai.pageTitle": "المساعد الذكي",
     "ai.prototypeBadge": "نموذج أولي محدود",
@@ -995,6 +1052,25 @@ const translations: Record<Language, TranslationMap> = {
     "energyFocus.subtitle":
       "Die wichtigsten Energiethemen und strategischen Schwerpunkte, die RamBelEnergy in Algerien, Afrika, dem Mittelmeerraum und Europa abdeckt.",
     "energyFocus.cta": "Analysen entdecken",
+
+    // Global Map
+    "globalMap.pageTitle": "Globale Solarkarte",
+    "globalMap.interactiveBadge": "Externe Interaktive Ressource",
+    "globalMap.heading": "Globale Solarkarte",
+    "globalMap.description":
+      "Erkunden Sie Daten zu Solarressourcen und Photovoltaik-Potenzial für Algerien und andere Regionen über den Global Solar Atlas — ein interaktives Tool der Weltbankgruppe.",
+    "globalMap.openMap": "Globale Solarkarte öffnen",
+    "globalMap.homeLink": "Global Solar Atlas Startseite besuchen",
+    "globalMap.coordinatesLabel": "Algerien Koordinaten: 30.45°N, 0.23°E",
+    "globalMap.solarDataTitle": "Solarressourcendaten",
+    "globalMap.solarDataDesc":
+      "Zugriff auf globale Horizontalstrahlung (GHI), direkte Normalstrahlung (DNI) und Photovoltaik-Potenzial.",
+    "globalMap.interactiveTitle": "Interaktive Karte",
+    "globalMap.interactiveDesc":
+      "Zoomen, verschieben und klicken Sie auf die Karte, um standortspezifische Solardaten und jährliche PV-Ertragsschätzungen zu erhalten.",
+    "globalMap.algeriaFocusTitle": "Algerien-Fokus",
+    "globalMap.algeriaFocusDesc":
+      "Karte auf Algerien bei 30.45°N, 0.23°E zentriert — bereit, das Weltklasse-Solarpotenzial der Sahara zu erkunden.",
 
     // AI Assistant Page
     "ai.pageTitle": "KI-Assistent",
@@ -1246,6 +1322,25 @@ const translations: Record<Language, TranslationMap> = {
       "Los temas energéticos clave y los asuntos estratégicos cubiertos por RamBelEnergy en Argelia, África, el Mediterráneo y Europa.",
     "energyFocus.cta": "Explorar análisis",
 
+    // Global Map
+    "globalMap.pageTitle": "Mapa Solar Global",
+    "globalMap.interactiveBadge": "Recurso Interactivo Externo",
+    "globalMap.heading": "Mapa Solar Global",
+    "globalMap.description":
+      "Explore los datos de recursos solares y potencial de energía fotovoltaica para Argelia y otras regiones a través del Global Solar Atlas — una herramienta interactiva del Grupo del Banco Mundial.",
+    "globalMap.openMap": "Abrir Mapa Solar Global",
+    "globalMap.homeLink": "Visitar la Página del Global Solar Atlas",
+    "globalMap.coordinatesLabel": "Coordenadas de Argelia: 30.45°N, 0.23°E",
+    "globalMap.solarDataTitle": "Datos de Recursos Solares",
+    "globalMap.solarDataDesc":
+      "Acceda a la irradiación horizontal global (GHI), irradiación normal directa (DNI) y potencial de energía fotovoltaica.",
+    "globalMap.interactiveTitle": "Mapa Interactivo",
+    "globalMap.interactiveDesc":
+      "Acérquese, desplace y haga clic en cualquier lugar del mapa para obtener datos solares específicos del sitio y estimaciones de producción fotovoltaica anual.",
+    "globalMap.algeriaFocusTitle": "Enfoque Argelia",
+    "globalMap.algeriaFocusDesc":
+      "Mapa pre-centrado en Argelia a 30.45°N, 0.23°E — listo para explorar el potencial solar de clase mundial del Sahara.",
+
     // AI Assistant Page
     "ai.pageTitle": "Asistente IA",
     "ai.prototypeBadge": "Prototipo limitado",
@@ -1495,6 +1590,25 @@ const translations: Record<Language, TranslationMap> = {
     "energyFocus.subtitle":
       "I temi energetici chiave e gli argomenti strategici trattati da RamBelEnergy in Algeria, Africa, Mediterraneo ed Europa.",
     "energyFocus.cta": "Esplora le analisi",
+
+    // Global Map
+    "globalMap.pageTitle": "Mappa Solare Globale",
+    "globalMap.interactiveBadge": "Risorsa Interattiva Esterna",
+    "globalMap.heading": "Mappa Solare Globale",
+    "globalMap.description":
+      "Esplora i dati sulle risorse solari e il potenziale di energia fotovoltaica per l'Algeria e altre regioni attraverso il Global Solar Atlas — uno strumento interattivo del Gruppo della Banca Mondiale.",
+    "globalMap.openMap": "Apri Mappa Solare Globale",
+    "globalMap.homeLink": "Visita la Home del Global Solar Atlas",
+    "globalMap.coordinatesLabel": "Coordinate Algeria: 30.45°N, 0.23°E",
+    "globalMap.solarDataTitle": "Dati sulle Risorse Solari",
+    "globalMap.solarDataDesc":
+      "Accedi all'irradiazione orizzontale globale (GHI), all'irradiazione normale diretta (DNI) e al potenziale fotovoltaico.",
+    "globalMap.interactiveTitle": "Mappa Interattiva",
+    "globalMap.interactiveDesc":
+      "Zoom, sposta e clicca ovunque sulla mappa per ottenere dati solari specifici del sito e stime di produzione fotovoltaica annuale.",
+    "globalMap.algeriaFocusTitle": "Focus Algeria",
+    "globalMap.algeriaFocusDesc":
+      "Mappa pre-centrata sull'Algeria a 30.45°N, 0.23°E — pronta per esplorare il potenziale solare di livello mondiale del Sahara.",
 
     // AI Assistant Page
     "ai.pageTitle": "Assistente IA",

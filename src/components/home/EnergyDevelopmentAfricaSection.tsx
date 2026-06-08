@@ -101,6 +101,8 @@ export function EnergyDevelopmentAfricaSection() {
                 src="/mission300Banner.webp"
                 alt="Mission 300 — Energy access and development in Africa"
                 className="w-full"
+                loading="lazy"
+                decoding="async"
               />
             <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5 transition-colors group-hover:bg-[var(--navy)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
@@ -121,6 +123,8 @@ export function EnergyDevelopmentAfricaSection() {
                 src="/mission300latestebanner.webp"
                 alt="Mission 300 — Energy access and development in Africa"
                 className="w-full"
+                loading="lazy"
+                decoding="async"
               />
             <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5 transition-colors group-hover:bg-[var(--navy)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">

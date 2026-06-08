@@ -76,6 +76,8 @@ export default async function AnalysisArticlePage({ params }: Props) {
                 src={article.cover_image_url}
                 alt={article.title}
                 className="h-[200px] w-full object-cover sm:h-[340px] lg:h-[400px]"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           )}

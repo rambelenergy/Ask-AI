@@ -35,13 +35,18 @@ export function SearchOverlay() {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // Close on Escape
+  // Close on Escape + open on Ctrl+K
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape" && open) {
         setOpen(false);
         setQuery("");
         setResults([]);
+      }
+      // Ctrl+K / Cmd+K to open search
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setOpen(true);
       }
     }
     document.addEventListener("keydown", handleKeyDown);

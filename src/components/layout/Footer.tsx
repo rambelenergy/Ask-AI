@@ -26,15 +26,19 @@ export async function Footer() {
                 src="/logo.png"
                 alt="RamBelEnergy"
                 className="h-9 w-auto brightness-0 invert"
+                loading="lazy"
+                decoding="async"
               />
               <span className="text-xl font-bold tracking-[-0.02em]">RamBelEnergy</span>
             </Link>
             <p className="mt-5 max-w-sm text-[14px] leading-[1.75] text-slate-300">
               {tagline}
             </p>
-            <p className="mt-4 max-w-sm text-[11px] leading-[1.7] text-slate-500 italic">
-              <T k="footer.disclaimer" />
-            </p>
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <p className="max-w-sm text-[12px] leading-[1.7] text-slate-400">
+                <T k="footer.disclaimer" />
+              </p>
+            </div>
             <div className="mt-6 flex items-center gap-2 text-[13px] text-slate-400">
               <Globe size={14} className="shrink-0" />
               <span>rambelenergy.com</span>

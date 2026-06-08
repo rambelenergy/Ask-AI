@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { CTASection } from "@/components/content/CTASection";
 import { getAllAboutSections } from "@/lib/about-sections";
@@ -61,6 +62,12 @@ export default async function AboutPage() {
           ═══════════════════════════════════════════════ */}
       <section className="section-py">
         <div className="container-page">
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "About" },
+            ]}
+          />
           <div className="mb-12">
             <p className="eyebrow mb-4"><T k="about.profile.eyebrow" /></p>
             <h2 className="heading-lg">{profile.title}</h2>
@@ -73,6 +80,8 @@ export default async function AboutPage() {
                 src="/about.jpeg"
                 alt="Professional portrait of Ramdane Belamri"
                 className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </figure>
 

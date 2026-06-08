@@ -38,6 +38,8 @@ export function SaharaRenewableSection() {
                 src="/sahara-energy.jpeg"
                 alt="Sahara desert solar energy potential"
                 className="h-[340px] w-full object-cover sm:h-[420px]"
+                loading="lazy"
+                decoding="async"
               />
               {/* Labels overlay */}
               <div className="absolute bottom-5 left-5 z-10">

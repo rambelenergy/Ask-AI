@@ -173,6 +173,8 @@ export function ArticleCarousel({ articles }: ArticleCarouselProps) {
                         src={a.cover_image_url!}
                         alt={a.title}
                         className="h-[220px] w-full object-cover md:h-full"
+                        loading="lazy"
+                        decoding="async"
                       />
                       {/* Gradient overlays */}
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--navy)]/70 via-[var(--navy)]/10 to-transparent md:bg-gradient-to-l md:from-[var(--navy)]/60 md:via-transparent md:to-transparent" />
