@@ -32,6 +32,9 @@ export async function Footer() {
             <p className="mt-5 max-w-sm text-[14px] leading-[1.75] text-slate-300">
               {tagline}
             </p>
+            <p className="mt-4 max-w-sm text-[11px] leading-[1.7] text-slate-500 italic">
+              <T k="footer.disclaimer" />
+            </p>
             <div className="mt-6 flex items-center gap-2 text-[13px] text-slate-400">
               <Globe size={14} className="shrink-0" />
               <span>rambelenergy.com</span>

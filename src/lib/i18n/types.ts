@@ -103,6 +103,7 @@ export type TranslationKey =
   | "home.cta.button"
   // Footer
   | "footer.tagline"
+  | "footer.disclaimer"
   | "footer.copyright"
   | "footer.navHeading"
   | "footer.focusHeading"
