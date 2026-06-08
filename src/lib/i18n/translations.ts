@@ -117,9 +117,9 @@ const translations: Record<Language, TranslationMap> = {
 
     // Footer
     "footer.tagline":
-      "Professional energy analysis and sustainability intelligence focused on Algeria–Europe relations and Mediterranean energy security.",
+      "Professional energy analysis and sustainability intelligence focused on Algeria-Africa–Europe relations and Mediterranean energy security.",
     "footer.disclaimer":
-      "RamBelEnergy is an independent energy journalism, research, and analysis platform. Our focus is energy policy analysis and news (particularly Algeria–Europe), not engineering services, engineering consultancy, or an investment platform.",
+      "RamBelEnergy is an independent energy journalism, research, and analysis platform. Our focus is energy policy analysis and news (particularly Algeria-Africa–Europe).",
     "footer.copyright": "RamBelEnergy. All rights reserved.",
     "footer.navHeading": "Navigation",
     "footer.focusHeading": "Focus Areas",
@@ -376,9 +376,9 @@ const translations: Record<Language, TranslationMap> = {
 
     // Footer
     "footer.tagline":
-      "Analyse énergétique professionnelle et veille durable axées sur les relations Algérie–Europe et la sécurité énergétique méditerranéenne.",
+      "Analyse énergétique professionnelle et veille durable axées sur les relations Algérie-Africa–Europe et la sécurité énergétique méditerranéenne.",
     "footer.disclaimer":
-      "RamBelEnergy est une plateforme indépendante de journalisme, de recherche et d'analyse énergétique. Notre focus est l'analyse des politiques et de l'actualité énergétiques (en particulier Algérie–Europe), et non les services d'ingénierie, le conseil en ingénierie ou une plateforme d'investissement.",
+      "RamBelEnergy est une plateforme indépendante de journalisme, de recherche et d'analyse énergétique. Notre focus est l'analyse des politiques et de l'actualité énergétiques (en particulier Algérie-Africa–Europe).",
     "footer.copyright": "RamBelEnergy. Tous droits réservés.",
     "footer.navHeading": "Navigation",
     "footer.focusHeading": "Domaines d'Expertise",
@@ -635,9 +635,9 @@ const translations: Record<Language, TranslationMap> = {
 
     // Footer
     "footer.tagline":
-      "تحليل طاقوي مهني واستخبارات استدامة تركز على العلاقات بين الجزائر وأوروبا وأمن الطاقة المتوسطي.",
+      "تحليل طاقوي مهني واستخبارات استدامة تركز على العلاقات بين الجزائر وأفريقيا وأوروبا وأمن الطاقة المتوسطي.",
     "footer.disclaimer":
-      "RamBelEnergy هي منصة مستقلة للصحافة والبحث والتحليل في مجال الطاقة. ينصب تركيزنا على تحليل سياسات وأخبار الطاقة (خاصة الجزائر-أوروبا)، وليس الخدمات الهندسية أو الاستشارات الهندسية أو منصة استثمار.",
+      "RamBelEnergy هي منصة مستقلة للصحافة والبحث والتحليل في مجال الطاقة. ينصب تركيزنا على تحليل سياسات وأخبار الطاقة (خاصة الجزائر-أفريقيا-أوروبا).",
     "footer.copyright": "RamBelEnergy. جميع الحقوق محفوظة.",
     "footer.navHeading": "التنقل",
     "footer.focusHeading": "مجالات التركيز",
@@ -886,9 +886,9 @@ const translations: Record<Language, TranslationMap> = {
 
     // Footer
     "footer.tagline":
-      "Professionelle Energieanalyse und Nachhaltigkeits-Intelligence mit Fokus auf die Beziehungen Algerien–Europa und die Energiesicherheit im Mittelmeerraum.",
+      "Professionelle Energieanalyse und Nachhaltigkeits-Intelligence mit Fokus auf die Beziehungen Algerien-Africa–Europa und die Energiesicherheit im Mittelmeerraum.",
     "footer.disclaimer":
-      "RamBelEnergy ist eine unabhängige Plattform für Energie-Journalismus, -Forschung und -Analyse. Unser Fokus liegt auf energiepolitischer Analyse und Nachrichten (insbesondere Algerien–Europa), nicht auf Ingenieurdienstleistungen, Ingenieurberatung oder einer Investitionsplattform.",
+      "RamBelEnergy ist eine unabhängige Plattform für Energie-Journalismus, -Forschung und -Analyse. Unser Fokus liegt auf energiepolitischer Analyse und Nachrichten (insbesondere Algerien-Africa–Europa).",
     "footer.copyright": "RamBelEnergy. Alle Rechte vorbehalten.",
     "footer.navHeading": "Navigation",
     "footer.focusHeading": "Schwerpunkte",
@@ -1136,9 +1136,9 @@ const translations: Record<Language, TranslationMap> = {
 
     // Footer
     "footer.tagline":
-      "Análisis energético profesional e inteligencia de sostenibilidad centrados en las relaciones Argelia–Europa y la seguridad energética del Mediterráneo.",
+      "Análisis energético profesional e inteligencia de sostenibilidad centrados en las relaciones Argelia-Africa–Europa y la seguridad energética del Mediterráneo.",
     "footer.disclaimer":
-      "RamBelEnergy es una plataforma independiente de periodismo, investigación y análisis energético. Nuestro enfoque es el análisis de políticas y noticias energéticas (particularmente Argelia–Europa), no servicios de ingeniería, consultoría de ingeniería o una plataforma de inversión.",
+      "RamBelEnergy es una plataforma independiente de periodismo, investigación y análisis energético. Nuestro enfoque es el análisis de políticas y noticias energéticas (particularmente Argelia-Africa–Europa).",
     "footer.copyright": "RamBelEnergy. Todos los derechos reservados.",
     "footer.navHeading": "Navegación",
     "footer.focusHeading": "Áreas de Enfoque",
@@ -1386,9 +1386,9 @@ const translations: Record<Language, TranslationMap> = {
 
     // Footer
     "footer.tagline":
-      "Analisi energetica professionale e intelligence sulla sostenibilità focalizzate sulle relazioni Algeria–Europa e sulla sicurezza energetica del Mediterraneo.",
+      "Analisi energetica professionale e intelligence sulla sostenibilità focalizzate sulle relazioni Algeria-Africa–Europa e sulla sicurezza energetica del Mediterraneo.",
     "footer.disclaimer":
-      "RamBelEnergy è una piattaforma indipendente di giornalismo, ricerca e analisi energetica. Il nostro focus è l'analisi delle politiche e delle notizie energetiche (in particolare Algeria–Europa), non servizi di ingegneria, consulenza ingegneristica o una piattaforma di investimento.",
+      "RamBelEnergy è una piattaforma indipendente di giornalismo, ricerca e analisi energetica. Il nostro focus è l'analisi delle politiche e delle notizie energetiche (in particolare Algeria-Africa–Europa).",
     "footer.copyright": "RamBelEnergy. Tutti i diritti riservati.",
     "footer.navHeading": "Navigazione",
     "footer.focusHeading": "Aree di Focus",
