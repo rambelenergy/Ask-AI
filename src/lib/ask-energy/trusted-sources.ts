@@ -13,7 +13,7 @@ export interface TrustedSourceGroup {
  * are intentionally excluded.
  *
  * ═══════════════════════════════════════════════════════════════
- * Last updated: 2026-06-05
+ * Last updated: 2026-06-08
  * ═══════════════════════════════════════════════════════════════
  */
 export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
@@ -136,7 +136,6 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "data.un.org",
       "ourworldindata.org",
       "ember-energy.org",
-      "iea.org",
     ],
   },
 
@@ -150,9 +149,33 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
     ],
   },
 
-  // ═══ PRIORITY 11 — Supplementary: General News & Policy (not energy-specific) ═══
+  // ═══ PRIORITY 11 — Quality International & Regional News Media ═══
   {
     priority: 11,
+    name: "International & Regional News Media",
+    domains: [
+      "france24.com",
+      "bbc.com",
+      "aljazeera.com",
+      "dw.com",
+      "euronews.com",
+      "lemonde.fr",
+      "elpais.com",
+      "lavanguardia.com",
+      "tsa-algerie.com",
+      "elwatan-dz.com",
+      "horizons.dz",
+      "lavoiedalgerie.dz",
+      "theafricareport.com",
+      "newarab.com",
+      "africanews.com",
+      "africaradio.com",
+    ],
+  },
+
+  // ═══ PRIORITY 12 — Supplementary: General News & Policy (not energy-specific) ═══
+  {
+    priority: 12,
     name: "General News & Policy",
     domains: [
       "bloomberg.com",
@@ -162,10 +185,10 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
     ],
   },
 
-  // ═══ PRIORITY 12 — Supplementary: Energy Market & Data Platforms ═══
+  // ═══ PRIORITY 13 — Supplementary: Energy Market & Data Platforms ═══
   // Lower priority — official sources (1-10) preferred for same news
   {
-    priority: 12,
+    priority: 13,
     name: "Energy Market & Data Platforms",
     domains: [
       "argusmedia.com",
@@ -174,9 +197,9 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
     ],
   },
 
-  // ═══ PRIORITY 13 — Supplementary: Algerian Research & Institutions ═══
+  // ═══ PRIORITY 14 — Supplementary: Algerian Research & Institutions ═══
   {
-    priority: 13,
+    priority: 14,
     name: "Algerian Research & Institutions",
     domains: [
       "cder.dz",

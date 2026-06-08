@@ -104,19 +104,21 @@ export async function searchTrustedSources(
   // Step 1: Expand query (pass language for non-English English keyword injection)
   const expandedQueries = expandEnergyQuery(question, language);
 
-  // Step 2: Search with the original question only (single query, fast)
-  const searchQueries = expandedQueries.slice(0, 1);
+  // Step 2: Search with up to 2 expanded queries (wider coverage for trusted domains)
+  const searchQueries = expandedQueries.slice(0, 2);
   const allRawResults: LangSearchResult[] = [];
   const domainsFound = new Set<string>();
 
-  try {
-    const results = await searchWithLangSearch(searchQueries[0], signal);
-    for (const r of results) {
-      allRawResults.push(r);
-      domainsFound.add(extractDomain(r.url));
+  for (const q of searchQueries) {
+    try {
+      const results = await searchWithLangSearch(q, signal);
+      for (const r of results) {
+        allRawResults.push(r);
+        domainsFound.add(extractDomain(r.url));
+      }
+    } catch {
+      // Graceful: individual query failure doesn't block others
     }
-  } catch {
-    // Graceful: return empty if search fails
   }
 
   // If ALL queries failed, return empty

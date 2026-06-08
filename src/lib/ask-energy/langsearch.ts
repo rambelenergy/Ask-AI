@@ -56,7 +56,7 @@ export async function searchWithLangSearch(
         query,
         freshness: "noLimit",
         summary: true,
-        count: 15,
+        count: 10,
       }),
       signal: internalController.signal,
     });
