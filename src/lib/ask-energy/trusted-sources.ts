@@ -37,6 +37,7 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "sonatrach.com",
       "sonelgaz.dz",
       "creg.gov.dz",
+      "elmoudjahid.dz",
     ],
   },
 
@@ -95,6 +96,7 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "miteco.gob.es",
       "ree.es",
       "idae.es",
+      "exteriores.gob.es",
       "mase.gov.it",
       "gse.it",
       "arera.it",
@@ -170,12 +172,52 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "newarab.com",
       "africanews.com",
       "africaradio.com",
+      "algerie360.com",
+      "lechodalgerie.dz",
+      "allafrica.com",
+      "ansa.it",
+      "corriere.it",
+      "ilsole24ore.com",
+      "spiegel.de",
+      "faz.net",
+      "sueddeutsche.de",
+      "democrata.es",
+      "algeriainvest.com",
+      "afriquinfos.com",
+      "lalgerieaujourdhui.dz",
     ],
   },
 
-  // ═══ PRIORITY 12 — Supplementary: General News & Policy (not energy-specific) ═══
+  // ═══ PRIORITY 12 — Energy Think Tanks & Research Institutes ═══
   {
     priority: 12,
+    name: "Energy Think Tanks & Research",
+    domains: [
+      "oxfordenergy.org",
+      "carnegieendowment.org",
+      "climateanalytics.org",
+      "ifri.org",
+      "chathamhouse.org",
+      "energyinst.org",
+      "carbonbrief.org",
+    ],
+  },
+
+  // ═══ PRIORITY 13 — Energy Industry News ═══
+  {
+    priority: 13,
+    name: "Energy Industry News",
+    domains: [
+      "oilprice.com",
+      "rechargenews.com",
+      "pv-magazine.com",
+      "energymonitor.ai",
+    ],
+  },
+
+  // ═══ PRIORITY 14 — Supplementary: General News & Policy (not energy-specific) ═══
+  {
+    priority: 14,
     name: "General News & Policy",
     domains: [
       "bloomberg.com",
@@ -185,10 +227,10 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
     ],
   },
 
-  // ═══ PRIORITY 13 — Supplementary: Energy Market & Data Platforms ═══
+  // ═══ PRIORITY 15 — Supplementary: Energy Market & Data Platforms ═══
   // Lower priority — official sources (1-10) preferred for same news
   {
-    priority: 13,
+    priority: 15,
     name: "Energy Market & Data Platforms",
     domains: [
       "argusmedia.com",
@@ -197,9 +239,9 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
     ],
   },
 
-  // ═══ PRIORITY 14 — Supplementary: Algerian Research & Institutions ═══
+  // ═══ PRIORITY 16 — Supplementary: Algerian Research & Institutions ═══
   {
-    priority: 14,
+    priority: 16,
     name: "Algerian Research & Institutions",
     domains: [
       "cder.dz",
