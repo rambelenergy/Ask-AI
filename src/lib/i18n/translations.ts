@@ -77,6 +77,8 @@ const translations: Record<Language, TranslationMap> = {
     "home.sahara.desc":
       "Algeria possesses one of the highest solar irradiation levels in the world, especially across its vast Saharan territories. This natural advantage positions the country as a potential future hub for solar electricity generation and green hydrogen production, contributing to both domestic energy transition and Euro-African energy cooperation.",
     "home.sahara.cta": "Explore renewable sources",
+    "home.sahara.overlaySahara": "Algerian Sahara",
+    "home.sahara.overlayHub": "Renewable Hub",
 
     // Home Renewable Sources
     "home.renewable.eyebrow": "Selected External References",
@@ -107,6 +109,27 @@ const translations: Record<Language, TranslationMap> = {
     // Home Focus
     "home.focus.eyebrow": "Focus Areas",
     "home.focus.heading": "Energy themes covered by RamBelEnergy",
+
+    // Home Energy Development Africa
+    "home.energyDev.eyebrow": "ENERGY ACCESS & HUMAN DEVELOPMENT",
+    "home.energyDev.heading": "Energy & Development in Africa",
+    "home.energyDev.description":
+      "Energy is not only a matter of markets, pipelines, and infrastructure. Across Africa and the Sahel, access to reliable energy can support education, healthcare, job creation, rural electrification, and long-term economic development.",
+    "home.energyDev.supportingText":
+      "This section highlights how energy initiatives contribute to human development while remaining connected to RamBelEnergy's broader focus on energy, sustainability, and Africa–Europe strategic cooperation.",
+    "home.energyDev.catEnergyDev": "Energy & Development",
+    "home.energyDev.catEducation": "Energy and Education",
+    "home.energyDev.catHealthcare": "Energy and Healthcare",
+    "home.energyDev.catWomen": "Women and Energy",
+    "home.energyDev.catGreenJobs": "Green Jobs",
+    "home.energyDev.catRural": "Rural Electrification",
+    "home.energyDev.catSahel": "Sahel Development",
+    "home.energyDev.catTransSaharan": "Trans-Saharan Gas Pipeline & Local Economic Impact",
+    "home.energyDev.img1Label": "Energy for People",
+    "home.energyDev.img1Badge": "Human Impact",
+    "home.energyDev.img2Label": "Energy & Development Context",
+    "home.energyDev.img2Badge": "Africa & Sahel",
+    "home.energyDev.moreSources": "additional development references available",
 
     // Home CTA
     "home.cta.eyebrow": "Contact / Collaboration",
@@ -354,6 +377,8 @@ const translations: Record<Language, TranslationMap> = {
     "home.sahara.desc":
       "L'Algérie possède l'un des niveaux d'irradiation solaire les plus élevés au monde, en particulier sur ses vastes territoires sahariens. Cet avantage naturel positionne le pays comme un futur hub potentiel pour la production d'électricité solaire et d'hydrogène vert, contribuant à la fois à la transition énergétique nationale et à la coopération énergétique euro-africaine.",
     "home.sahara.cta": "Explorer les sources renouvelables",
+    "home.sahara.overlaySahara": "Sahara Algérien",
+    "home.sahara.overlayHub": "Pôle Renouvelable",
 
     // Home Renewable Sources
     "home.renewable.eyebrow": "Références Externes Sélectionnées",
@@ -384,6 +409,27 @@ const translations: Record<Language, TranslationMap> = {
     // Home Focus
     "home.focus.eyebrow": "Domaines d'Expertise",
     "home.focus.heading": "Thèmes énergétiques couverts par RamBelEnergy",
+
+    // Home Energy Development Africa
+    "home.energyDev.eyebrow": "ACCÈS À L'ÉNERGIE & DÉVELOPPEMENT HUMAIN",
+    "home.energyDev.heading": "Énergie et Développement en Afrique",
+    "home.energyDev.description":
+      "L'énergie ne concerne pas seulement les marchés, les pipelines et les infrastructures. À travers l'Afrique et le Sahel, l'accès à une énergie fiable peut soutenir l'éducation, les soins de santé, la création d'emplois, l'électrification rurale et le développement économique à long terme.",
+    "home.energyDev.supportingText":
+      "Cette section montre comment les initiatives énergétiques contribuent au développement humain tout en restant liées à la mission de RamBelEnergy sur l'énergie, la durabilité et la coopération stratégique Afrique-Europe.",
+    "home.energyDev.catEnergyDev": "Énergie & Développement",
+    "home.energyDev.catEducation": "Énergie et Éducation",
+    "home.energyDev.catHealthcare": "Énergie et Santé",
+    "home.energyDev.catWomen": "Femmes et Énergie",
+    "home.energyDev.catGreenJobs": "Emplois Verts",
+    "home.energyDev.catRural": "Électrification Rurale",
+    "home.energyDev.catSahel": "Développement du Sahel",
+    "home.energyDev.catTransSaharan": "Gazoduc Transsaharien & Impact Économique Local",
+    "home.energyDev.img1Label": "Énergie pour les Populations",
+    "home.energyDev.img1Badge": "Impact Humain",
+    "home.energyDev.img2Label": "Contexte Énergie & Développement",
+    "home.energyDev.img2Badge": "Afrique & Sahel",
+    "home.energyDev.moreSources": "références de développement supplémentaires disponibles",
 
     // Home CTA
     "home.cta.eyebrow": "Contact / Collaboration",
@@ -633,6 +679,8 @@ const translations: Record<Language, TranslationMap> = {
     "home.sahara.desc":
       "تمتلك الجزائر أحد أعلى مستويات الإشعاع الشمسي في العالم، خاصة عبر أراضيها الصحراوية الشاسعة. هذه الميزة الطبيعية تضع البلاد كمركز محتمل مستقبلي لإنتاج الكهرباء الشمسية والهيدروجين الأخضر، مما يساهم في التحول الطاقوي المحلي والتعاون الطاقوي الأورو-أفريقي.",
     "home.sahara.cta": "استكشف المصادر المتجددة",
+    "home.sahara.overlaySahara": "الصحراء الجزائرية",
+    "home.sahara.overlayHub": "مركز الطاقة المتجددة",
 
     // Home Renewable Sources
     "home.renewable.eyebrow": "مراجع خارجية مختارة",
@@ -663,6 +711,27 @@ const translations: Record<Language, TranslationMap> = {
     // Home Focus
     "home.focus.eyebrow": "مجالات التركيز",
     "home.focus.heading": "المواضيع الطاقوية التي تغطيها RamBelEnergy",
+
+    // Home Energy Development Africa
+    "home.energyDev.eyebrow": "الوصول إلى الطاقة والتنمية البشرية",
+    "home.energyDev.heading": "الطاقة والتنمية في أفريقيا",
+    "home.energyDev.description":
+      "الطاقة ليست مجرد مسألة أسواق وخطوط أنابيب وبنية تحتية. في جميع أنحاء أفريقيا ومنطقة الساحل، يمكن للوصول إلى طاقة موثوقة أن يدعم التعليم والرعاية الصحية وخلق فرص العمل والكهربة الريفية والتنمية الاقتصادية طويلة الأجل.",
+    "home.energyDev.supportingText":
+      "يسلط هذا القسم الضوء على كيفية مساهمة مبادرات الطاقة في التنمية البشرية مع بقائها مرتبطة بتركيز RamBelEnergy الأوسع على الطاقة والاستدامة والتعاون الاستراتيجي بين أفريقيا وأوروبا.",
+    "home.energyDev.catEnergyDev": "الطاقة والتنمية",
+    "home.energyDev.catEducation": "الطاقة والتعليم",
+    "home.energyDev.catHealthcare": "الطاقة والرعاية الصحية",
+    "home.energyDev.catWomen": "المرأة والطاقة",
+    "home.energyDev.catGreenJobs": "الوظائف الخضراء",
+    "home.energyDev.catRural": "الكهربة الريفية",
+    "home.energyDev.catSahel": "تنمية الساحل",
+    "home.energyDev.catTransSaharan": "خط أنابيب الغاز العابر للصحراء والأثر الاقتصادي المحلي",
+    "home.energyDev.img1Label": "الطاقة للناس",
+    "home.energyDev.img1Badge": "الأثر البشري",
+    "home.energyDev.img2Label": "سياق الطاقة والتنمية",
+    "home.energyDev.img2Badge": "أفريقيا والساحل",
+    "home.energyDev.moreSources": "مراجع تنموية إضافية متاحة",
 
     // Home CTA
     "home.cta.eyebrow": "اتصال / تعاون",
@@ -903,6 +972,8 @@ const translations: Record<Language, TranslationMap> = {
     "home.sahara.desc":
       "Algerien verfügt über eine der höchsten Sonneneinstrahlungen weltweit, insbesondere in seinen weiten Sahara-Gebieten. Dieser natürliche Vorteil positioniert das Land als potenziellen zukünftigen Knotenpunkt für die Erzeugung von Solarstrom und die Produktion von grünem Wasserstoff und trägt sowohl zur nationalen Energiewende als auch zur euro-afrikanischen Energiekooperation bei.",
     "home.sahara.cta": "Erneuerbare Quellen entdecken",
+    "home.sahara.overlaySahara": "Algerische Sahara",
+    "home.sahara.overlayHub": "Zentrum für Erneuerbare",
 
     // Home Renewable Sources
     "home.renewable.eyebrow": "Ausgewählte Externe Referenzen",
@@ -933,6 +1004,27 @@ const translations: Record<Language, TranslationMap> = {
     // Home Focus
     "home.focus.eyebrow": "Schwerpunkte",
     "home.focus.heading": "Energiethemen, die RamBelEnergy abdeckt",
+
+    // Home Energy Development Africa
+    "home.energyDev.eyebrow": "ENERGIEZUGANG & MENSCHLICHE ENTWICKLUNG",
+    "home.energyDev.heading": "Energie & Entwicklung in Afrika",
+    "home.energyDev.description":
+      "Energie betrifft nicht nur Märkte, Pipelines und Infrastruktur. In ganz Afrika und der Sahelzone kann der Zugang zu zuverlässiger Energie Bildung, Gesundheitsversorgung, Arbeitsplätze, ländliche Elektrifizierung und langfristige wirtschaftliche Entwicklung unterstützen.",
+    "home.energyDev.supportingText":
+      "Dieser Abschnitt zeigt, wie Energieinitiativen zur menschlichen Entwicklung beitragen und gleichzeitig mit dem übergeordneten Fokus von RamBelEnergy auf Energie, Nachhaltigkeit und strategische Zusammenarbeit zwischen Afrika und Europa verbunden bleiben.",
+    "home.energyDev.catEnergyDev": "Energie & Entwicklung",
+    "home.energyDev.catEducation": "Energie und Bildung",
+    "home.energyDev.catHealthcare": "Energie und Gesundheit",
+    "home.energyDev.catWomen": "Frauen und Energie",
+    "home.energyDev.catGreenJobs": "Grüne Arbeitsplätze",
+    "home.energyDev.catRural": "Ländliche Elektrifizierung",
+    "home.energyDev.catSahel": "Sahel-Entwicklung",
+    "home.energyDev.catTransSaharan": "Transsahara-Gaspipeline & lokale wirtschaftliche Auswirkungen",
+    "home.energyDev.img1Label": "Energie für Menschen",
+    "home.energyDev.img1Badge": "Menschliche Wirkung",
+    "home.energyDev.img2Label": "Kontext Energie & Entwicklung",
+    "home.energyDev.img2Badge": "Afrika & Sahel",
+    "home.energyDev.moreSources": "weitere Entwicklungsreferenzen verfügbar",
 
     // Home CTA
     "home.cta.eyebrow": "Kontakt / Zusammenarbeit",
@@ -1172,6 +1264,8 @@ const translations: Record<Language, TranslationMap> = {
     "home.sahara.desc":
       "Argelia posee uno de los niveles de irradiación solar más altos del mundo, especialmente en sus vastos territorios saharianos. Esta ventaja natural posiciona al país como un futuro centro potencial para la generación de electricidad solar y la producción de hidrógeno verde, contribuyendo tanto a la transición energética nacional como a la cooperación energética euroafricana.",
     "home.sahara.cta": "Explorar fuentes renovables",
+    "home.sahara.overlaySahara": "Sahara Argelino",
+    "home.sahara.overlayHub": "Centro Renovable",
 
     // Home Renewable Sources
     "home.renewable.eyebrow": "Referencias Externas Seleccionadas",
@@ -1202,6 +1296,27 @@ const translations: Record<Language, TranslationMap> = {
     // Home Focus
     "home.focus.eyebrow": "Áreas de Enfoque",
     "home.focus.heading": "Temas energéticos cubiertos por RamBelEnergy",
+
+    // Home Energy Development Africa
+    "home.energyDev.eyebrow": "ACCESO A LA ENERGÍA Y DESARROLLO HUMANO",
+    "home.energyDev.heading": "Energía y Desarrollo en África",
+    "home.energyDev.description":
+      "La energía no es solo una cuestión de mercados, gasoductos e infraestructura. En toda África y el Sahel, el acceso a energía confiable puede apoyar la educación, la atención médica, la creación de empleo, la electrificación rural y el desarrollo económico a largo plazo.",
+    "home.energyDev.supportingText":
+      "Esta sección destaca cómo las iniciativas energéticas contribuyen al desarrollo humano, manteniéndose conectadas con el enfoque más amplio de RamBelEnergy en energía, sostenibilidad y cooperación estratégica África-Europa.",
+    "home.energyDev.catEnergyDev": "Energía y Desarrollo",
+    "home.energyDev.catEducation": "Energía y Educación",
+    "home.energyDev.catHealthcare": "Energía y Salud",
+    "home.energyDev.catWomen": "Mujeres y Energía",
+    "home.energyDev.catGreenJobs": "Empleos Verdes",
+    "home.energyDev.catRural": "Electrificación Rural",
+    "home.energyDev.catSahel": "Desarrollo del Sahel",
+    "home.energyDev.catTransSaharan": "Gasoducto Transahariano e Impacto Económico Local",
+    "home.energyDev.img1Label": "Energía para las Personas",
+    "home.energyDev.img1Badge": "Impacto Humano",
+    "home.energyDev.img2Label": "Contexto Energía y Desarrollo",
+    "home.energyDev.img2Badge": "África y Sahel",
+    "home.energyDev.moreSources": "referencias de desarrollo adicionales disponibles",
 
     // Home CTA
     "home.cta.eyebrow": "Contacto / Colaboración",
@@ -1441,6 +1556,8 @@ const translations: Record<Language, TranslationMap> = {
     "home.sahara.desc":
       "L'Algeria possiede uno dei livelli di irradiazione solare più elevati al mondo, specialmente nei suoi vasti territori sahariani. Questo vantaggio naturale posiziona il paese come futuro hub potenziale per la generazione di elettricità solare e la produzione di idrogeno verde, contribuendo sia alla transizione energetica nazionale che alla cooperazione energetica euro-africana.",
     "home.sahara.cta": "Esplora le fonti rinnovabili",
+    "home.sahara.overlaySahara": "Sahara Algerino",
+    "home.sahara.overlayHub": "Polo Rinnovabile",
 
     // Home Renewable Sources
     "home.renewable.eyebrow": "Riferimenti Esterni Selezionati",
@@ -1471,6 +1588,27 @@ const translations: Record<Language, TranslationMap> = {
     // Home Focus
     "home.focus.eyebrow": "Aree di Focus",
     "home.focus.heading": "Temi energetici trattati da RamBelEnergy",
+
+    // Home Energy Development Africa
+    "home.energyDev.eyebrow": "ACCESSO ALL'ENERGIA E SVILUPPO UMANO",
+    "home.energyDev.heading": "Energia e Sviluppo in Africa",
+    "home.energyDev.description":
+      "L'energia non riguarda solo mercati, gasdotti e infrastrutture. In tutta l'Africa e il Sahel, l'accesso a un'energia affidabile può sostenere l'istruzione, l'assistenza sanitaria, la creazione di posti di lavoro, l'elettrificazione rurale e lo sviluppo economico a lungo termine.",
+    "home.energyDev.supportingText":
+      "Questa sezione evidenzia come le iniziative energetiche contribuiscano allo sviluppo umano, rimanendo collegate al focus più ampio di RamBelEnergy su energia, sostenibilità e cooperazione strategica Africa-Europa.",
+    "home.energyDev.catEnergyDev": "Energia e Sviluppo",
+    "home.energyDev.catEducation": "Energia e Istruzione",
+    "home.energyDev.catHealthcare": "Energia e Sanità",
+    "home.energyDev.catWomen": "Donne ed Energia",
+    "home.energyDev.catGreenJobs": "Lavori Verdi",
+    "home.energyDev.catRural": "Elettrificazione Rurale",
+    "home.energyDev.catSahel": "Sviluppo del Sahel",
+    "home.energyDev.catTransSaharan": "Gasdotto Trans-Sahariano e Impatto Economico Locale",
+    "home.energyDev.img1Label": "Energia per le Persone",
+    "home.energyDev.img1Badge": "Impatto Umano",
+    "home.energyDev.img2Label": "Contesto Energia e Sviluppo",
+    "home.energyDev.img2Badge": "Africa e Sahel",
+    "home.energyDev.moreSources": "riferimenti di sviluppo aggiuntivi disponibili",
 
     // Home CTA
     "home.cta.eyebrow": "Contatti / Collaborazione",

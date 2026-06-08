@@ -73,6 +73,8 @@ export type TranslationKey =
   | "home.sahara.title"
   | "home.sahara.desc"
   | "home.sahara.cta"
+  | "home.sahara.overlaySahara"
+  | "home.sahara.overlayHub"
   // Home renewable
   | "home.renewable.eyebrow"
   | "home.renewable.heading"
@@ -96,6 +98,24 @@ export type TranslationKey =
   // Home focus
   | "home.focus.eyebrow"
   | "home.focus.heading"
+
+  | "home.energyDev.eyebrow"
+  | "home.energyDev.heading"
+  | "home.energyDev.description"
+  | "home.energyDev.supportingText"
+  | "home.energyDev.catEnergyDev"
+  | "home.energyDev.catEducation"
+  | "home.energyDev.catHealthcare"
+  | "home.energyDev.catWomen"
+  | "home.energyDev.catGreenJobs"
+  | "home.energyDev.catRural"
+  | "home.energyDev.catSahel"
+  | "home.energyDev.catTransSaharan"
+  | "home.energyDev.img1Label"
+  | "home.energyDev.img1Badge"
+  | "home.energyDev.img2Label"
+  | "home.energyDev.img2Badge"
+  | "home.energyDev.moreSources"
   // Home CTA
   | "home.cta.eyebrow"
   | "home.cta.title"

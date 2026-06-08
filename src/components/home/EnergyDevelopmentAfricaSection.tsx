@@ -8,22 +8,21 @@ import {
   Globe,
   Landmark,
 } from "lucide-react";
+import { T } from "@/components/language/t";
+import type { TranslationKey } from "@/lib/i18n/types";
 import { ExternalSourceCard } from "@/components/resources/ExternalSourceCard";
-import {
-  developmentCategories,
-  energyDevelopmentSources,
-} from "@/data/energy-development-sources";
+import { energyDevelopmentSources } from "@/data/energy-development-sources";
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  "Energy & Development": <Zap size={13} />,
-  "Energy and Education": <GraduationCap size={13} />,
-  "Energy and Healthcare": <Heart size={13} />,
-  "Women and Energy": <Users size={13} />,
-  "Green Jobs": <Briefcase size={13} />,
-  "Rural Electrification": <Plug size={13} />,
-  "Sahel Development": <Globe size={13} />,
-  "Trans-Saharan Gas Pipeline & Local Economic Impact": <Landmark size={13} />,
-};
+const categoryItems: { key: TranslationKey; icon: React.ReactNode }[] = [
+  { key: "home.energyDev.catEnergyDev", icon: <Zap size={13} /> },
+  { key: "home.energyDev.catEducation", icon: <GraduationCap size={13} /> },
+  { key: "home.energyDev.catHealthcare", icon: <Heart size={13} /> },
+  { key: "home.energyDev.catWomen", icon: <Users size={13} /> },
+  { key: "home.energyDev.catGreenJobs", icon: <Briefcase size={13} /> },
+  { key: "home.energyDev.catRural", icon: <Plug size={13} /> },
+  { key: "home.energyDev.catSahel", icon: <Globe size={13} /> },
+  { key: "home.energyDev.catTransSaharan", icon: <Landmark size={13} /> },
+];
 
 export function EnergyDevelopmentAfricaSection() {
   const displayedSources = energyDevelopmentSources.slice(0, 3);
@@ -32,41 +31,36 @@ export function EnergyDevelopmentAfricaSection() {
     <section className="section-light section-py">
       <div className="container-page">
         {/* ── Eyebrow ── */}
-        <p className="eyebrow mb-4">ENERGY ACCESS & HUMAN DEVELOPMENT</p>
+        <p className="eyebrow mb-4"><T k="home.energyDev.eyebrow" /></p>
 
         {/* ── Two-column layout ── */}
         <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:items-start">
           {/* ═══ LEFT: Title + intro + categories + supporting text ═══ */}
           <div>
             <h2 className="heading-lg mb-5">
-              Energy & Development in Africa
+              <T k="home.energyDev.heading" />
             </h2>
 
             <p className="body-lg max-w-xl">
-              Energy is not only a matter of markets, pipelines, and infrastructure.
-              Across Africa and the Sahel, access to reliable energy can support
-              education, healthcare, job creation, rural electrification, and
-              long-term economic development.
+              <T k="home.energyDev.description" />
             </p>
 
             {/* Category tags */}
             <div className="mt-7 flex flex-wrap gap-2">
-              {developmentCategories.map((cat) => (
+              {categoryItems.map((cat) => (
                 <span
-                  key={cat.label}
+                  key={cat.key}
                   className="inline-flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--paper)] px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.01em] text-[var(--navy)] transition-colors duration-200 hover:border-[var(--green)]/30 hover:bg-[var(--green-soft)]"
                 >
-                  {categoryIcons[cat.label] ?? null}
-                  {cat.label}
+                  {cat.icon}
+                  <T k={cat.key} />
                 </span>
               ))}
             </div>
 
             {/* Supporting text */}
             <p className="body-sm mt-7 max-w-xl border-l-[3px] border-[var(--green-muted)] pl-4 italic text-[var(--muted-soft)]">
-              This section highlights how energy initiatives contribute to human
-              development while remaining connected to RamBelEnergy&apos;s broader
-              focus on energy, sustainability, and Africa–Europe strategic cooperation.
+              <T k="home.energyDev.supportingText" />
             </p>
           </div>
 
@@ -82,8 +76,7 @@ export function EnergyDevelopmentAfricaSection() {
             {/* Compact "more sources" link */}
             {energyDevelopmentSources.length > 3 && (
               <p className="mt-4 text-center text-[12px] font-medium text-[var(--muted-soft)]">
-                +{energyDevelopmentSources.length - 3} additional development references
-                available
+                +{energyDevelopmentSources.length - 3} <T k="home.energyDev.moreSources" />
               </p>
             )}
           </div>
@@ -106,10 +99,10 @@ export function EnergyDevelopmentAfricaSection() {
               />
             <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5 transition-colors group-hover:bg-[var(--navy)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
-                Energy for People
+                <T k="home.energyDev.img1Label" />
               </span>
               <span className="text-[11px] font-medium text-[var(--green)]">
-                Human Impact
+                <T k="home.energyDev.img1Badge" />
               </span>
             </div>
           </a>
@@ -128,10 +121,10 @@ export function EnergyDevelopmentAfricaSection() {
               />
             <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5 transition-colors group-hover:bg-[var(--navy)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
-                Energy &amp; Development Context
+                <T k="home.energyDev.img2Label" />
               </span>
               <span className="text-[11px] font-medium text-[var(--green)]">
-                Africa &amp; Sahel
+                <T k="home.energyDev.img2Badge" />
               </span>
             </div>
           </a>
