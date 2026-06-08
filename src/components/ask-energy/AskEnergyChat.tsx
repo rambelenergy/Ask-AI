@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Loader2, Send, Sparkles, Search } from "lucide-react";
+import { Loader2, Send, Sparkles, Search, RotateCcw } from "lucide-react";
 import { ChatMessage, hasArabic } from "./ChatMessage";
 import { SuggestedQuestions } from "./SuggestedQuestions";
 import { getAllSuggestedQuestions } from "@/lib/ai/suggested-questions";
@@ -13,6 +13,8 @@ interface Source {
   url: string;
   domain: string;
   priorityGroup: string;
+  trusted: boolean;
+  priority: number;
 }
 
 interface ErrorWithSuggestions {
@@ -245,6 +247,17 @@ export function AskEnergyChat() {
     handleSend(q);
   };
 
+  const handleReset = () => {
+    if (loading) {
+      abortRef.current?.abort();
+    }
+    setMessages([]);
+    setStreamingContent("");
+    setLoading(false);
+    setInput("");
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
   return (
     <div className="ask-energy-chat overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
       {/* Chat header — compact */}
@@ -258,6 +271,18 @@ export function AskEnergyChat() {
             <p className="text-[10px] text-white/40">Trusted Source Search</p>
           </div>
         </div>
+        {messages.length > 0 && (
+          <button
+            onClick={handleReset}
+            disabled={loading}
+            className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold text-white/60 transition hover:bg-white/10 hover:text-white disabled:opacity-40"
+            title="Clear all chat"
+            aria-label="Clear all chat"
+          >
+            <RotateCcw size={11} />
+            <span className="hidden sm:inline">Reset</span>
+          </button>
+        )}
       </div>
 
       {/* Messages area with Sahara background */}

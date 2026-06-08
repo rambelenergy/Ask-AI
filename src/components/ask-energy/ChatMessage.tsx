@@ -1,4 +1,4 @@
-import { Sparkles, ExternalLink, Copy, Check } from "lucide-react";
+import { Sparkles, ExternalLink, Copy, Check, AlertTriangle } from "lucide-react";
 import { useState, useCallback } from "react";
 import { SummaryBox } from "./SummaryBox";
 
@@ -12,6 +12,8 @@ interface Source {
   url: string;
   domain: string;
   priorityGroup: string;
+  trusted: boolean;
+  priority: number;
 }
 
 interface ChatMessageProps {
@@ -30,23 +32,39 @@ function SourceCards({ sources }: { sources: Source[] }) {
         Trusted Sources
       </p>
       <div className="space-y-2">
-        {sources.map((s, i) => (
+        {sources.map((s, i) => {
+          const untrusted = !s.trusted || s.priorityGroup === "General Web Search";
+          return (
           <a
             key={i}
             href={s.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-start gap-2.5 rounded-lg border border-[var(--line)] px-3 py-2 text-xs transition hover:border-[var(--green)] hover:bg-[var(--surface)]"
+            className={`flex items-start gap-2.5 rounded-lg border px-3 py-2 text-xs transition hover:border-[var(--green)] hover:bg-[var(--surface)] ${
+              untrusted
+                ? "border-amber-200 bg-amber-50/50"
+                : "border-[var(--line)]"
+            }`}
           >
-            <ExternalLink size={12} className="mt-0.5 shrink-0 text-[var(--muted)]" />
+            {untrusted ? (
+              <AlertTriangle size={12} className="mt-0.5 shrink-0 text-amber-500" />
+            ) : (
+              <ExternalLink size={12} className="mt-0.5 shrink-0 text-[var(--muted)]" />
+            )}
             <div className="min-w-0">
               <p className="truncate font-medium text-[var(--navy)]">{s.title}</p>
               <p className="mt-0.5 text-[var(--muted-soft)]">
                 {s.domain} · {s.priorityGroup}
+                {untrusted && (
+                  <span className="ml-1 inline-block rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                    Unverified
+                  </span>
+                )}
               </p>
             </div>
           </a>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -96,6 +114,7 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
   }
 
   const isArabic = hasArabic(content);
+  const hasUntrustedSources = sources && sources.length > 0 && sources.some((s) => !s.trusted || s.priorityGroup === "General Web Search");
 
   return (
     <div className="mb-4 flex justify-start">
@@ -108,6 +127,14 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
             Ask Energy
           </span>
         </div>
+        {hasUntrustedSources && (
+          <div className="mb-2 flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[11px] leading-tight text-amber-700">
+            <AlertTriangle size={12} className="shrink-0 text-amber-500" />
+            <span>
+              <strong>Untrusted Source.</strong> This answer draws from general web results that have not been verified against energy-authority sources.
+            </span>
+          </div>
+        )}
         <p className="whitespace-pre-wrap">{content}</p>
         <SourceCards sources={sources ?? []} />
         {/* Bottom toolbar: copy + summarize */}

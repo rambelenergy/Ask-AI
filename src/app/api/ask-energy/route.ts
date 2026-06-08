@@ -175,6 +175,8 @@ export async function POST(request: Request): Promise<Response> {
     url: r.url,
     domain: r.domain,
     priorityGroup: r.priorityGroup,
+    trusted: r.trusted,
+    priority: r.priority,
   }));
 
   // --- Step 4: Call AI (OpenAI) ---
