@@ -704,7 +704,7 @@ const translations: Record<Language, TranslationMap> = {
 
     // Home About
     "home.about.eyebrow": "حول المؤسس",
-    "home.about.heading": "رمضان بلامري",
+    "home.about.heading": "رمضان بلعمري",
     "home.about.viewProfile": "عرض الملف الكامل",
     "home.about.researchPub": "الأبحاث والمنشورات",
 
