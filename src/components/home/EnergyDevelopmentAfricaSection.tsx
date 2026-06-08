@@ -91,13 +91,18 @@ export function EnergyDevelopmentAfricaSection() {
 
         {/* Dual images — full width below text */}
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
-          <div className="overflow-hidden rounded-lg border border-[var(--line)]">
+          <a
+            href="https://www.worldbank.org/en/programs/energizing-africa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group overflow-hidden rounded-lg border border-[var(--line)] transition hover:border-[var(--green)] hover:shadow-md"
+          >
             <img
                 src="/mission300Banner.webp"
                 alt="Mission 300 — Energy access and development in Africa"
                 className="w-full"
               />
-            <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5">
+            <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5 transition-colors group-hover:bg-[var(--navy)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
                 Energy for People
               </span>
@@ -105,14 +110,19 @@ export function EnergyDevelopmentAfricaSection() {
                 Human Impact
               </span>
             </div>
-          </div>
-          <div className="overflow-hidden rounded-lg border border-[var(--line)]">
+          </a>
+          <a
+            href="https://www.afdb.org/en/topics-and-sectors/initiatives-and-partnerships/mission-300"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group overflow-hidden rounded-lg border border-[var(--line)] transition hover:border-[var(--green)] hover:shadow-md"
+          >
             <img
                 src="/mission300latestebanner.webp"
                 alt="Mission 300 — Energy access and development in Africa"
                 className="w-full"
               />
-            <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5">
+            <div className="flex items-center justify-between bg-[var(--navy-soft)] px-4 py-2.5 transition-colors group-hover:bg-[var(--navy)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80">
                 Energy &amp; Development Context
               </span>
@@ -120,7 +130,7 @@ export function EnergyDevelopmentAfricaSection() {
                 Africa &amp; Sahel
               </span>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </section>
