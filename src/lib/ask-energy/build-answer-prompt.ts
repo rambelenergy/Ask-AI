@@ -98,6 +98,24 @@ const AI_UNAVAILABLE_MESSAGES: Record<SupportedLanguage, string> = {
     "AI response generation is temporarily unavailable. Please try again later.",
 };
 
+/** Query too long — Brave API has 400-character limit on q parameter */
+const QUERY_TOO_LONG_MESSAGES: Record<SupportedLanguage, string> = {
+  English:
+    "Your question is too long. Please keep it under 400 characters.",
+  French:
+    "Votre question est trop longue. Veuillez la limiter à 400 caractères.",
+  Arabic:
+    "سؤالك طويل جدًا. يرجى اختصاره إلى أقل من 400 حرف.",
+  Spanish:
+    "Tu pregunta es demasiado larga. Por favor, limítala a 400 caracteres.",
+  Italian:
+    "La tua domanda è troppo lunga. Per favore, limitati a 400 caratteri.",
+  German:
+    "Ihre Frage ist zu lang. Bitte beschränken Sie sich auf 400 Zeichen.",
+  Unknown:
+    "Your question is too long. Please keep it under 400 characters.",
+};
+
 /** Broad query suggestions — shown when query is too broad */
 const BROAD_QUERY_MESSAGES: Record<SupportedLanguage, string> = {
   English:
@@ -136,6 +154,10 @@ export function getAiUnavailableMessage(language: SupportedLanguage): string {
 
 export function getBroadQueryMessage(language: SupportedLanguage): string {
   return BROAD_QUERY_MESSAGES[language] ?? BROAD_QUERY_MESSAGES.Unknown;
+}
+
+export function getQueryTooLongMessage(language: SupportedLanguage): string {
+  return QUERY_TOO_LONG_MESSAGES[language] ?? QUERY_TOO_LONG_MESSAGES.Unknown;
 }
 
 export function buildAskEnergyPrompt(

@@ -39,6 +39,7 @@ export function AskEnergyChat() {
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [loadingText, setLoadingText] = useState("Searching trusted energy sources...");
+  const [progressSteps, setProgressSteps] = useState<{ text: string; done: boolean; active: boolean }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -84,6 +85,7 @@ export function AskEnergyChat() {
       setLoading(true);
       setStreamingContent("");
       setLoadingText("Searching trusted energy sources...");
+      setProgressSteps([]);
 
       const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: message };
       const newMessages = [...messages, userMsg];
@@ -143,10 +145,49 @@ export function AskEnergyChat() {
 
                 try {
                   const parsed = JSON.parse(payload);
+
+                  // Progress events
+                  if (parsed.p) {
+                    if (parsed.p === "searching_trusted") {
+                      setLoadingText("Searching trusted energy sources...");
+                      setProgressSteps([{ text: "Searching trusted sources", done: false, active: true }]);
+                    } else if (parsed.p === "trusted_not_found") {
+                      setLoadingText("No data from trusted sources");
+                      setProgressSteps((prev) => [
+                        { text: "Searching trusted sources", done: true, active: false },
+                        { text: "No data from trusted sources", done: true, active: false },
+                      ]);
+                    } else if (parsed.p === "searching_alternative") {
+                      setLoadingText("Searching alternative sources...");
+                      setProgressSteps((prev) => [
+                        { text: "Searching trusted sources", done: true, active: false },
+                        { text: "No data from trusted sources", done: true, active: false },
+                        { text: "Searching alternative sources", done: false, active: true },
+                      ]);
+                    }
+                  }
+
+                  // SSE error (search failure during streaming)
+                  if (parsed.error) {
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        id: crypto.randomUUID(),
+                        role: "error",
+                        content: parsed.error,
+                      },
+                    ]);
+                    setStreamingContent("");
+                    setLoading(false);
+                    setProgressSteps([]);
+                    return;
+                  }
+
                   if (parsed.c) {
                     fullContent += parsed.c;
                     setStreamingContent(fullContent);
                     setLoadingText("Generating answer...");
+                    setProgressSteps((prev) => prev.map((s) => ({ ...s, active: false, done: true })));
                   }
                   if (parsed.sources) {
                     streamedSources = parsed.sources;
@@ -345,11 +386,11 @@ export function AskEnergyChat() {
           );
         })()}
 
-        {/* Loading indicator */}
+        {/* Loading indicator with progress steps */}
         {loading && !streamingContent && (
           <div className="mb-4 flex justify-start">
             <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-white/10 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
-              <div className="mb-1.5 flex items-center gap-1.5">
+              <div className="mb-2 flex items-center gap-1.5">
                 <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--gold)]/20">
                   <Search size={9} className="text-[var(--gold)]" />
                 </div>
@@ -357,10 +398,32 @@ export function AskEnergyChat() {
                   Ask Energy
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
-                <Loader2 size={12} className="animate-spin" />
-                {loadingText}
-              </div>
+
+              {progressSteps.length > 0 ? (
+                <div className="space-y-1.5">
+                  {progressSteps.map((step, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs">
+                      {step.done ? (
+                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--green)] text-white">
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.5 6L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </span>
+                      ) : step.active ? (
+                        <Loader2 size={12} className="animate-spin text-[var(--gold)]" />
+                      ) : (
+                        <span className="block h-3.5 w-3.5 rounded-full border border-[var(--line)]" />
+                      )}
+                      <span className={step.done ? "text-[var(--muted)]" : step.active ? "text-[var(--navy)] font-medium" : "text-[var(--muted-soft)]"}>
+                        {step.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
+                  <Loader2 size={12} className="animate-spin" />
+                  {loadingText}
+                </div>
+              )}
             </div>
           </div>
         )}
