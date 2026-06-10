@@ -20,7 +20,8 @@ interface LangSearchResponse {
 
 export async function searchWithLangSearch(
   query: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  freshness?: string
 ): Promise<LangSearchResult[]> {
   const apiKey = process.env.LANGSEARCH_API_KEY;
 
@@ -54,7 +55,7 @@ export async function searchWithLangSearch(
       },
       body: JSON.stringify({
         query,
-        freshness: "noLimit",
+        freshness: freshness ?? "noLimit",
         summary: true,
         count: 25,
       }),

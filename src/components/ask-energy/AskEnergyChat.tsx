@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Loader2, Send, Sparkles, Search, RotateCcw, Maximize2, Minimize2, ChevronUp } from "lucide-react";
+import { Loader2, Send, Sparkles, Search, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
 import { ChatMessage, hasArabic } from "./ChatMessage";
 import { SuggestedQuestions } from "./SuggestedQuestions";
 import { getAllSuggestedQuestions } from "@/lib/ai/suggested-questions";
@@ -38,7 +38,6 @@ export function AskEnergyChat() {
   const [streamingContent, setStreamingContent] = useState("");
   const [loadingText, setLoadingText] = useState("Searching trusted energy sources...");
   const [progressSteps, setProgressSteps] = useState<{ text: string; done: boolean; active: boolean }[]>([]);
-  const [inputCollapsed, setInputCollapsed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -60,32 +59,20 @@ export function AskEnergyChat() {
     }
   }, [messages, streamingContent]);
 
-  // Auto-collapse input when answer appears (inline mode only — fullscreen keeps input open)
+  // Focus input when not loading
   useEffect(() => {
-    if (hasAnswers && !loading && !streamingContent) {
-      if (!isFullscreen) {
-        setInputCollapsed(true);
-      }
-    }
-  }, [hasAnswers, loading, streamingContent]);
-
-  // Focus input when expanded (preventScroll so page doesn't jump on mount)
-  useEffect(() => {
-    if (!loading && !inputCollapsed && inputRef.current) {
+    if (!loading && inputRef.current) {
       inputRef.current.focus({ preventScroll: true });
     }
-  }, [loading, inputCollapsed]);
+  }, [loading]);
 
-  // Lock body scroll when fullscreen. Expand input on enter so user can type immediately.
+  // Lock body scroll when fullscreen
   useEffect(() => {
     if (isFullscreen) {
       document.body.style.overflow = "hidden";
-      setInputCollapsed(false);
       setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
     } else {
       document.body.style.overflow = "";
-      // Expand input on exit so search field is always visible in normal mode
-      setInputCollapsed(false);
     }
     return () => { document.body.style.overflow = ""; };
   }, [isFullscreen]);
@@ -108,7 +95,6 @@ export function AskEnergyChat() {
       if (!message || loading) return;
 
       setInput("");
-      setInputCollapsed(false);
       setLoading(true);
       setStreamingContent("");
       setLoadingText("Searching trusted energy sources...");
@@ -312,19 +298,13 @@ export function AskEnergyChat() {
     setStreamingContent("");
     setLoading(false);
     setInput("");
-    setInputCollapsed(false);
-    setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0);
-  };
-
-  const expandInput = () => {
-    setInputCollapsed(false);
     setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0);
   };
 
   // ── SHARED RENDER PARTS ──
 
   const headerBar = (
-    <div className="flex items-center justify-between border-b border-white/10 bg-[var(--navy)] px-4 py-2.5">
+    <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-[var(--navy)] px-4 py-2.5">
       <div className="flex items-center gap-2">
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--gold)]">
           <Search size={13} className="text-white" />
@@ -374,18 +354,15 @@ export function AskEnergyChat() {
   const messagesArea = (
     <div
       ref={messagesContainerRef}
-      className={isFullscreen ? "flex-1 overflow-y-auto px-4 py-4 h-full" : "overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"}
-      style={{
-        minHeight: messages.length === 0 ? "200px" : undefined,
-        maxHeight: isFullscreen ? undefined : (messages.length > 0 ? "min(calc(100dvh - 380px), 400px)" : "none"),
-        background: "url('/sahara-energy.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      className={
+        isFullscreen
+          ? "flex-1 overflow-y-auto px-4 py-4 h-full"
+          : "px-3 sm:px-4 py-3 sm:py-4"
+      }
     >
       <div className="relative z-10">
         {messages.length === 0 && !loading && (
-          <div className="flex min-h-[180px] sm:min-h-[240px] flex-col items-center justify-center text-center">
+          <div className="flex min-h-[140px] sm:min-h-[200px] flex-col items-center justify-center text-center">
             <div className="rounded-2xl bg-[#0a1628]/80 px-6 py-8 backdrop-blur">
               <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10">
                 <Search size={20} className="text-[var(--gold)]" />
@@ -475,56 +452,34 @@ export function AskEnergyChat() {
   );
 
   const inputArea = (
-    <div className="ask-energy-input border-t border-[var(--line)] bg-white">
-      {inputCollapsed && hasAnswers && !loading ? (
-        /* Collapsed: compact "Ask another" bar */
-        <button
-          onClick={expandInput}
-          className="flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-medium text-[var(--muted)] transition hover:bg-[var(--paper)] hover:text-[var(--green)]"
-        >
-          <Search size={13} />
-          <span>Ask another question</span>
-          <ChevronUp size={13} className="text-[var(--line)]" />
-        </button>
-      ) : (
-        /* Expanded input */
-        <div className="px-3 py-2.5">
-          <div className="flex items-center gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask about Algeria, Europe, energy..."
-              disabled={loading}
-              maxLength={MAX_MESSAGE_LENGTH}
-              className="flex-1 rounded-full border border-[var(--line)] bg-[var(--paper)] px-4 py-2.5 text-sm text-[var(--navy)] placeholder:text-[var(--muted)] focus:border-[var(--green)] focus:outline-none focus:ring-1 focus:ring-[var(--green)] disabled:opacity-50"
-            />
-            <button
-              onClick={() => handleSend()}
-              disabled={!canSend}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white transition hover:bg-[#0e4b40] disabled:cursor-not-allowed disabled:opacity-40"
-              aria-label="Send"
-            >
-              {loading ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Send size={14} className="ml-0.5" />
-              )}
-            </button>
-          </div>
-          {hasAnswers && !loading && (
-            <button
-              onClick={() => setInputCollapsed(true)}
-              className="mt-2 flex w-full items-center justify-center gap-1 text-[10px] text-[var(--muted-soft)] transition hover:text-[var(--muted)]"
-            >
-              <Minimize2 size={10} />
-              <span>Collapse to focus on answer</span>
-            </button>
-          )}
+    <div className="ask-energy-input shrink-0 border-t border-[var(--line)] bg-white">
+      <div className="px-3 py-2.5">
+        <div className="flex items-center gap-2">
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about Algeria, Europe, energy..."
+            disabled={loading}
+            maxLength={MAX_MESSAGE_LENGTH}
+            className="flex-1 rounded-full border border-[var(--line)] bg-[var(--paper)] px-4 py-2.5 text-sm text-[var(--navy)] placeholder:text-[var(--muted)] focus:border-[var(--green)] focus:outline-none focus:ring-1 focus:ring-[var(--green)] disabled:opacity-50"
+          />
+          <button
+            onClick={() => handleSend()}
+            disabled={!canSend}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white transition hover:bg-[#0e4b40] disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label="Send"
+          >
+            {loading ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Send size={14} className="ml-0.5" />
+            )}
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 
@@ -541,22 +496,42 @@ export function AskEnergyChat() {
     >
       <div
         className={
-          "flex flex-col bg-white" +
+          "relative flex flex-col bg-white" +
           (isFullscreen
             ? " h-full"
             : " overflow-hidden rounded-2xl border border-[var(--line)] shadow-sm"
           )
         }
-        style={!isFullscreen ? { maxHeight: "min(calc(100dvh - 200px), 550px)" } : undefined}
+        style={!isFullscreen ? { maxHeight: "min(calc(100dvh - 120px), 620px)" } : undefined}
       >
-        {headerBar}
-        <div className={isFullscreen ? "min-h-0 flex-1 overflow-hidden" : undefined}>
+        {/* Static background — stays put while messages scroll */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0"
+          style={{
+            background: "url('/sahara-energy.jpeg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="relative z-10 shrink-0">{headerBar}</div>
+        <div
+          className={
+            "relative z-10" +
+            (isFullscreen
+              ? " min-h-0 flex-1 overflow-hidden"
+              : " min-h-0 flex-1 overflow-y-auto"
+            )
+          }
+        >
           {messagesArea}
         </div>
-        {messages.length === 0 && (
-          <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
-        )}
-        {inputArea}
+        <div className="relative z-10">
+          {messages.length === 0 && (
+            <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
+          )}
+        </div>
+        <div className="relative z-10 shrink-0">{inputArea}</div>
       </div>
     </div>
   );

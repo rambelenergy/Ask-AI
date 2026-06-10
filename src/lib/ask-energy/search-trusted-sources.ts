@@ -1,8 +1,9 @@
 import { searchWithLangSearch, type LangSearchResult } from "./langsearch";
-import { searchWithBrave } from "./brave-search";
-import { isApprovedDomain, getPriorityGroupByUrl, getTrustedDomains } from "./trusted-sources";
+import { searchWithBrave, detectFreshness } from "./brave-search";
+import { isApprovedDomain, getPriorityGroupByUrl, getTrustedDomains, getTrustedDomainsForCategory } from "./trusted-sources";
 import { expandEnergyQuery } from "./expand-query";
-import { rerankByEmbedding } from "./embed";
+import { rerankByEmbedding, type CategoryBoost } from "./embed";
+import { categorizeQuestion, getCategoryLabel, type QuestionCategory } from "./categorize-question";
 import type { SupportedLanguage } from "./detect-language";
 
 export interface TrustedSearchResult {
@@ -100,6 +101,9 @@ export interface SearchDebugInfo {
   domainsFound: string[];
   /** Whether results came from trusted sources (true) or alternative fallback (false) */
   fromTrustedSources: boolean;
+  /** Question category used for domain ordering and rerank boost */
+  questionCategory?: string;
+  categoryConfidence?: number;
 }
 
 /**
@@ -129,12 +133,17 @@ function mapToTrustedResults(
 }
 
 /**
- * Search trusted energy sources with Brave (primary) → LangSearch (fallback).
+ * Search trusted energy sources with Brave + LangSearch in parallel.
  *
  * Flow:
- *  1. Brave Search with `site:` filter → only trusted domains
- *  2. If results found → return immediately
- *  3. If empty → fallback to LangSearch (broader search)
+ *  1. Brave Search with `site:` filter → trusted domains only
+ *  2. LangSearch in parallel → broader search to capture government TLD domains
+ *     and other trusted sources not in the explicit domain list
+ *  3. Merge + deduplicate + filter + rerank results from both
+ *
+ * Running both in parallel ensures government TLD domains (.gov, .gov.dz,
+ * .gov.it, .gov.pt, .gov.de, .gov.es, .eu) are always captured alongside
+ * the explicitly listed trusted sources.
  */
 export async function searchTrustedSources(
   question: string,
@@ -147,53 +156,84 @@ export async function searchTrustedSources(
 }> {
   const expandedQueries = expandEnergyQuery(question, language);
   const searchQueries = expandedQueries.slice(0, MAX_EXPANDED_QUERIES);
-  const trustedDomains = getTrustedDomains(); // already ordered by priority
 
-  // ─── Phase 1: Brave Search with site: filter ───
-  let allRawResults: LangSearchResult[] = [];
+  // ─── Categorize question for context-aware prioritization ───
+  const categoryResult = categorizeQuestion(question, language);
+  const { category, confidence, priorityBoost, preferredGroups } = categoryResult;
+
+  // Reorder trusted domains: category-preferred groups first
+  const trustedDomains = getTrustedDomainsForCategory(preferredGroups);
+
+  // ─── Detect freshness for time-sensitive queries ───
+  const braveFreshness = detectFreshness(question);
+  // Map Brave freshness to LangSearch freshness
+  const freshnessMap: Record<string, string> = {
+    pd: "Day",
+    pw: "Week",
+    pm: "Month",
+  };
+  const langFreshness = braveFreshness ? (freshnessMap[braveFreshness] ?? "noLimit") : "noLimit";
+
+  // ─── Phase 1: Run Brave (site: filter) + LangSearch in parallel ───
+  let braveRaw: LangSearchResult[] = [];
+  let langRaw: LangSearchResult[] = [];
   const domainsFound = new Set<string>();
-  let fromTrustedSources = true;
 
-  for (const q of searchQueries) {
-    try {
-      const braveResults = await searchWithBrave(q, trustedDomains, signal);
-      if (braveResults.length > 0) {
-        for (const r of braveResults) {
-          allRawResults.push({
-            title: r.title,
-            url: r.url,
-            snippet: r.snippet ?? r.description,
-          });
-          domainsFound.add(extractDomain(r.url));
-        }
-      }
-    } catch {
-      // Brave failed — will fall back to LangSearch
-    }
-    // Got good results, skip remaining queries to save API calls
-    if (allRawResults.length >= 10) break;
-  }
-
-  // ─── Phase 2: Fallback to LangSearch if trusted sources returned nothing ───
-  if (allRawResults.length === 0) {
-    fromTrustedSources = false;
-
+  // Brave search (trusted domains only, with freshness)
+  const bravePromise = (async () => {
     for (const q of searchQueries) {
       try {
-        const langResults = await searchWithLangSearch(q, signal);
-        for (const r of langResults) {
-          allRawResults.push(r);
-          domainsFound.add(extractDomain(r.url));
+        const braveResults = await searchWithBrave(q, trustedDomains, signal, braveFreshness);
+        if (braveResults.length > 0) {
+          for (const r of braveResults) {
+            braveRaw.push({
+              title: r.title,
+              url: r.url,
+              snippet: r.snippet ?? r.description,
+            });
+            domainsFound.add(extractDomain(r.url));
+          }
         }
-        if (langResults.length > 0) break;
+        if (braveRaw.length >= 10) break;
+      } catch {
+        // Graceful — LangSearch will cover
+      }
+    }
+  })();
+
+  // LangSearch in parallel (broader search to capture government TLDs, with freshness)
+  const langPromise = (async () => {
+    for (const q of searchQueries) {
+      try {
+        const langResults = await searchWithLangSearch(q, signal, langFreshness);
+        if (langResults.length > 0) {
+          for (const r of langResults) {
+            langRaw.push(r);
+            domainsFound.add(extractDomain(r.url));
+          }
+        }
+        if (langRaw.length >= 10) break;
       } catch {
         // Graceful
       }
     }
-  }
+  })();
+
+  await Promise.allSettled([bravePromise, langPromise]);
+
+  // ─── Merge: Brave results (trusted) + LangSearch results filtered by approved domains ───
+  // Brave results with site: filter are always trusted
+  const braveMapped = mapToTrustedResults(braveRaw, true);
+
+  // LangSearch results: only keep those matching trusted domains or government TLDs
+  const langMapped = mapToTrustedResults(langRaw, false);
+  const langFiltered = langMapped.filter((r) => r.trusted);
+
+  // Merge all, prefer Brave results in deduplication (they used site: filter)
+  const allRaw = [...braveMapped, ...langFiltered];
 
   // ─── No results at all ───
-  if (allRawResults.length === 0) {
+  if (allRaw.length === 0) {
     return {
       results: [],
       fromTrustedSources: false,
@@ -204,13 +244,17 @@ export async function searchTrustedSources(
         trustedFilteredCount: 0,
         domainsFound: [],
         fromTrustedSources: false,
+        questionCategory: getCategoryLabel(category),
+        categoryConfidence: confidence,
       },
     };
   }
 
-  // ─── Map + deduplicate + sort + rerank ───
-  const mapped = mapToTrustedResults(allRawResults, fromTrustedSources);
-  const deduped = deduplicateByUrl(mapped);
+  const hasBraveResults = braveMapped.length > 0;
+  const fromTrustedSources = hasBraveResults || langFiltered.length > 0;
+
+  // ─── Deduplicate + sort + rerank ───
+  const deduped = deduplicateByUrl(allRaw);
 
   deduped.sort((a, b) => {
     if (a.trusted !== b.trusted) return a.trusted ? -1 : 1;
@@ -221,8 +265,8 @@ export async function searchTrustedSources(
     return 0;
   });
 
-  // ─── Re-rank with priority-weighted embedding ───
-  const reranked = await rerankByEmbedding(question, deduped);
+  // ─── Re-rank with priority-weighted embedding + category boost ───
+  const reranked = await rerankByEmbedding(question, deduped, priorityBoost);
 
   // ─── Ensure priority diversity (not all from one source type) ───
   const final = ensurePriorityDiversity(reranked, MAX_FINAL_RESULTS);
@@ -233,10 +277,12 @@ export async function searchTrustedSources(
     debug: {
       originalQuestion: question,
       expandedQueries,
-      rawResultsCount: allRawResults.length,
+      rawResultsCount: allRaw.length,
       trustedFilteredCount: final.length,
       domainsFound: Array.from(domainsFound),
       fromTrustedSources,
+      questionCategory: getCategoryLabel(category),
+      categoryConfidence: confidence,
     },
   };
 }

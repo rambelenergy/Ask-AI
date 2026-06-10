@@ -14,18 +14,20 @@
  * Priority weight multiplier per priority group.
  * Higher-priority sources get a stronger boost in semantic ranking.
  *
- * Priority 1 (Algerian official):    1.25x boost
- * Priority 2 (European institutions): 1.20x boost
- * Priority 3 (International orgs):    1.15x boost
- * Priority 4 (News agencies):         1.00x (neutral)
- * Priority 5 (Other media/analytical):0.90x (slight penalty)
+ * Priority 1 (Government domains):    1.30x boost
+ * Priority 2 (Algerian official):     1.25x boost
+ * Priority 3 (European institutions): 1.20x boost
+ * Priority 4 (International orgs):    1.15x boost
+ * Priority 5 (News agencies):         1.00x (neutral)
+ * Priority 6 (Other media/analytical):0.90x (slight penalty)
  */
 const PRIORITY_WEIGHT: Record<number, number> = {
-  1: 1.25,
-  2: 1.20,
-  3: 1.15,
-  4: 1.00,
-  5: 0.90,
+  1: 1.30,
+  2: 1.25,
+  3: 1.20,
+  4: 1.15,
+  5: 1.00,
+  6: 0.90,
 };
 
 function getEmbeddingModel(): string {
@@ -101,18 +103,26 @@ export interface RankableResult {
   priority?: number;
 }
 
+/** Category-specific priority boost (priority → multiplier). Applied on top of base weight. */
+export type CategoryBoost = Partial<Record<number, number>>;
+
 /**
  * Embed the question and each result's text, then return results sorted
- * by a combined score: (cosineSimilarity * priorityWeight).
+ * by a combined score: (cosineSimilarity * priorityWeight * categoryBoost).
  *
  * Higher-priority institutional sources get a score multiplier, preventing
  * news agencies and general media from dominating purely on semantic match.
+ *
+ * When a categoryBoost is provided, it multiplies the base weight for
+ * matching priority groups — so a question about Algerian energy gets
+ * Algerian government sources boosted even higher.
  *
  * Falls back to original order if embedding fails.
  */
 export async function rerankByEmbedding<T extends RankableResult>(
   question: string,
-  results: T[]
+  results: T[],
+  categoryBoost?: CategoryBoost
 ): Promise<T[]> {
   if (results.length <= 1) return results;
 
@@ -129,16 +139,18 @@ export async function rerankByEmbedding<T extends RankableResult>(
   const embeddingPromises = texts.map((t) => embedText(t));
   const resultEmbeddings = await Promise.all(embeddingPromises);
 
-  // Compute combined scores: semantic similarity × priority weight
+  // Compute combined scores: semantic similarity × priority weight × category boost
   const scored = results.map((r, i) => {
     const semanticScore = resultEmbeddings[i]
       ? cosineSimilarity(questionEmbedding, resultEmbeddings[i])
       : 0;
-    const priority = r.priority ?? 5;
-    const weight = PRIORITY_WEIGHT[priority] ?? 1.0;
+    const priority = r.priority ?? 6;
+    const baseWeight = PRIORITY_WEIGHT[priority] ?? 1.0;
+    const catBoost = categoryBoost?.[priority] ?? 1.0;
+    const weight = baseWeight * catBoost;
     return {
       result: r,
-      // Combined score with priority weighting
+      // Combined score with priority weighting + category boost
       score: semanticScore * weight,
     };
   });

@@ -20,6 +20,46 @@ interface BraveApiResponse {
 }
 
 /**
+ * Detect if a question asks for current/recent/today's data.
+ * Returns a Brave freshness value: "pd" (past day), "pw" (past week),
+ * "pm" (past month), or undefined (no limit).
+ */
+export function detectFreshness(question: string): string | undefined {
+  const q = question.toLowerCase();
+
+  // Strong signals for "right now" data → past day
+  const todaySignals = [
+    "today", "now", "right now", "current price", "live price",
+    "latest price", "today's", "todays", "real-time", "real time",
+    "at the moment", "as of today",
+  ];
+  for (const s of todaySignals) {
+    if (q.includes(s)) return "pd";
+  }
+
+  // Medium signals for recent data → past week
+  const recentSignals = [
+    "price", "prices", "cost", "costs",
+    "this week", "recent", "latest", "update",
+    "current", "currently",
+  ];
+  for (const s of recentSignals) {
+    if (q.includes(s)) return "pw";
+  }
+
+  // Month-sensitive queries
+  const monthSignals = [
+    "this month", "monthly", "last month",
+  ];
+  for (const s of monthSignals) {
+    if (q.includes(s)) return "pm";
+  }
+
+  // Default: no freshness limit
+  return undefined;
+}
+
+/**
  * Build a Brave Search query with optional site filter.
  * Brave natively supports the `site:` operator in the `q` parameter.
  * Example: "renewable energy Algeria site:iea.org OR site:irena.org"
@@ -55,14 +95,16 @@ function buildQuery(query: string, sites?: string[]): string {
  * Search using Brave Search API (primary search provider).
  * Uses the BRAVESEARCH_API_KEY environment variable.
  *
- * @param query  - Search query
- * @param sites  - Optional trusted domains to restrict search to (uses Brave `site:` operator)
- * @param signal - AbortSignal for cancellation
+ * @param query     - Search query
+ * @param sites     - Optional trusted domains to restrict search to (uses Brave `site:` operator)
+ * @param signal    - AbortSignal for cancellation
+ * @param freshness - Optional freshness filter: "pd" (past day), "pw" (past week), "pm" (past month)
  */
 export async function searchWithBrave(
   query: string,
   sites?: string[],
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  freshness?: string
 ): Promise<BraveSearchResult[]> {
   const apiKey = process.env.BRAVESEARCH_API_KEY;
 
@@ -77,6 +119,10 @@ export async function searchWithBrave(
     count: "20",
     search_lang: "en",
   });
+
+  if (freshness) {
+    params.set("freshness", freshness);
+  }
 
   const url = `https://api.search.brave.com/res/v1/web/search?${params.toString()}`;
 
