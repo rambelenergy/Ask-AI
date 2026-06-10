@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Loader2, Send, Sparkles, Search, RotateCcw, X, Minimize2, Maximize2, ChevronUp } from "lucide-react";
+import { Loader2, Send, Sparkles, Search, RotateCcw, Maximize2, Minimize2, ChevronUp } from "lucide-react";
 import { ChatMessage, hasArabic } from "./ChatMessage";
 import { SuggestedQuestions } from "./SuggestedQuestions";
 import { getAllSuggestedQuestions } from "@/lib/ai/suggested-questions";
@@ -39,7 +39,7 @@ export function AskEnergyChat() {
   const [loadingText, setLoadingText] = useState("Searching trusted energy sources...");
   const [progressSteps, setProgressSteps] = useState<{ text: string; done: boolean; active: boolean }[]>([]);
   const [inputCollapsed, setInputCollapsed] = useState(false);
-  const [mobileExpanded, setMobileExpanded] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +52,7 @@ export function AskEnergyChat() {
   const canSend = !inputEmpty && !inputOverLimit && !loading;
   const hasAnswers = messages.length > 0;
 
-  // Scroll to bottom when content changes
+  // Scroll to bottom
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {
@@ -60,29 +60,29 @@ export function AskEnergyChat() {
     }
   }, [messages, streamingContent]);
 
-  // Auto-collapse input when an answer appears
+  // Auto-collapse input when answer appears
   useEffect(() => {
     if (hasAnswers && !loading && !streamingContent) {
       setInputCollapsed(true);
     }
   }, [hasAnswers, loading, streamingContent]);
 
-  // Focus input when loading finishes and input is expanded
+  // Focus input when expanded
   useEffect(() => {
     if (!loading && !inputCollapsed && inputRef.current) {
       inputRef.current.focus();
     }
   }, [loading, inputCollapsed]);
 
-  // Lock body scroll when mobile modal is open
+  // Lock body scroll when fullscreen
   useEffect(() => {
-    if (mobileExpanded) {
+    if (isFullscreen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
-  }, [mobileExpanded]);
+  }, [isFullscreen]);
 
   const buildHistory = useCallback(
     (msgs: Message[]) =>
@@ -210,7 +210,7 @@ export function AskEnergyChat() {
                     streamedSources = parsed.sources;
                   }
                 } catch {
-                  // skip malformed
+                  // skip
                 }
               }
             }
@@ -244,9 +244,7 @@ export function AskEnergyChat() {
                 },
               ]);
             }
-          } catch {
-            // fallback
-          }
+          } catch {}
           setLoading(false);
           return;
         }
@@ -303,9 +301,7 @@ export function AskEnergyChat() {
   };
 
   const handleReset = () => {
-    if (loading) {
-      abortRef.current?.abort();
-    }
+    if (loading) abortRef.current?.abort();
     setMessages([]);
     setStreamingContent("");
     setLoading(false);
@@ -314,7 +310,7 @@ export function AskEnergyChat() {
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 
-  // ── RENDER ──
+  // ── SHARED RENDER PARTS ──
 
   const headerBar = (
     <div className="flex items-center justify-between border-b border-white/10 bg-[var(--navy)] px-4 py-2.5">
@@ -340,13 +336,14 @@ export function AskEnergyChat() {
             <span className="hidden sm:inline">New</span>
           </button>
         )}
-        {/* Mobile close button */}
+        {/* Fullscreen toggle */}
         <button
-          onClick={() => setMobileExpanded(false)}
-          className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white md:hidden"
-          aria-label="Close"
+          onClick={() => setIsFullscreen(!isFullscreen)}
+          className="flex h-7 w-7 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"
+          title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+          aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
         >
-          <X size={15} />
+          {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
         </button>
       </div>
     </div>
@@ -357,8 +354,7 @@ export function AskEnergyChat() {
       ref={messagesContainerRef}
       className="flex-1 overflow-y-auto px-4 py-4"
       style={{
-        minHeight: messages.length === 0 ? "300px" : "auto",
-        maxHeight: "none",
+        minHeight: messages.length === 0 ? "280px" : "auto",
         background: "url('/sahara-energy.jpeg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -366,7 +362,7 @@ export function AskEnergyChat() {
     >
       <div className="relative z-10">
         {messages.length === 0 && !loading && (
-          <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
+          <div className="flex min-h-[240px] flex-col items-center justify-center text-center">
             <div className="rounded-2xl bg-[#0a1628]/80 px-6 py-8 backdrop-blur">
               <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10">
                 <Search size={20} className="text-[var(--gold)]" />
@@ -392,7 +388,7 @@ export function AskEnergyChat() {
           />
         ))}
 
-        {/* Streaming message bubble */}
+        {/* Streaming bubble */}
         {streamingContent && (() => {
           const isArabic = hasArabic(streamingContent);
           return (
@@ -402,9 +398,7 @@ export function AskEnergyChat() {
                   <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--gold)]/20">
                     <Sparkles size={9} className="text-[var(--gold)]" />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">
-                    Ask Energy
-                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">Ask Energy</span>
                 </div>
                 <p className="whitespace-pre-wrap">{streamingContent}</p>
                 <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-[var(--green)] align-text-bottom" />
@@ -413,7 +407,7 @@ export function AskEnergyChat() {
           );
         })()}
 
-        {/* Loading indicator with progress steps */}
+        {/* Loading indicator */}
         {loading && !streamingContent && (
           <div className="mb-4 flex justify-start">
             <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-white/10 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
@@ -421,11 +415,8 @@ export function AskEnergyChat() {
                 <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--gold)]/20">
                   <Search size={9} className="text-[var(--gold)]" />
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">
-                  Ask Energy
-                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">Ask Energy</span>
               </div>
-
               {progressSteps.length > 0 ? (
                 <div className="space-y-1.5">
                   {progressSteps.map((step, i) => (
@@ -463,7 +454,7 @@ export function AskEnergyChat() {
   const inputArea = (
     <div className="ask-energy-input border-t border-[var(--line)] bg-white">
       {inputCollapsed && hasAnswers && !loading ? (
-        /* Collapsed: compact "Ask another question" bar */
+        /* Collapsed: compact "Ask another" bar */
         <button
           onClick={() => { setInputCollapsed(false); setTimeout(() => inputRef.current?.focus(), 0); }}
           className="flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-medium text-[var(--muted)] transition hover:bg-[var(--paper)] hover:text-[var(--green)]"
@@ -500,7 +491,6 @@ export function AskEnergyChat() {
               )}
             </button>
           </div>
-          {/* Collapse hint when answers exist */}
           {hasAnswers && !loading && (
             <button
               onClick={() => setInputCollapsed(true)}
@@ -515,59 +505,33 @@ export function AskEnergyChat() {
     </div>
   );
 
-  // ── Mobile: Floating Action Button ──
-  const mobileFab = (
-    <div className="fixed bottom-5 right-5 z-50 md:hidden">
-      <button
-        onClick={() => setMobileExpanded(true)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--navy)] shadow-lg shadow-black/25 transition hover:bg-[var(--green)] hover:scale-105 active:scale-95"
-        aria-label="Open Ask Energy"
-      >
-        {hasAnswers ? (
-          <Sparkles size={22} className="text-[var(--gold)]" />
-        ) : (
-          <Search size={22} className="text-white" />
-        )}
-      </button>
-      {hasAnswers && (
-        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--green)] text-[10px] font-bold text-white">
-          {messages.filter(m => m.role === "assistant").length}
-        </span>
-      )}
-    </div>
-  );
-
-  // ── Mobile: Full-screen modal ──
-  const mobileModal = mobileExpanded && (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-white md:hidden">
+  // ── CHAT CONTENT (shared between inline and fullscreen) ──
+  const chatContent = (
+    <>
       {headerBar}
       {messagesArea}
-      {/* Suggested questions (only when empty) */}
       {messages.length === 0 && (
         <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
       )}
       {inputArea}
-    </div>
-  );
-
-  // ── Desktop: Inline widget ──
-  const desktopWidget = (
-    <div className="hidden md:flex md:flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
-      {headerBar}
-      {messagesArea}
-      {/* Suggested questions (only when empty) */}
-      {messages.length === 0 && (
-        <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
-      )}
-      {inputArea}
-    </div>
+    </>
   );
 
   return (
     <>
-      {desktopWidget}
-      {mobileFab}
-      {mobileModal}
+      {/* Fullscreen overlay */}
+      {isFullscreen && (
+        <div className="fixed inset-0 z-[100] flex flex-col bg-white">
+          {chatContent}
+        </div>
+      )}
+
+      {/* Inline widget — always visible, hidden when fullscreen is active */}
+      <div className={isFullscreen ? "invisible" : ""}>
+        <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
+          {chatContent}
+        </div>
+      </div>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronRight, Sparkles, Search } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { AskEnergyChat } from "@/components/ask-energy/AskEnergyChat";
 import { T } from "@/components/language/t";
 
@@ -32,7 +32,7 @@ export default function AiAssistantPage() {
         </div>
       </section>
 
-      {/* Chat section — AskEnergyChat handles both desktop (inline widget) and mobile (FAB + modal) */}
+      {/* Chat section — AskEnergyChat handles both desktop & mobile (inline widget with fullscreen toggle) */}
       <section
         className="py-10 sm:py-14"
         style={{
@@ -42,8 +42,6 @@ export default function AiAssistantPage() {
         }}
       >
         <div className="container-page">
-          {/* Desktop: inline widget takes this space */}
-          {/* Mobile: hint card fills this space, FAB floats from component below */}
           <div className="mx-auto max-w-[720px]">
             <AskEnergyChat />
           </div>
