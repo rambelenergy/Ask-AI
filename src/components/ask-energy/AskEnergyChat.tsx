@@ -374,7 +374,7 @@ export function AskEnergyChat() {
   const messagesArea = (
     <div
       ref={messagesContainerRef}
-      className={isFullscreen ? "flex-1 overflow-y-auto px-4 py-4" : "overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"}
+      className={isFullscreen ? "flex-1 overflow-y-auto px-4 py-4 h-full" : "overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"}
       style={{
         minHeight: messages.length === 0 ? "200px" : undefined,
         maxHeight: isFullscreen ? undefined : (messages.length > 0 ? "calc(100dvh - 380px)" : "none"),
@@ -549,8 +549,7 @@ export function AskEnergyChat() {
         }
       >
         {headerBar}
-        {/* Wrapper for flex-1 in fullscreen; plain div in inline */}
-        <div className={isFullscreen ? "min-h-0 flex-1" : undefined}>
+        <div className={isFullscreen ? "min-h-0 flex-1 overflow-hidden" : undefined}>
           {messagesArea}
         </div>
         {messages.length === 0 && (
