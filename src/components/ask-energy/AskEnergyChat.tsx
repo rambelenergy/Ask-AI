@@ -523,33 +523,34 @@ export function AskEnergyChat() {
     </div>
   );
 
-  // ── CHAT CONTENT (shared between inline and fullscreen) ──
-  const chatContent = (
-    <>
-      {headerBar}
-      {messagesArea}
-      {messages.length === 0 && (
-        <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
-      )}
-      {inputArea}
-    </>
-  );
-
+  // ── Single render — toggles between inline and fullscreen via CSS ──
+  // This preserves all React state (SummaryBox, scroll position, etc.)
+  // across the fullscreen toggle because the component tree never unmounts.
   return (
-    <>
-      {/* Fullscreen overlay — sits below the site header (72px) so nav stays visible */}
-      {isFullscreen && (
-        <div className="fixed inset-x-0 top-[72px] bottom-0 z-50 flex flex-col bg-white">
-          {chatContent}
-        </div>
-      )}
-
-      {/* Inline widget — hidden (display:none) when fullscreen so it doesn't take layout space */}
-      <div className={isFullscreen ? "hidden" : ""}>
-        <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm" style={{ maxHeight: "calc(100dvh - 180px)" }}>
-          {chatContent}
-        </div>
+    <div
+      className={
+        isFullscreen
+          ? "fixed inset-x-0 top-[72px] bottom-0 z-50 flex flex-col bg-white"
+          : ""
+      }
+    >
+      <div
+        className={
+          "flex flex-col overflow-hidden bg-white" +
+          (isFullscreen
+            ? " h-full"
+            : " rounded-2xl border border-[var(--line)] shadow-sm"
+          )
+        }
+        style={!isFullscreen ? { maxHeight: "calc(100dvh - 180px)" } : undefined}
+      >
+        {headerBar}
+        {messagesArea}
+        {messages.length === 0 && (
+          <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
+        )}
+        {inputArea}
       </div>
-    </>
+    </div>
   );
 }
