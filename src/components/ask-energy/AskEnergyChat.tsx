@@ -535,9 +535,9 @@ export function AskEnergyChat() {
 
   return (
     <>
-      {/* Fullscreen overlay — z-[9999] to clear site header (z-50), mobile menu (z-[70]) */}
+      {/* Fullscreen overlay — sits below the site header (72px) so nav stays visible */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-[9999] flex flex-col bg-white">
+        <div className="fixed inset-x-0 top-[72px] bottom-0 z-50 flex flex-col bg-white">
           {chatContent}
         </div>
       )}

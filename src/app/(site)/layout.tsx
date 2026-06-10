@@ -12,7 +12,7 @@ export default function SiteLayout({
         Skip to content
       </a>
       <Header />
-      <main id="main-content" className="relative z-0 flex-1">{children}</main>
+      <main id="main-content" className="relative flex-1">{children}</main>
       <Footer />
     </>
   );
