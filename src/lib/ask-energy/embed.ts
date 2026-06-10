@@ -2,11 +2,31 @@
  * Embedding utility using OpenAI text-embedding-3-small.
  *
  * Used to re-rank trusted search results by semantic similarity to the user question,
- * improving result quality beyond simple priority-group sorting.
+ * with a priority-group weighting multiplier to ensure higher-priority sources
+ * (Algerian official, European institutions, international organizations) are
+ * favored over lower-priority sources (news agencies, general media).
  *
  * Model: text-embedding-3-small (default)
  * Produces 1536-dimensional normalized embeddings.
  */
+
+/**
+ * Priority weight multiplier per priority group.
+ * Higher-priority sources get a stronger boost in semantic ranking.
+ *
+ * Priority 1 (Algerian official):    1.25x boost
+ * Priority 2 (European institutions): 1.20x boost
+ * Priority 3 (International orgs):    1.15x boost
+ * Priority 4 (News agencies):         1.00x (neutral)
+ * Priority 5 (Other media/analytical):0.90x (slight penalty)
+ */
+const PRIORITY_WEIGHT: Record<number, number> = {
+  1: 1.25,
+  2: 1.20,
+  3: 1.15,
+  4: 1.00,
+  5: 0.90,
+};
 
 function getEmbeddingModel(): string {
   return process.env.OPENAI_EMBEDDING_MODEL ?? "text-embedding-3-small";
@@ -74,12 +94,23 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return denom === 0 ? 0 : dot / denom;
 }
 
+export interface RankableResult {
+  title: string;
+  snippet?: string;
+  summary?: string;
+  priority?: number;
+}
+
 /**
  * Embed the question and each result's text, then return results sorted
- * by cosine similarity (most relevant first). Falls back to original order
- * if embedding fails.
+ * by a combined score: (cosineSimilarity * priorityWeight).
+ *
+ * Higher-priority institutional sources get a score multiplier, preventing
+ * news agencies and general media from dominating purely on semantic match.
+ *
+ * Falls back to original order if embedding fails.
  */
-export async function rerankByEmbedding<T extends { title: string; snippet?: string; summary?: string }>(
+export async function rerankByEmbedding<T extends RankableResult>(
   question: string,
   results: T[]
 ): Promise<T[]> {
@@ -98,13 +129,21 @@ export async function rerankByEmbedding<T extends { title: string; snippet?: str
   const embeddingPromises = texts.map((t) => embedText(t));
   const resultEmbeddings = await Promise.all(embeddingPromises);
 
-  // Compute similarity scores
-  const scored = results.map((r, i) => ({
-    result: r,
-    score: resultEmbeddings[i] ? cosineSimilarity(questionEmbedding, resultEmbeddings[i]) : 0,
-  }));
+  // Compute combined scores: semantic similarity × priority weight
+  const scored = results.map((r, i) => {
+    const semanticScore = resultEmbeddings[i]
+      ? cosineSimilarity(questionEmbedding, resultEmbeddings[i])
+      : 0;
+    const priority = r.priority ?? 5;
+    const weight = PRIORITY_WEIGHT[priority] ?? 1.0;
+    return {
+      result: r,
+      // Combined score with priority weighting
+      score: semanticScore * weight,
+    };
+  });
 
-  // Sort by score descending
+  // Sort by combined score descending
   scored.sort((a, b) => b.score - a.score);
 
   return scored.map((s) => s.result);

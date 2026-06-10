@@ -1,12 +1,5 @@
-import { searchWithLangSearch, type LangSearchResult } from "@/lib/ask-energy/langsearch";
-import { searchWithBrave } from "@/lib/ask-energy/brave-search";
+import { searchTrustedSources } from "@/lib/ask-energy/search-trusted-sources";
 import { expandEnergyQuery } from "@/lib/ask-energy/expand-query";
-import { rerankByEmbedding } from "@/lib/ask-energy/embed";
-import {
-  isApprovedDomain,
-  getPriorityGroupByUrl,
-  getTrustedDomains,
-} from "@/lib/ask-energy/trusted-sources";
 import {
   buildAskEnergyPrompt,
   getSearchUnavailableMessage,
@@ -18,24 +11,15 @@ import {
   detectQuestionLanguage,
   type SupportedLanguage,
 } from "@/lib/ask-energy/detect-language";
+import { getTrustedDomains } from "@/lib/ask-energy/trusted-sources";
 
 const MAX_QUESTION_LENGTH = 500;
 const MAX_HISTORY_LENGTH = 10;
+const BRAVE_QUERY_CHAR_LIMIT = 400;
 
 interface AskEnergyRequest {
   question: string;
   history?: { role: "user" | "assistant"; content: string }[];
-}
-
-interface TrustedSearchResult {
-  title: string;
-  url: string;
-  domain: string;
-  priority: number;
-  priorityGroup: string;
-  snippet?: string;
-  summary?: string;
-  trusted: boolean;
 }
 
 function sanitizeQuestion(input: string): string {
@@ -74,7 +58,7 @@ function debugLog(label: string, data: unknown) {
             : typeof data === "object" && data !== null
               ? JSON.stringify(data).slice(0, 200)
               : String(data);
-    console.log(`[AskEnergy] ${label}:`, preview);
+    console.log(`[AskEnergy] label:`, preview);
   }
 }
 
@@ -85,114 +69,6 @@ function isTooBroad(question: string): boolean {
   if (words.length <= 1) return true;
   if (words.length === 1 && !/[A-Z]{3,}/.test(trimmed)) return true;
   return false;
-}
-
-// ── Relevance scoring & dedup (shared with search-trusted-sources) ──
-
-const RELEVANCE_KEYWORDS = [
-  "Algeria", "algeria", "Algérie", "algérie",
-  "Europe", "europe", "European", "european",
-  "Italy", "italy", "Italia", "italia",
-  "Spain", "spain", "España", "españa",
-  "France", "france",
-  "MEDGAZ", "medgaz", "Medgaz",
-  "NIGAL", "nigal",
-  "TRANSMED", "transmed",
-  "Sonatrach", "sonatrach", "SONATRACH",
-  "ENI", "eni",
-  "Naturgy", "naturgy",
-  "gas", "Gas", "gaz", "Gaz",
-  "natural gas", "Natural gas", "Natural Gas",
-  "pipeline", "Pipeline", "gazoduc",
-  "solar", "Solar", "solaire", "Solaire",
-  "hydrogen", "Hydrogen", "hydrogène",
-  "renewable", "Renewable",
-  "energy security", "Energy security",
-  "Sahara", "sahara",
-  "cooperation", "Cooperation", "coopération",
-  "partnership", "Partnership", "partenariat",
-  "export", "Export",
-];
-
-function relevanceScore(result: TrustedSearchResult): number {
-  const text = `${result.title} ${result.snippet ?? ""} ${result.summary ?? ""}`;
-  let score = 0;
-  for (const kw of RELEVANCE_KEYWORDS) {
-    if (text.includes(kw)) score += 1;
-  }
-  return score;
-}
-
-function extractDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return url;
-  }
-}
-
-function deduplicateByUrl(results: TrustedSearchResult[]): TrustedSearchResult[] {
-  const seen = new Map<string, TrustedSearchResult>();
-  for (const r of results) {
-    const key = r.url.toLowerCase();
-    const existing = seen.get(key);
-    if (!existing) {
-      seen.set(key, r);
-    } else {
-      const currentHasSummary = !!(r.summary && r.summary.length > 50);
-      const existingHasSummary = !!(existing.summary && existing.summary.length > 50);
-      if (currentHasSummary && !existingHasSummary) {
-        seen.set(key, r);
-      } else if (!currentHasSummary && !existingHasSummary) {
-        const curLen = r.snippet?.length ?? 0;
-        const existLen = existing.snippet?.length ?? 0;
-        if (curLen > existLen) seen.set(key, r);
-      }
-    }
-  }
-  return Array.from(seen.values());
-}
-
-function mapResults(
-  rawResults: LangSearchResult[],
-  isTrustedSearch: boolean
-): TrustedSearchResult[] {
-  return rawResults.map((r) => {
-    const domain = extractDomain(r.url);
-    const isApproved = isTrustedSearch || isApprovedDomain(r.url);
-    const group = isApproved ? getPriorityGroupByUrl(r.url) : null;
-    return {
-      title: r.title,
-      url: r.url,
-      domain,
-      priority: group?.priority ?? 99,
-      priorityGroup: group?.name ?? "General Web Search",
-      snippet: r.snippet,
-      summary: r.summary,
-      trusted: isApproved,
-    };
-  });
-}
-
-async function processAndRank(
-  question: string,
-  rawResults: LangSearchResult[],
-  isTrustedSearch: boolean
-): Promise<TrustedSearchResult[]> {
-  const mapped = mapResults(rawResults, isTrustedSearch);
-  const deduped = deduplicateByUrl(mapped);
-
-  deduped.sort((a, b) => {
-    if (a.trusted !== b.trusted) return a.trusted ? -1 : 1;
-    const relA = relevanceScore(a);
-    const relB = relevanceScore(b);
-    if (relA !== relB) return relB - relA;
-    if (a.priority !== b.priority) return a.priority - b.priority;
-    return 0;
-  });
-
-  const reranked = await rerankByEmbedding(question, deduped);
-  return reranked.slice(0, 8);
 }
 
 // ── SSE helpers ──
@@ -243,14 +119,10 @@ export async function POST(request: Request): Promise<Response> {
   debugLog("question", question);
   debugLog("language", language);
 
-  // --- Reject query that exceeds 400 characters (Brave API limit) ---
-  const MAX_QUERY_LENGTH = 400;
-  if (question.length > MAX_QUERY_LENGTH) {
+  // --- Reject query that exceeds Brave's 400-character limit ---
+  if (question.length > BRAVE_QUERY_CHAR_LIMIT) {
     return Response.json(
-      {
-        error: getQueryTooLongMessage(language),
-        language,
-      },
+      { error: getQueryTooLongMessage(language), language },
       { status: 200 }
     );
   }
@@ -264,8 +136,6 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const history = sanitizeHistory(body.history);
-  const expandedQueries = expandEnergyQuery(question, language);
-  const searchQueries = expandedQueries.slice(0, 2);
   const trustedDomains = getTrustedDomains();
 
   const encoder = new TextEncoder();
@@ -277,72 +147,29 @@ export async function POST(request: Request): Promise<Response> {
         controller.enqueue(encoder.encode(sseEvent(data)));
       };
 
-      // ─── Phase 1: Search trusted sources (Brave with site: filter) ───
+      // ─── Phase 1: Search trusted sources ───
       enqueue({ p: "searching_trusted" });
 
-      let allRawResults: LangSearchResult[] = [];
-      let fromTrustedSources = true;
-      let searchError = false;
-
-      // Phase 1: Brave with site filter
-      for (const q of searchQueries) {
-        try {
-          const braveResults = await searchWithBrave(q, trustedDomains);
-          if (braveResults.length > 0) {
-            for (const r of braveResults) {
-              allRawResults.push({
-                title: r.title,
-                url: r.url,
-                snippet: r.snippet ?? r.description,
-              });
-            }
-          }
-        } catch (e) {
-          debugLog("Brave search error", e);
-          searchError = true;
-        }
-        // Got results, skip remaining queries
-        if (allRawResults.length > 0) break;
-      }
-
-      // ─── Phase 2: Fallback to LangSearch (alternative sources) ───
-      if (allRawResults.length === 0 && braveKey) {
-        enqueue({ p: "trusted_not_found" });
-
-        if (langsearchKey) {
-          enqueue({ p: "searching_alternative" });
-
-          for (const q of searchQueries) {
-            try {
-              const langResults = await searchWithLangSearch(q);
-              for (const r of langResults) {
-                allRawResults.push(r);
-              }
-              if (langResults.length > 0) break;
-            } catch (e) {
-              debugLog("LangSearch error", e);
-              searchError = true;
-            }
-          }
-
-          fromTrustedSources = false;
-        }
-      }
-
-      // ─── No results from any source ───
-      if (allRawResults.length === 0) {
-        if (searchError) {
-          enqueue({ error: getSearchUnavailableMessage(language) });
-        } else {
-          enqueue({ error: "No relevant information found for your question. Please try rephrasing or asking about a different energy topic." });
-        }
+      let searchResult: Awaited<ReturnType<typeof searchTrustedSources>>;
+      try {
+        searchResult = await searchTrustedSources(question, language);
+      } catch (e) {
+        debugLog("search error", e);
+        enqueue({ error: getSearchUnavailableMessage(language) });
         controller.close();
         return;
       }
 
-      // ─── Process & rank results ───
-      const searchResults = await processAndRank(question, allRawResults, fromTrustedSources);
+      const { results: searchResults, fromTrustedSources, debug } = searchResult;
       debugLog("final results", searchResults.length);
+      debugLog("from trusted sources", fromTrustedSources);
+
+      // ─── No results from any source ───
+      if (searchResults.length === 0) {
+        enqueue({ error: "No relevant information found for your question. Please try rephrasing or asking about a different energy topic." });
+        controller.close();
+        return;
+      }
 
       // ─── Build sources for response ───
       const sources = searchResults.map((r) => ({
@@ -382,7 +209,7 @@ export async function POST(request: Request): Promise<Response> {
           body: JSON.stringify({
             model,
             messages,
-            max_tokens: 1500,
+            max_tokens: 3500,
             temperature: 0.4,
             stream: true,
           }),

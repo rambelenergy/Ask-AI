@@ -74,7 +74,7 @@ export async function searchWithBrave(
 
   const params = new URLSearchParams({
     q: fullQuery,
-    count: "10",
+    count: "20",
     search_lang: "en",
   });
 

@@ -5,60 +5,209 @@ export interface TrustedSourceGroup {
 }
 
 /**
- * Trusted source priority groups for Ask Energy.
+ * Trusted source priority groups for RamBelEnergy Ask Energy.
  *
- * Ordered by priority — Priority 1 sources rank highest.
- * Primary sources from official organizations, governments, operators, and news agencies.
- * Competing energy media platforms (Argus, ICIS, MEES, Montel, Energy Intelligence, etc.)
- * are intentionally excluded.
+ * Priority order (as specified):
+ *   1. Official Algerian institutions and government sources
+ *   2. Official European institutions and agencies
+ *   3. International organizations and development institutions
+ *   4. Reputable news agencies (Reuters, Bloomberg, APS, AP, AFP, etc.)
+ *   5. Other media, analytical sources, and sector-specific infrastructure
+ *
+ * The platform always favors original institutional sources over media reports
+ * that quote or summarize them.
  *
  * ═══════════════════════════════════════════════════════════════
- * Last updated: 2026-06-08
+ * Last updated: 2026-06-10
  * ═══════════════════════════════════════════════════════════════
  */
 export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
-  // ═══ PRIORITY 1 — International News Agencies (Verification Sources) ═══
+  // ═══ PRIORITY 1 — Official Algerian Institutions & Government ═══
   {
     priority: 1,
-    name: "International News Agencies",
+    name: "Algerian Official & Government Sources",
     domains: [
-      "reuters.com",
-      "apnews.com",
-      "aps.dz",
-    ],
-  },
-
-  // ═══ PRIORITY 2 — Algerian Government & National Operators ═══
-  {
-    priority: 2,
-    name: "Algerian Government & Operators",
-    domains: [
-      "energy.gov.dz",
+      // Energy companies & agencies
       "sonatrach.com",
+      "sonatrach.dz",
       "sonelgaz.dz",
+      "energy.gov.dz",
+      "alnaft.dz",
+      "aapi.dz",
       "creg.gov.dz",
+      "creg.dz",
+      // Government & parliament
+      "el-mouradia.dz",
+      "premier-ministre.gov.dz",
+      "apn.dz",
+      "majliselouma.dz",
+      "mfa.gov.dz",
+      "interieur.gov.dz",
+      "commerce.gov.dz",
+      "industrie.gov.dz",
+      "finances.gov.dz",
+      // Official press agency
+      "aps.dz",
+      // Research & regulatory
+      "cder.dz",
+      "arh.gov.dz",
+      // Official journal & constitutional
+      "joradp.dz",
+      "cour-constitutionnelle.dz",
+      // Additional Algerian institutions
+      "ons.dz",
+      "banque-of.dz",
+      "caci.dz",
+      "andi.dz",
+      // Algerian state media
       "elmoudjahid.dz",
     ],
   },
 
-  // ═══ PRIORITY 3 — European Energy Institutions ═══
+  // ═══ PRIORITY 2 — Official European Institutions & Agencies ═══
   {
-    priority: 3,
-    name: "European Energy Institutions",
+    priority: 2,
+    name: "European Union Institutions & Agencies",
     domains: [
       "energy.ec.europa.eu",
       "ec.europa.eu",
-      "entsog.eu",
-      "entsoe.eu",
-      "acer.europa.eu",
-      "eib.org",
+      "commission.europa.eu",
+      "europa.eu",
+      "consilium.europa.eu",
+      "eeas.europa.eu",
       "eea.europa.eu",
+      "acer.europa.eu",
+      "entsoe.eu",
+      "entsog.eu",
+      "transparency.entsog.eu",
+      "clean-hydrogen.europa.eu",
+      "gie.eu",
+      "eib.org",
+      "bruegel.org",
+    ],
+  },
+  {
+    priority: 2,
+    name: "European National Energy & Regulatory Authorities",
+    domains: [
+      // Germany
+      "bmwk.de",
+      "bundeswirtschaftsministerium.de",
+      "bundesnetzagentur.de",
+      "umweltbundesamt.de",
+      "bafa.de",
+      // France
+      "ecologie.gouv.fr",
+      "rte-france.com",
+      "ademe.fr",
+      "cre.fr",
+      // Spain
+      "miteco.gob.es",
+      "ree.es",
+      "idae.es",
+      "cnmc.es",
+      "exteriores.gob.es",
+      // Italy
+      "mase.gov.it",
+      "gse.it",
+      "arera.it",
+      "tema.it",
+      // Portugal
+      "dgeg.gov.pt",
+      "erse.pt",
+      // Greece
+      "ypen.gov.gr",
+      "rae.gr",
+      // Additional EU member states
+      "rvo.nl",
+      "elia.be",
     ],
   },
 
-  // ═══ PRIORITY 4 — Major International Energy Companies ═══
+  // ═══ PRIORITY 3 — International Organizations & Development Institutions ═══
+  {
+    priority: 3,
+    name: "International Energy & Research Organizations",
+    domains: [
+      "iea.org",
+      "irena.org",
+      "worldenergy.org",
+      "opec.org",
+      "iaea.org",
+      "oxfordenergy.org",
+      "energypolicy.columbia.edu",
+      "ifri.org",
+      "chathamhouse.org",
+      "energyinst.org",
+      "carnegieendowment.org",
+    ],
+  },
+  {
+    priority: 3,
+    name: "Development Banks & Global Financial Institutions",
+    domains: [
+      "worldbank.org",
+      "data.worldbank.org",
+      "imf.org",
+      "afdb.org",
+      "ebrd.com",
+      "isdb.org",
+      "undp.org",
+      "data.un.org",
+    ],
+  },
+  {
+    priority: 3,
+    name: "Energy Data, Statistics & Research",
+    domains: [
+      "ourworldindata.org",
+      "ember-energy.org",
+      "enerdata.net",
+      "irena.org/publications",
+      "carbonbrief.org",
+    ],
+  },
+
+  // ═══ PRIORITY 4 — Reputable News Agencies ═══
   {
     priority: 4,
+    name: "International News Agencies & Wires",
+    domains: [
+      "reuters.com",
+      "apnews.com",
+      "afp.com",
+      "ansa.it",
+      "efe.com",
+      "dpa.com",
+      "bloomberg.com",
+    ],
+  },
+  {
+    priority: 4,
+    name: "Energy-Focused News & Market Intelligence",
+    domains: [
+      "energyintel.com",
+      "argusmedia.com",
+      "spglobal.com",
+      "bnef.com",
+      "upstreamonline.com",
+      "worldoil.com",
+    ],
+  },
+  {
+    priority: 4,
+    name: "Major Financial & Business Press",
+    domains: [
+      "ft.com",
+      "wsj.com",
+      "economist.com",
+      "euractiv.com",
+    ],
+  },
+
+  // ═══ PRIORITY 5 — Infrastructure, Companies, Research & Other Media ═══
+  {
+    priority: 5,
     name: "International Energy Companies",
     domains: [
       "eni.com",
@@ -66,58 +215,30 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "bp.com",
       "shell.com",
       "equinor.com",
-    ],
-  },
-
-  // ═══ PRIORITY 5 — International Energy Institutions ═══
-  {
-    priority: 5,
-    name: "International Energy Institutions",
-    domains: [
-      "iea.org",
-      "irena.org",
-      "opec.org",
-      "worldenergy.org",
-      "iaea.org",
-    ],
-  },
-
-  // ═══ PRIORITY 6 — European National Energy Authorities ═══
-  {
-    priority: 6,
-    name: "European National Authorities",
-    domains: [
-      "bundeswirtschaftsministerium.de",
-      "umweltbundesamt.de",
-      "bundesnetzagentur.de",
-      "ecologie.gouv.fr",
-      "rte-france.com",
-      "ademe.fr",
-      "miteco.gob.es",
-      "ree.es",
-      "idae.es",
-      "exteriores.gob.es",
-      "mase.gov.it",
-      "gse.it",
-      "arera.it",
-    ],
-  },
-
-  // ═══ PRIORITY 7 — Pipeline & Strategic Infrastructure ═══
-  {
-    priority: 7,
-    name: "Pipeline & Strategic Infrastructure",
-    domains: [
-      "medgaz.com",
-      "south2corridor.net",
+      "repsol.com",
+      "galp.com",
+      "omv.com",
       "snam.it",
       "naturgy.com",
     ],
   },
-
-  // ═══ PRIORITY 8 — Hydrogen, Renewables & Future Energy ═══
   {
-    priority: 8,
+    priority: 5,
+    name: "Pipeline & Strategic Infrastructure",
+    domains: [
+      "medgaz.com",
+      "south2corridor.net",
+      "sea-corridor.com",
+      "transmed-spa.it",
+      "galsi.it",
+      "elmedproject.com",
+      "offshore-technology.com",
+      "offshore-mag.com",
+      "gasprocessingnews.com",
+    ],
+  },
+  {
+    priority: 5,
     name: "Hydrogen, Renewables & Future Energy",
     domains: [
       "hydrogeneurope.eu",
@@ -125,35 +246,21 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "globalsolarcouncil.org",
       "gwec.net",
       "hydrogencouncil.com",
+      "windeurope.org",
+      "solarpowereurope.org",
     ],
   },
-
-  // ═══ PRIORITY 9 — Energy Data & Statistics ═══
   {
-    priority: 9,
-    name: "Energy Data & Statistics",
-    domains: [
-      "data.worldbank.org",
-      "imf.org",
-      "data.un.org",
-      "ourworldindata.org",
-      "ember-energy.org",
-    ],
-  },
-
-  // ═══ PRIORITY 10 — Mediterranean & Regional Cooperation ═══
-  {
-    priority: 10,
+    priority: 5,
     name: "Mediterranean & Regional Cooperation",
     domains: [
       "ufmsecretariat.org",
       "med-tso.org",
+      "res4africa.org",
     ],
   },
-
-  // ═══ PRIORITY 11 — Quality International & Regional News Media ═══
   {
-    priority: 11,
+    priority: 5,
     name: "International & Regional News Media",
     domains: [
       "france24.com",
@@ -164,101 +271,53 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "lemonde.fr",
       "elpais.com",
       "lavanguardia.com",
-      "tsa-algerie.com",
-      "elwatan-dz.com",
-      "horizons.dz",
-      "lavoiedalgerie.dz",
-      "theafricareport.com",
-      "newarab.com",
-      "africanews.com",
-      "africaradio.com",
-      "algerie360.com",
-      "lechodalgerie.dz",
-      "allafrica.com",
-      "ansa.it",
       "corriere.it",
       "ilsole24ore.com",
       "spiegel.de",
       "faz.net",
       "sueddeutsche.de",
-      "democrata.es",
-      "algeriainvest.com",
-      "afriquinfos.com",
-      "lalgerieaujourdhui.dz",
+      "tsa-algerie.com",
+      "elwatan-dz.com",
+      "horizons.dz",
+      "algerie360.com",
+      "lechodalgerie.dz",
     ],
   },
-
-  // ═══ PRIORITY 12 — Energy Think Tanks & Research Institutes ═══
   {
-    priority: 12,
-    name: "Energy Think Tanks & Research",
-    domains: [
-      "oxfordenergy.org",
-      "carnegieendowment.org",
-      "climateanalytics.org",
-      "ifri.org",
-      "chathamhouse.org",
-      "energyinst.org",
-      "carbonbrief.org",
-    ],
-  },
-
-  // ═══ PRIORITY 13 — Energy Industry News ═══
-  {
-    priority: 13,
-    name: "Energy Industry News",
+    priority: 5,
+    name: "Specialized Energy Media & Research",
     domains: [
       "oilprice.com",
       "rechargenews.com",
       "pv-magazine.com",
       "energymonitor.ai",
-    ],
-  },
-
-  // ═══ PRIORITY 14 — Supplementary: General News & Policy (not energy-specific) ═══
-  {
-    priority: 14,
-    name: "General News & Policy",
-    domains: [
-      "bloomberg.com",
-      "ft.com",
-      "euractiv.com",
-      "bruegel.org",
-    ],
-  },
-
-  // ═══ PRIORITY 15 — Supplementary: Energy Market & Data Platforms ═══
-  // Lower priority — official sources (1-10) preferred for same news
-  {
-    priority: 15,
-    name: "Energy Market & Data Platforms",
-    domains: [
-      "argusmedia.com",
-      "energyintel.com",
-      "spglobal.com",
-    ],
-  },
-
-  // ═══ PRIORITY 16 — Supplementary: Algerian Research & Institutions ═══
-  {
-    priority: 16,
-    name: "Algerian Research & Institutions",
-    domains: [
-      "cder.dz",
-      "aapi.dz",
-      "alnaft.dz",
-      "mfa.gov.dz",
+      "ieee.org",
+      "ieeexplore.ieee.org",
+      "researchgate.net",
+      "sciencedirect.com",
+      "nature.com",
+      "mdpi.com",
+      "springer.com",
+      "tandfonline.com",
     ],
   },
 ];
 
-export function getTrustedDomains(): string[] {
+/** Domains ordered by priority — higher priority domains appear first.
+ *  This ordering is used by Brave Search's `site:` filter so that when
+ *  the 400-character query limit truncates the domain list, the most
+ *  important (P1 Algerian) domains are always included. */
+export function getTrustedDomainsByPriority(): string[] {
   return TRUSTED_SOURCE_GROUPS.flatMap((g) => g.domains);
+}
+
+/** Backward-compatible alias */
+export function getTrustedDomains(): string[] {
+  return getTrustedDomainsByPriority();
 }
 
 /**
  * Check if a URL's hostname matches or is a subdomain of an approved domain.
- * Example: "www.iea.org" matches "iea.org", "data.un.org" matches "data.un.org"
  */
 export function isApprovedDomain(url: string): boolean {
   try {

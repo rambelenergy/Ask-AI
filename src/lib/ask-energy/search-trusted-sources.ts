@@ -16,6 +16,12 @@ export interface TrustedSearchResult {
   trusted: boolean;
 }
 
+/** Max results to return after all filtering, deduplication, and reranking */
+const MAX_FINAL_RESULTS = 12;
+
+/** Max expanded queries to search (original + N expanded) */
+const MAX_EXPANDED_QUERIES = 4;
+
 function extractDomain(url: string): string {
   try {
     return new URL(url).hostname.replace(/^www\./, "");
@@ -140,8 +146,8 @@ export async function searchTrustedSources(
   fromTrustedSources: boolean;
 }> {
   const expandedQueries = expandEnergyQuery(question, language);
-  const searchQueries = expandedQueries.slice(0, 2);
-  const trustedDomains = getTrustedDomains();
+  const searchQueries = expandedQueries.slice(0, MAX_EXPANDED_QUERIES);
+  const trustedDomains = getTrustedDomains(); // already ordered by priority
 
   // ─── Phase 1: Brave Search with site: filter ───
   let allRawResults: LangSearchResult[] = [];
@@ -164,6 +170,8 @@ export async function searchTrustedSources(
     } catch {
       // Brave failed — will fall back to LangSearch
     }
+    // Got good results, skip remaining queries to save API calls
+    if (allRawResults.length >= 10) break;
   }
 
   // ─── Phase 2: Fallback to LangSearch if trusted sources returned nothing ───
@@ -177,10 +185,9 @@ export async function searchTrustedSources(
           allRawResults.push(r);
           domainsFound.add(extractDomain(r.url));
         }
-        // Got results, skip remaining queries
         if (langResults.length > 0) break;
       } catch {
-        // Graceful: individual query failure doesn't block others
+        // Graceful
       }
     }
   }
@@ -214,8 +221,11 @@ export async function searchTrustedSources(
     return 0;
   });
 
+  // ─── Re-rank with priority-weighted embedding ───
   const reranked = await rerankByEmbedding(question, deduped);
-  const final = reranked.slice(0, 8);
+
+  // ─── Ensure priority diversity (not all from one source type) ───
+  const final = ensurePriorityDiversity(reranked, MAX_FINAL_RESULTS);
 
   return {
     results: final,
@@ -229,4 +239,82 @@ export async function searchTrustedSources(
       fromTrustedSources,
     },
   };
+}
+
+/**
+ * Ensure results include diversity across priority groups.
+ * Prevents the reranker from pulling too heavily from one source type
+ * (e.g., news agencies dominating over institutional sources).
+ *
+ * Strategy: interleave — take top results but guarantee representation
+ * from each priority level that has available results.
+ */
+function ensurePriorityDiversity(
+  results: TrustedSearchResult[],
+  maxResults: number
+): TrustedSearchResult[] {
+  if (results.length <= maxResults) return results;
+
+  // Group results by priority
+  const byPriority = new Map<number, TrustedSearchResult[]>();
+  for (const r of results) {
+    const p = r.priority;
+    if (!byPriority.has(p)) byPriority.set(p, []);
+    byPriority.get(p)!.push(r);
+  }
+
+  const final: TrustedSearchResult[] = [];
+  const seen = new Set<string>();
+
+  // Round-robin through priority groups until we fill maxResults
+  const priorities = Array.from(byPriority.keys()).sort((a, b) => a - b);
+  let idx = 0;
+
+  while (final.length < maxResults && byPriority.size > 0) {
+    const priority = priorities[idx % priorities.length];
+    const group = byPriority.get(priority);
+
+    if (group && group.length > 0) {
+      const candidate = group.shift()!;
+      const key = candidate.url.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        final.push(candidate);
+      }
+    } else {
+      // This priority group exhausted — remove it
+      byPriority.delete(priority);
+      priorities.splice(priorities.indexOf(priority), 1);
+      if (priorities.length === 0) break;
+      idx = 0;
+      continue;
+    }
+
+    idx++;
+
+    // Safety: if we've done max rounds, just fill from whatever's left
+    if (idx > maxResults * 3) {
+      for (const remaining of results) {
+        const key = remaining.url.toLowerCase();
+        if (!seen.has(key) && final.length < maxResults) {
+          seen.add(key);
+          final.push(remaining);
+        }
+      }
+      break;
+    }
+  }
+
+  // If we didn't fill up, add remaining unique results
+  if (final.length < maxResults) {
+    for (const r of results) {
+      const key = r.url.toLowerCase();
+      if (!seen.has(key) && final.length < maxResults) {
+        seen.add(key);
+        final.push(r);
+      }
+    }
+  }
+
+  return final.slice(0, maxResults);
 }
