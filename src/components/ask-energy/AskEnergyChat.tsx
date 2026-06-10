@@ -370,9 +370,9 @@ export function AskEnergyChat() {
   const messagesArea = (
     <div
       ref={messagesContainerRef}
-      className="flex-1 overflow-y-auto px-4 py-4"
+      className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"
       style={{
-        minHeight: messages.length === 0 ? "280px" : "auto",
+        minHeight: messages.length === 0 ? "200px" : "auto",
         background: "url('/sahara-energy.jpeg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -380,7 +380,7 @@ export function AskEnergyChat() {
     >
       <div className="relative z-10">
         {messages.length === 0 && !loading && (
-          <div className="flex min-h-[240px] flex-col items-center justify-center text-center">
+          <div className="flex min-h-[180px] sm:min-h-[240px] flex-col items-center justify-center text-center">
             <div className="rounded-2xl bg-[#0a1628]/80 px-6 py-8 backdrop-blur">
               <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10">
                 <Search size={20} className="text-[var(--gold)]" />
@@ -544,9 +544,9 @@ export function AskEnergyChat() {
         </div>
       )}
 
-      {/* Inline widget — always visible, hidden when fullscreen is active */}
-      <div className={isFullscreen ? "invisible" : ""}>
-        <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
+      {/* Inline widget — hidden (display:none) when fullscreen so it doesn't take layout space */}
+      <div className={isFullscreen ? "hidden" : ""}>
+        <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm" style={{ maxHeight: "calc(100dvh - 180px)" }}>
           {chatContent}
         </div>
       </div>
