@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronRight, Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles, Search } from "lucide-react";
 import { AskEnergyChat } from "@/components/ask-energy/AskEnergyChat";
 import { T } from "@/components/language/t";
 
@@ -32,9 +32,9 @@ export default function AiAssistantPage() {
         </div>
       </section>
 
-      {/* Desktop: Chat panel with background */}
+      {/* Chat section — AskEnergyChat handles both desktop (inline widget) and mobile (FAB + modal) */}
       <section
-        className="hidden md:block py-10 sm:py-14"
+        className="py-10 sm:py-14"
         style={{
           background: "url('/sahara-energy.jpeg')",
           backgroundSize: "cover",
@@ -42,6 +42,8 @@ export default function AiAssistantPage() {
         }}
       >
         <div className="container-page">
+          {/* Desktop: inline widget takes this space */}
+          {/* Mobile: hint card fills this space, FAB floats from component below */}
           <div className="mx-auto max-w-[720px]">
             <AskEnergyChat />
           </div>
@@ -53,19 +55,8 @@ export default function AiAssistantPage() {
         </div>
       </section>
 
-      {/* Mobile: spacer for FAB + disclaimer */}
-      <section className="md:hidden py-6">
-        <div className="container-page">
-          <div className="mx-auto max-w-[680px] rounded-xl border border-[var(--line)] bg-[var(--paper)] p-5 text-center">
-            <p className="text-[11px] leading-5 text-[var(--muted)]">
-              Tap the <span className="inline-flex items-center gap-0.5 rounded bg-[var(--navy)] px-1.5 py-0.5 text-[10px] text-white"><Sparkles size={10} className="text-[var(--gold)]"/> Ask Energy</span> button to start a trusted-source energy search.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* What Ask Energy does — always visible, answer-focused */}
-      <section className="container-page pb-12 sm:pb-20">
+      {/* What Ask Energy does — always visible */}
+      <section className="container-page pb-20 sm:pb-24 md:pb-28">
         <div className="mx-auto max-w-[740px] rounded-xl border border-[var(--line)] bg-[var(--paper)] p-5 sm:p-8">
           <h2 className="text-lg font-bold text-[var(--navy)]">What Ask Energy does</h2>
           <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--muted)]">
