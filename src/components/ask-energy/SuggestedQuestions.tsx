@@ -7,14 +7,14 @@ export function SuggestedQuestions({ questions, onSelect }: SuggestedQuestionsPr
   if (questions.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 px-5 py-3">
+    <div className="flex flex-wrap gap-1.5 px-4 py-3">
       {questions.map((q) => (
         <button
           key={q}
           onClick={() => onSelect(q)}
-          className="ask-energy-chip rounded-full border border-[var(--line)] bg-white px-3.5 py-1.5 text-[12px] text-[var(--muted)] transition-all hover:border-[var(--green)] hover:text-[var(--green)] hover:shadow-sm"
+          className="ask-energy-chip rounded-full border border-[var(--line)] bg-white px-3 py-1.5 text-[11px] sm:text-[12px] text-[var(--muted)] transition-all hover:border-[var(--green)] hover:text-[var(--green)] hover:shadow-sm active:scale-[0.97]"
         >
-          <span className="font-bold text-[var(--gold)]">EXP:</span> {q.length > 70 ? q.slice(0, 70) + "…" : q}
+          <span className="font-bold text-[var(--gold)]">EXP:</span> {q.length > 60 ? q.slice(0, 60) + "…" : q}
         </button>
       ))}
     </div>

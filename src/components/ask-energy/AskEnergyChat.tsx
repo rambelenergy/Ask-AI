@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Loader2, Send, Sparkles, Search, RotateCcw } from "lucide-react";
+import { Loader2, Send, Sparkles, Search, RotateCcw, X, Minimize2, Maximize2, ChevronUp } from "lucide-react";
 import { ChatMessage, hasArabic } from "./ChatMessage";
 import { SuggestedQuestions } from "./SuggestedQuestions";
 import { getAllSuggestedQuestions } from "@/lib/ai/suggested-questions";
@@ -31,8 +31,6 @@ interface Message {
   suggestions?: string[];
 }
 
-
-
 export function AskEnergyChat() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -40,6 +38,8 @@ export function AskEnergyChat() {
   const [streamingContent, setStreamingContent] = useState("");
   const [loadingText, setLoadingText] = useState("Searching trusted energy sources...");
   const [progressSteps, setProgressSteps] = useState<{ text: string; done: boolean; active: boolean }[]>([]);
+  const [inputCollapsed, setInputCollapsed] = useState(false);
+  const [mobileExpanded, setMobileExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +50,9 @@ export function AskEnergyChat() {
   const inputEmpty = input.trim().length === 0;
   const inputOverLimit = input.trim().length > MAX_MESSAGE_LENGTH;
   const canSend = !inputEmpty && !inputOverLimit && !loading;
+  const hasAnswers = messages.length > 0;
 
+  // Scroll to bottom when content changes
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {
@@ -58,11 +60,29 @@ export function AskEnergyChat() {
     }
   }, [messages, streamingContent]);
 
+  // Auto-collapse input when an answer appears
   useEffect(() => {
-    if (!loading && inputRef.current) {
+    if (hasAnswers && !loading && !streamingContent) {
+      setInputCollapsed(true);
+    }
+  }, [hasAnswers, loading, streamingContent]);
+
+  // Focus input when loading finishes and input is expanded
+  useEffect(() => {
+    if (!loading && !inputCollapsed && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [loading]);
+  }, [loading, inputCollapsed]);
+
+  // Lock body scroll when mobile modal is open
+  useEffect(() => {
+    if (mobileExpanded) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileExpanded]);
 
   const buildHistory = useCallback(
     (msgs: Message[]) =>
@@ -82,6 +102,7 @@ export function AskEnergyChat() {
       if (!message || loading) return;
 
       setInput("");
+      setInputCollapsed(false);
       setLoading(true);
       setStreamingContent("");
       setLoadingText("Searching trusted energy sources...");
@@ -103,11 +124,9 @@ export function AskEnergyChat() {
           signal: controller.signal,
         });
 
-        // Handle no-results (200 with error field)
         if (response.ok) {
           const contentType = response.headers.get("content-type") ?? "";
           if (contentType.includes("text/event-stream") && response.body) {
-            // Streaming path
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let buffer = "";
@@ -146,7 +165,6 @@ export function AskEnergyChat() {
                 try {
                   const parsed = JSON.parse(payload);
 
-                  // Progress events
                   if (parsed.p) {
                     if (parsed.p === "searching_trusted") {
                       setLoadingText("Searching trusted energy sources...");
@@ -167,7 +185,6 @@ export function AskEnergyChat() {
                     }
                   }
 
-                  // SSE error (search failure during streaming)
                   if (parsed.error) {
                     setMessages((prev) => [
                       ...prev,
@@ -198,7 +215,6 @@ export function AskEnergyChat() {
               }
             }
 
-            // Stream ended without [DONE]
             if (fullContent) {
               setMessages((prev) => [
                 ...prev,
@@ -215,7 +231,6 @@ export function AskEnergyChat() {
             return;
           }
 
-          // Non-streaming responses (no-trusted-results or errors)
           try {
             const json: ErrorWithSuggestions = await response.json();
             if (json.error) {
@@ -236,7 +251,6 @@ export function AskEnergyChat() {
           return;
         }
 
-        // Non-OK response
         if (!response.ok || !response.body) {
           let errorMsg = "AI service temporarily unavailable.";
           try {
@@ -296,61 +310,74 @@ export function AskEnergyChat() {
     setStreamingContent("");
     setLoading(false);
     setInput("");
+    setInputCollapsed(false);
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 
-  return (
-    <div className="ask-energy-chat overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
-      {/* Chat header — compact */}
-      <div className="flex items-center justify-between border-b border-white/10 bg-[var(--navy)] px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--gold)]">
-            <Search size={13} className="text-white" />
-          </div>
-          <div>
-            <h3 className="text-xs font-bold leading-tight text-white">Ask Energy</h3>
-            <p className="text-[10px] text-white/40">Trusted Source Search</p>
-          </div>
+  // ── RENDER ──
+
+  const headerBar = (
+    <div className="flex items-center justify-between border-b border-white/10 bg-[var(--navy)] px-4 py-2.5">
+      <div className="flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--gold)]">
+          <Search size={13} className="text-white" />
         </div>
-        {messages.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold leading-tight text-white">Ask Energy</h3>
+          <p className="text-[10px] text-white/40">Trusted Source Search</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-1">
+        {hasAnswers && (
           <button
             onClick={handleReset}
             disabled={loading}
             className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold text-white/60 transition hover:bg-white/10 hover:text-white disabled:opacity-40"
-            title="Clear all chat"
-            aria-label="Clear all chat"
+            title="New search"
+            aria-label="New search"
           >
             <RotateCcw size={11} />
-            <span className="hidden sm:inline">Reset</span>
+            <span className="hidden sm:inline">New</span>
           </button>
         )}
+        {/* Mobile close button */}
+        <button
+          onClick={() => setMobileExpanded(false)}
+          className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white md:hidden"
+          aria-label="Close"
+        >
+          <X size={15} />
+        </button>
       </div>
+    </div>
+  );
 
-      {/* Messages area with Sahara background */}
-      <div
-        ref={messagesContainerRef}
-        className="h-[340px] overflow-y-auto px-4 py-4"
-        style={{
-          background: "url('/sahara-energy.jpeg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        {/* Content */}
-        <div className="relative z-10">
+  const messagesArea = (
+    <div
+      ref={messagesContainerRef}
+      className="flex-1 overflow-y-auto px-4 py-4"
+      style={{
+        minHeight: messages.length === 0 ? "300px" : "auto",
+        maxHeight: "none",
+        background: "url('/sahara-energy.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="relative z-10">
         {messages.length === 0 && !loading && (
-          <div className="flex h-[300px] flex-col items-center justify-center text-center">
+          <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
             <div className="rounded-2xl bg-[#0a1628]/80 px-6 py-8 backdrop-blur">
-            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10">
-              <Search size={20} className="text-[var(--gold)]" />
-            </div>
-            <p className="text-sm font-semibold text-white">Ask Energy</p>
-            <p className="mt-1 max-w-[280px] text-[11px] leading-5 text-white/70">
-              Ask questions about Algeria–Europe energy relations, energy security, renewables, green hydrogen, and related topics.
-            </p>
-            <p className="mt-2 rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--gold)]">
-              Experimental · Trusted Source Search
-            </p>
+              <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10">
+                <Search size={20} className="text-[var(--gold)]" />
+              </div>
+              <p className="text-sm font-semibold text-white">Ask Energy</p>
+              <p className="mt-1 max-w-[280px] text-[11px] leading-5 text-white/70">
+                Ask questions about Algeria–Europe energy relations, energy security, renewables, green hydrogen, and related topics.
+              </p>
+              <p className="mt-2 rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--gold)]">
+                Experimental · Trusted Source Search
+              </p>
             </div>
           </div>
         )}
@@ -369,20 +396,20 @@ export function AskEnergyChat() {
         {streamingContent && (() => {
           const isArabic = hasArabic(streamingContent);
           return (
-          <div className="mb-4 flex justify-start">
-            <div className={`max-w-[85%] rounded-2xl rounded-bl-md border border-white/10 bg-white/95 px-3.5 py-2.5 text-sm leading-relaxed text-[var(--navy)] shadow-sm backdrop-blur overflow-hidden break-words ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
-              <div className="mb-1 flex items-center gap-1.5">
-                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--gold)]/20">
-                  <Sparkles size={9} className="text-[var(--gold)]" />
+            <div className="mb-4 flex justify-start">
+              <div className={`max-w-[85%] rounded-2xl rounded-bl-md border border-white/10 bg-white/95 px-3.5 py-2.5 text-sm leading-relaxed text-[var(--navy)] shadow-sm backdrop-blur overflow-hidden break-words ${isArabic ? "text-right" : "text-left"}`} dir={isArabic ? "rtl" : "ltr"}>
+                <div className="mb-1 flex items-center gap-1.5">
+                  <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--gold)]/20">
+                    <Sparkles size={9} className="text-[var(--gold)]" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">
+                    Ask Energy
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">
-                  Ask Energy
-                </span>
+                <p className="whitespace-pre-wrap">{streamingContent}</p>
+                <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-[var(--green)] align-text-bottom" />
               </div>
-              <p className="whitespace-pre-wrap">{streamingContent}</p>
-              <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-[var(--green)] align-text-bottom" />
             </div>
-          </div>
           );
         })()}
 
@@ -429,42 +456,118 @@ export function AskEnergyChat() {
         )}
 
         <div ref={messagesEndRef} />
-        </div>
       </div>
+    </div>
+  );
 
-      {/* Suggested questions */}
+  const inputArea = (
+    <div className="ask-energy-input border-t border-[var(--line)] bg-white">
+      {inputCollapsed && hasAnswers && !loading ? (
+        /* Collapsed: compact "Ask another question" bar */
+        <button
+          onClick={() => { setInputCollapsed(false); setTimeout(() => inputRef.current?.focus(), 0); }}
+          className="flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-medium text-[var(--muted)] transition hover:bg-[var(--paper)] hover:text-[var(--green)]"
+        >
+          <Search size={13} />
+          <span>Ask another question</span>
+          <ChevronUp size={13} className="text-[var(--line)]" />
+        </button>
+      ) : (
+        /* Expanded input */
+        <div className="px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about Algeria, Europe, energy..."
+              disabled={loading}
+              maxLength={MAX_MESSAGE_LENGTH}
+              className="flex-1 rounded-full border border-[var(--line)] bg-[var(--paper)] px-4 py-2.5 text-sm text-[var(--navy)] placeholder:text-[var(--muted)] focus:border-[var(--green)] focus:outline-none focus:ring-1 focus:ring-[var(--green)] disabled:opacity-50"
+            />
+            <button
+              onClick={() => handleSend()}
+              disabled={!canSend}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white transition hover:bg-[#0e4b40] disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Send"
+            >
+              {loading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Send size={14} className="ml-0.5" />
+              )}
+            </button>
+          </div>
+          {/* Collapse hint when answers exist */}
+          {hasAnswers && !loading && (
+            <button
+              onClick={() => setInputCollapsed(true)}
+              className="mt-2 flex w-full items-center justify-center gap-1 text-[10px] text-[var(--muted-soft)] transition hover:text-[var(--muted)]"
+            >
+              <Minimize2 size={10} />
+              <span>Collapse to focus on answer</span>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  // ── Mobile: Floating Action Button ──
+  const mobileFab = (
+    <div className="fixed bottom-5 right-5 z-50 md:hidden">
+      <button
+        onClick={() => setMobileExpanded(true)}
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--navy)] shadow-lg shadow-black/25 transition hover:bg-[var(--green)] hover:scale-105 active:scale-95"
+        aria-label="Open Ask Energy"
+      >
+        {hasAnswers ? (
+          <Sparkles size={22} className="text-[var(--gold)]" />
+        ) : (
+          <Search size={22} className="text-white" />
+        )}
+      </button>
+      {hasAnswers && (
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--green)] text-[10px] font-bold text-white">
+          {messages.filter(m => m.role === "assistant").length}
+        </span>
+      )}
+    </div>
+  );
+
+  // ── Mobile: Full-screen modal ──
+  const mobileModal = mobileExpanded && (
+    <div className="fixed inset-0 z-[100] flex flex-col bg-white md:hidden">
+      {headerBar}
+      {messagesArea}
+      {/* Suggested questions (only when empty) */}
       {messages.length === 0 && (
         <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
       )}
-
-      {/* Input area — compact */}
-      <div className="ask-energy-input border-t border-[var(--line)] bg-white px-3 py-2">
-        <div className="flex items-center gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask about Algeria, Europe, energy..."
-            disabled={loading}
-            maxLength={MAX_MESSAGE_LENGTH}
-            className="flex-1 rounded-full border border-[var(--line)] bg-[var(--paper)] px-4 py-2 text-xs text-[var(--navy)] placeholder:text-[var(--muted)] focus:border-[var(--green)] focus:outline-none focus:ring-1 focus:ring-[var(--green)] disabled:opacity-50"
-          />
-          <button
-            onClick={() => handleSend()}
-            disabled={!canSend}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white transition hover:bg-[#0e4b40] disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label="Send"
-          >
-            {loading ? (
-              <Loader2 size={13} className="animate-spin" />
-            ) : (
-              <Send size={13} className="ml-0.5" />
-            )}
-          </button>
-        </div>
-      </div>
+      {inputArea}
     </div>
+  );
+
+  // ── Desktop: Inline widget ──
+  const desktopWidget = (
+    <div className="hidden md:flex md:flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-sm">
+      {headerBar}
+      {messagesArea}
+      {/* Suggested questions (only when empty) */}
+      {messages.length === 0 && (
+        <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
+      )}
+      {inputArea}
+    </div>
+  );
+
+  return (
+    <>
+      {desktopWidget}
+      {mobileFab}
+      {mobileModal}
+    </>
   );
 }
