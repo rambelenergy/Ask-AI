@@ -74,10 +74,12 @@ export function AskEnergyChat() {
     }
   }, [loading, inputCollapsed]);
 
-  // Lock body scroll when fullscreen
+  // Lock body scroll when fullscreen. Expand input on enter so user can type immediately.
   useEffect(() => {
     if (isFullscreen) {
       document.body.style.overflow = "hidden";
+      setInputCollapsed(false);
+      setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
     } else {
       document.body.style.overflow = "";
     }
