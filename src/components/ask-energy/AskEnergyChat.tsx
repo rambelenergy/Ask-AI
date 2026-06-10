@@ -60,10 +60,12 @@ export function AskEnergyChat() {
     }
   }, [messages, streamingContent]);
 
-  // Auto-collapse input when answer appears
+  // Auto-collapse input when answer appears (inline mode only — fullscreen keeps input open)
   useEffect(() => {
     if (hasAnswers && !loading && !streamingContent) {
-      setInputCollapsed(true);
+      if (!isFullscreen) {
+        setInputCollapsed(true);
+      }
     }
   }, [hasAnswers, loading, streamingContent]);
 
@@ -82,6 +84,8 @@ export function AskEnergyChat() {
       setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
     } else {
       document.body.style.overflow = "";
+      // Expand input on exit so search field is always visible in normal mode
+      setInputCollapsed(false);
     }
     return () => { document.body.style.overflow = ""; };
   }, [isFullscreen]);
@@ -370,9 +374,10 @@ export function AskEnergyChat() {
   const messagesArea = (
     <div
       ref={messagesContainerRef}
-      className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"
+      className={isFullscreen ? "flex-1 overflow-y-auto px-4 py-4" : "overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"}
       style={{
-        minHeight: messages.length === 0 ? "200px" : "auto",
+        minHeight: messages.length === 0 ? "200px" : undefined,
+        maxHeight: isFullscreen ? undefined : (messages.length > 0 ? "calc(100dvh - 380px)" : "none"),
         background: "url('/sahara-energy.jpeg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -536,16 +541,18 @@ export function AskEnergyChat() {
     >
       <div
         className={
-          "flex flex-col overflow-hidden bg-white" +
+          "flex flex-col bg-white" +
           (isFullscreen
             ? " h-full"
-            : " rounded-2xl border border-[var(--line)] shadow-sm"
+            : " overflow-hidden rounded-2xl border border-[var(--line)] shadow-sm"
           )
         }
-        style={!isFullscreen ? { maxHeight: "calc(100dvh - 180px)" } : undefined}
       >
         {headerBar}
-        {messagesArea}
+        {/* Wrapper for flex-1 in fullscreen; plain div in inline */}
+        <div className={isFullscreen ? "min-h-0 flex-1" : undefined}>
+          {messagesArea}
+        </div>
         {messages.length === 0 && (
           <SuggestedQuestions questions={suggestedQuestions} onSelect={handleSuggested} />
         )}
