@@ -377,7 +377,7 @@ export function AskEnergyChat() {
       className={isFullscreen ? "flex-1 overflow-y-auto px-4 py-4 h-full" : "overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"}
       style={{
         minHeight: messages.length === 0 ? "200px" : undefined,
-        maxHeight: isFullscreen ? undefined : (messages.length > 0 ? "calc(100dvh - 380px)" : "none"),
+        maxHeight: isFullscreen ? undefined : (messages.length > 0 ? "min(calc(100dvh - 380px), 500px)" : "none"),
         background: "url('/sahara-energy.jpeg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
