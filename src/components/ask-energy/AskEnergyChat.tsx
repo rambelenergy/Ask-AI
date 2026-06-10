@@ -67,10 +67,10 @@ export function AskEnergyChat() {
     }
   }, [hasAnswers, loading, streamingContent]);
 
-  // Focus input when expanded
+  // Focus input when expanded (preventScroll so page doesn't jump on mount)
   useEffect(() => {
     if (!loading && !inputCollapsed && inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus({ preventScroll: true });
     }
   }, [loading, inputCollapsed]);
 
@@ -307,7 +307,12 @@ export function AskEnergyChat() {
     setLoading(false);
     setInput("");
     setInputCollapsed(false);
-    setTimeout(() => inputRef.current?.focus(), 0);
+    setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0);
+  };
+
+  const expandInput = () => {
+    setInputCollapsed(false);
+    setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0);
   };
 
   // ── SHARED RENDER PARTS ──
@@ -456,7 +461,7 @@ export function AskEnergyChat() {
       {inputCollapsed && hasAnswers && !loading ? (
         /* Collapsed: compact "Ask another" bar */
         <button
-          onClick={() => { setInputCollapsed(false); setTimeout(() => inputRef.current?.focus(), 0); }}
+          onClick={expandInput}
           className="flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-medium text-[var(--muted)] transition hover:bg-[var(--paper)] hover:text-[var(--green)]"
         >
           <Search size={13} />
