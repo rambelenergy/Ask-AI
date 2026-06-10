@@ -341,14 +341,25 @@ export function AskEnergyChat() {
             <span className="hidden sm:inline">New</span>
           </button>
         )}
-        {/* Fullscreen toggle */}
+        {/* Fullscreen toggle — prominent exit button when fullscreen */}
         <button
           onClick={() => setIsFullscreen(!isFullscreen)}
-          className="flex h-7 w-7 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"
+          className={
+            isFullscreen
+              ? "flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-white/20"
+              : "flex h-7 w-7 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"
+          }
           title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
           aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
         >
-          {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          {isFullscreen ? (
+            <>
+              <Minimize2 size={13} />
+              <span>Exit</span>
+            </>
+          ) : (
+            <Maximize2 size={14} />
+          )}
         </button>
       </div>
     </div>
@@ -524,9 +535,9 @@ export function AskEnergyChat() {
 
   return (
     <>
-      {/* Fullscreen overlay */}
+      {/* Fullscreen overlay — z-[9999] to clear site header (z-50), mobile menu (z-[70]) */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-white">
+        <div className="fixed inset-0 z-[9999] flex flex-col bg-white">
           {chatContent}
         </div>
       )}
