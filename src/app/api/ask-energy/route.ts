@@ -12,6 +12,7 @@ import {
   type SupportedLanguage,
 } from "@/lib/ask-energy/detect-language";
 import { getTrustedDomains } from "@/lib/ask-energy/trusted-sources";
+import { fetchLivePrices } from "@/lib/ask-energy/fetch-live-prices";
 
 const MAX_QUESTION_LENGTH = 500;
 const MAX_HISTORY_LENGTH = 10;
@@ -163,6 +164,17 @@ export async function POST(request: Request): Promise<Response> {
       const { results: searchResults, fromTrustedSources, debug } = searchResult;
       debugLog("final results", searchResults.length);
       debugLog("from trusted sources", fromTrustedSources);
+      debugLog("debug", debug);
+      
+      // Send debug info to frontend for diagnostics
+      enqueue({ p: "debug", ...debug });
+
+      // ─── Live-fetch dynamic price pages (eia.gov/prices, oilprice.com) ───
+      // Search snippets are indexed snapshots — dynamic pages need live data
+      const livePriceData = await fetchLivePrices(searchResults.map((r) => r.url));
+      if (livePriceData.length > 0) {
+        debugLog("live price pages fetched", livePriceData.length);
+      }
 
       // ─── No results from any source ───
       if (searchResults.length === 0) {
@@ -182,7 +194,7 @@ export async function POST(request: Request): Promise<Response> {
       }));
 
       // ─── Build prompt & call AI ───
-      const { system, user } = buildAskEnergyPrompt(question, searchResults, language);
+      const { system, user } = buildAskEnergyPrompt(question, searchResults, language, livePriceData);
 
       const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
       const baseUrl = process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1";

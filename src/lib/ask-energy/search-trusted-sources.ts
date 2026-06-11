@@ -95,44 +95,57 @@ function parseAgeHours(age?: string): number | null {
 }
 
 /**
- * Recency score: 1.0 for <1 day old, tapering to 0 for >30 days.
- * Newer content gets a multiplicative boost in sorting.
- * Also checks content for embedded dates and PENALIZES stale data — especially PDFs.
+ * Recency score: 1.0 for <1 day old, tapering to near-zero for stale content.
+ * Uses the Brave age field AND content-embedded dates to catch stale snippets.
+ * KEY FIX: Extracts full dates (April 27, 2026) not just years, so same-year
+ * but months-old data gets properly penalized.
  */
 function recencyScore(result: TrustedSearchResult): number {
-  // Primary: Brave age field
-  const hours = parseAgeHours(result.age);
+  const now = new Date();
+  const todayTs = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   let score = 1.0;
 
+  // Primary: Brave age field (hours-old indexing)
+  const hours = parseAgeHours(result.age);
   if (hours !== null) {
     if (hours <= 24) score = 1.0;
     else if (hours <= 24 * 30) score = 1.0 - 0.15 * ((hours - 24) / (24 * 29));
     else score = 0.85;
   }
 
-  // Secondary: check content for embedded old dates
+  // Secondary: content-embedded full date check
   const contentText = `${result.title} ${result.snippet ?? ""} ${result.summary ?? ""}`;
-  const contentYear = extractContentYear(contentText);
+  const contentDate = extractContentDate(contentText);
   const isPdf = result.url.toLowerCase().endsWith(".pdf");
 
-  if (contentYear !== null) {
-    const currentYear = new Date().getFullYear();
-    if (contentYear < currentYear) {
-      const yearDiff = currentYear - contentYear;
-      if (yearDiff >= 2) {
-        score *= 0.15;  // 2+ years old → near-zero
-      } else if (yearDiff >= 1) {
-        score *= 0.25;  // 1 year old → massive penalty
-      } else if (yearDiff > 0) {
-        score *= 0.5;   // fractional (old month in current year)
+  if (contentDate !== null) {
+    // How many days between content date and today?
+    const contentTs = Date.UTC(contentDate.year, contentDate.month - 1, contentDate.day);
+    const daysOld = Math.floor((todayTs - contentTs) / (1000 * 60 * 60 * 24));
+
+    if (daysOld > 0) {
+      // Content date is in the past → apply age-based penalty
+      if (daysOld <= 1) {
+        // yesterday or today → no penalty
+      } else if (daysOld <= 3) {
+        score *= 0.7;   // 2-3 days old → mild penalty
+      } else if (daysOld <= 7) {
+        score *= 0.4;   // 4-7 days old → significant penalty
+      } else if (daysOld <= 30) {
+        score *= 0.15;  // 1-4 weeks old → near-zero
+      } else {
+        score *= 0.05;  // >1 month old → effectively zero
       }
+    } else if (daysOld < 0) {
+      // Content date is in the FUTURE (misconfigured source) → mild penalty
+      score *= 0.5;
     }
   }
 
   // Tertiary: PDFs → extra penalty (rarely real-time data)
   if (isPdf) {
     if (hours === null || hours > 24 * 7) {
-      score *= 0.4;
+      score *= 0.3;
     }
   }
 
@@ -140,44 +153,52 @@ function recencyScore(result: TrustedSearchResult): number {
 }
 
 /**
- * Extract a year from content text (e.g., "2025 annual report", "June 2024").
- * Also detects "data through [Month] [Year]", "as of [date]", "published [date]".
- * Returns the year or null if no year found or year is in the future.
+ * Extract a date from content text (e.g., "April 27, 2026", "2025-03-15").
+ * Returns { year, month (1-12), day (1-31) } or null.
  */
-function extractContentYear(text: string): number | null {
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1;
+function extractContentDate(text: string): { year: number; month: number; day: number } | null {
+  const monthNames: Record<string, number> = {
+    january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+    july: 7, august: 8, september: 9, october: 10, november: 11, december: 12
+  };
 
-  // Match year patterns: 20xx
-  const yearMatches = text.match(/\b(20[0-9]{2})\b/g);
-  if (!yearMatches) return null;
-
-  let latestYear: number | null = null;
-  for (const m of yearMatches) {
-    const y = parseInt(m, 10);
-    if (y <= currentYear + 1 && (latestYear === null || y > latestYear)) {
-      latestYear = y;
-    }
+  // Pattern 1: "April 27, 2026" or "April 27 2026" or "27 April 2026"
+  const namedMonth = text.match(
+    /(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s+(20\d{2})/i
+  );
+  if (namedMonth) {
+    const month = monthNames[namedMonth[1].toLowerCase()];
+    const day = parseInt(namedMonth[2], 10);
+    const year = parseInt(namedMonth[3], 10);
+    if (month && day >= 1 && day <= 31 && year >= 2020) return { year, month, day };
   }
 
-  // Check for explicit date context: "data through [Month] [Year]", "as of [date]"
-  const monthNames = ["january","february","march","april","may","june",
-    "july","august","september","october","november","december"];
-  const dateCtx = text.match(/data through|as of|updated:|published:|report date|for the week ending/i);
-  if (dateCtx && latestYear !== null) {
-    const monthMatch = text.match(new RegExp(monthNames.join("|"), "i"));
-    if (monthMatch) {
-      const monthNum = monthNames.indexOf(monthMatch[0].toLowerCase()) + 1;
-      if (latestYear < currentYear || (latestYear === currentYear && monthNum < currentMonth - 3)) {
-        // Data is stale — set fractional year for stronger penalty
-        if (latestYear === currentYear) {
-          latestYear = currentYear - 0.5;
-        }
-      }
-    }
+  // Pattern 2: "27 April 2026" (day-first)
+  const dayFirst = text.match(/(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/i);
+  if (dayFirst) {
+    const month = monthNames[dayFirst[2].toLowerCase()];
+    const day = parseInt(dayFirst[1], 10);
+    const year = parseInt(dayFirst[3], 10);
+    if (month && day >= 1 && day <= 31 && year >= 2020) return { year, month, day };
   }
 
-  return latestYear;
+  // Pattern 3: "2026-04-27" or "2026/04/27" (ISO-style)
+  const iso = text.match(/(20\d{2})[\-\/](\d{1,2})[\-\/](\d{1,2})/);
+  if (iso) {
+    const year = parseInt(iso[1], 10);
+    const month = parseInt(iso[2], 10);
+    const day = parseInt(iso[3], 10);
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2020) return { year, month, day };
+  }
+
+  // Pattern 4: Just a year — less useful but fallback
+  const yearOnly = text.match(/\b(20[0-9]{2})\b/);
+  if (yearOnly) {
+    const year = parseInt(yearOnly[1], 10);
+    if (year >= 2020) return { year, month: 1, day: 1 }; // year-only, assume Jan 1 for penalty
+  }
+
+  return null;
 }
 
 /** Deduplicate results by URL, keeping the one with more content (summary > snippet) */
@@ -351,6 +372,25 @@ export async function searchTrustedSources(
   // Merge all, prefer Brave results in deduplication (they used site: filter)
   const allRaw = [...braveMapped, ...langFiltered];
 
+  // If too few trusted results (<5), supplement with top untrusted LangSearch results
+  // Apply domain diversity: max 2 per domain to prevent single-source dominance
+  const MIN_TRUSTED = 5;
+  if (allRaw.length < MIN_TRUSTED && langMapped.length > langFiltered.length) {
+    const untrusted = langMapped
+      .filter((r) => !r.trusted)
+      .sort((a, b) => (b.snippet?.length ?? 0) - (a.snippet?.length ?? 0));
+    const domainCount = new Map<string, number>();
+    for (const r of untrusted) {
+      const dom = r.domain;
+      const count = domainCount.get(dom) ?? 0;
+      if (count < 2) {
+        domainCount.set(dom, count + 1);
+        allRaw.push(r);
+      }
+      if (allRaw.length >= 8) break;
+    }
+  }
+
   // ─── No results at all ───
   if (allRaw.length === 0) {
     return {
@@ -436,7 +476,9 @@ function ensurePriorityDiversity(
   }
 
   const final: TrustedSearchResult[] = [];
-  const seen = new Set<string>();
+  const seenUrls = new Set<string>();
+  const domainCount = new Map<string, number>(); // per-domain limit
+  const MAX_PER_DOMAIN = 3;
 
   // Round-robin through priority groups until we fill maxResults
   const priorities = Array.from(byPriority.keys()).sort((a, b) => a - b);
@@ -448,9 +490,13 @@ function ensurePriorityDiversity(
 
     if (group && group.length > 0) {
       const candidate = group.shift()!;
-      const key = candidate.url.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
+      const urlKey = candidate.url.toLowerCase();
+      const dom = candidate.domain;
+      const domCount = domainCount.get(dom) ?? 0;
+
+      if (!seenUrls.has(urlKey) && domCount < MAX_PER_DOMAIN) {
+        seenUrls.add(urlKey);
+        domainCount.set(dom, domCount + 1);
         final.push(candidate);
       }
     } else {
@@ -464,12 +510,12 @@ function ensurePriorityDiversity(
 
     idx++;
 
-    // Safety: if we've done max rounds, just fill from whatever's left
+    // Safety: if we've done max rounds, fill from whatever's left
     if (idx > maxResults * 3) {
       for (const remaining of results) {
-        const key = remaining.url.toLowerCase();
-        if (!seen.has(key) && final.length < maxResults) {
-          seen.add(key);
+        const urlKey = remaining.url.toLowerCase();
+        if (!seenUrls.has(urlKey) && final.length < maxResults) {
+          seenUrls.add(urlKey);
           final.push(remaining);
         }
       }
@@ -477,12 +523,14 @@ function ensurePriorityDiversity(
     }
   }
 
-  // If we didn't fill up, add remaining unique results
+  // If we didn't fill up, add remaining unique results (respecting domain limit)
   if (final.length < maxResults) {
     for (const r of results) {
-      const key = r.url.toLowerCase();
-      if (!seen.has(key) && final.length < maxResults) {
-        seen.add(key);
+      const urlKey = r.url.toLowerCase();
+      const domCount = domainCount.get(r.domain) ?? 0;
+      if (!seenUrls.has(urlKey) && final.length < maxResults && domCount < MAX_PER_DOMAIN) {
+        seenUrls.add(urlKey);
+        domainCount.set(r.domain, domCount + 1);
         final.push(r);
       }
     }

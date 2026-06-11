@@ -76,6 +76,45 @@ When the user asks for "today", "current", "latest", or "now" data, you MUST:
    - If the newest data is >1 week old: say "No recent data found. The latest available is from [date]."
    - If the data is from a previous year or quarter: say "⚠️ The most recent data I found is from [year/date], which is NOT current. For up-to-date prices, please check [source] directly."
 
+5. ⚠️ SNIPPET STALENESS — Search engine snippets are INDEX SNAPSHOTS, not live page content:
+   - Pages with "today", "prices", "live", "spot" in the URL are dynamic and update frequently
+   - The snippet/description returned by search may be DAYS or WEEKS old — EVEN if the live page shows fresh data
+   - If a snippet contains a date that is older than the page URL suggests → TRUST THE SNIPPET DATE, not the page URL
+   - When presenting snippet data from dynamic pages, PREFACE with "According to [Source N]'s indexed snippet (as indexed on [date]): ..." — NEVER present it as current unless the snippet date matches today
+   - If the snippet date is >3 days old for a "today" query → explicitly warn the user, and suggest visiting the URL directly for live data
+
+═══════════════════════════════════════
+CRITICAL — ANTI-HALLUCINATION RULES FOR NUMBERS:
+═══════════════════════════════════════
+
+When presenting numbers, prices, percentages, statistics, or any quantitative data:
+
+1. NEVER CALCULATE. Do not average, add, subtract, interpolate, or perform ANY arithmetic on numbers from different sources.
+   - WRONG: "WTI crude prices range from $90.29 to $93.68, averaging around $91.99"
+   - WRONG: "Combined, these sources suggest $92.66"
+   - RIGHT: "Source 1 shows WTI at $90.29. Source 2 shows WTI at $93.68."
+
+2. ONLY QUOTE EXACT NUMBERS that appear verbatim in the provided source content (title, snippet, summary).
+   - If a number does not appear word-for-word in the source text → DO NOT output it.
+   - TRACE every number you output back to a specific [Source N] tag.
+   - If you catch yourself writing a number that isn't explicitly in a source → delete it immediately.
+
+3. CONFLICTING SOURCES: show ALL values with individual attribution — NEVER synthesize.
+   - "According to [Source 1], the price is $X. According to [Source 3], the price is $Y."
+   - Do NOT say "the consensus is", "the average is", "approximately", or "around" unless those exact words and numbers come from the sources.
+
+4. NO IMPLIED RANGES from separate data points.
+   - If Source A says 90 and Source B says 94 → do NOT output "between 90 and 94"
+   - Instead: "Source A reports 90. Source B reports 94." Let the user interpret.
+
+5. IF IN DOUBT, QUOTE VERBATIM.
+   - When a source says something specific, use quotation marks and cite the source.
+   - Err on the side of under-reporting numbers rather than fabricating them.
+
+6. CHECK YOUR OUTPUT for orphan numbers — any number without an adjacent [Source N] reference is suspect.
+   - After writing your answer, scan for any dollar amounts, percentages, or figures.
+   - Every single one must have a clear source attribution.
+
 ═══════════════════════════════════════
 ANSWERING STYLE:
 ═══════════════════════════════════════
@@ -111,6 +150,8 @@ CONTEXT ANALYSIS — Before answering, analyze the question:
 Infer the audience (general/expert/decision-maker), scope (quick/deep/broad), and time context (current/historical/future). Match your answer style accordingly.
 
 TODAY'S DATE: The current date is provided in the user prompt as "TODAY'S DATE (reference for freshness)". ALWAYS use that date as reference. If source data is older than today, mention the source date explicitly. For price/current-event queries, warn if data is more than a few days old.
+
+⚠️ ANTI-HALLUCINATION: NEVER calculate, average, or synthesize numbers. Only quote EXACT numbers that appear verbatim in source content. If sources conflict, show each value with its [Source N] attribution — do NOT combine or average them. Every number must have a source reference next to it.
 
 IMPORTANT: The sources below come from a GENERAL WEB SEARCH and are NOT from verified/approved energy sources. Use them carefully.
 
@@ -242,7 +283,8 @@ export function getQueryTooLongMessage(language: SupportedLanguage): string {
 export function buildAskEnergyPrompt(
   question: string,
   results: TrustedSearchResult[],
-  language: SupportedLanguage
+  language: SupportedLanguage,
+  livePriceData?: { url: string; fetchedAt: string; content: string; extracted: { date?: string; prices?: { label: string; value: string; change?: string }[] } }[]
 ): { system: string; user: string; noResultsMessage: string } {
   const langName = LANGUAGE_NAMES[language];
   const noResultsMessage = NO_RESULTS_MESSAGES[language];
@@ -271,13 +313,18 @@ export function buildAskEnergyPrompt(
     .map(
       (r, i) => {
         const ageInfo = r.age ? ` • Source age: ${r.age}` : "";
+        // Detect dynamic pages (prices, today, live, spot in URL)
+        const isDynamic = /\b(today|prices?|live|spot|current|real-?time)\b/i.test(r.url);
+        const dynamicWarning = isDynamic
+          ? "\n   ⚠️ DYNAMIC PAGE — snippet is an indexed snapshot, may be stale. Check live page for current data."
+          : "";
         const content = r.summary
           ? `Content: ${r.summary}`
           : r.snippet
             ? `Snippet: ${r.snippet}`
             : "";
         const untrusted = r.trusted ? "" : " [unverified source]";
-        return `[${i + 1}] Title: ${r.title}\n   Domain: ${r.domain} (${r.priorityGroup}, Priority ${r.priority})${ageInfo}\n   ${content}\n   URL: ${r.url}${untrusted}`;
+        return `[${i + 1}] Title: ${r.title}\n   Domain: ${r.domain} (${r.priorityGroup}, Priority ${r.priority})${ageInfo}${dynamicWarning}\n   ${content}\n   URL: ${r.url}${untrusted}`;
       }
     )
     .join("\n\n");
@@ -293,8 +340,8 @@ export function buildAskEnergyPrompt(
   const todayISO = today.toISOString().split("T")[0];
 
   const instruction = allTrusted
-    ? `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use multiple paragraphs. Draw from ALL provided sources, favoring official institutional sources (Priority 1-3) as primary references. When news agencies (Priority 4) and official sources both cover the same topic, cite the official source. CHECK THE "Source age" on each result — if the newest source is more than 3 days older than today's date (${todayISO}), clearly tell the user the data may be outdated. Include a "Sources" section at the end listing only the sources you actually referenced. Stay on topic — do not change the subject. Do not invent facts.`
-    : `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use the search results below. CHECK THE "Source age" on each result — if the newest source is more than 3 days older than today's date (${todayISO}), tell the user the data may be outdated. Include a disclaimer that these are from general web search. Include a "Sources" section at the end. Stay on topic — do not change the subject. Do not invent facts.`;
+    ? `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use multiple paragraphs. Draw from ALL provided sources, favoring official institutional sources (Priority 1-3) as primary references. When news agencies (Priority 4) and official sources both cover the same topic, cite the official source. CHECK THE "Source age" on each result — if the newest source is more than 3 days older than today's date (${todayISO}), clearly tell the user the data may be outdated. CRITICAL: NEVER calculate, average, or synthesize numbers. Quote ONLY exact numbers that appear verbatim in the source content. If sources show different values, list each with its [Source N] reference — do NOT combine them. Every number must be traceable to a specific source. Include a "Sources" section at the end listing only the sources you actually referenced. Stay on topic — do not change the subject. Do not invent facts.`
+    : `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use the search results below. CHECK THE "Source age" on each result — if the newest source is more than 3 days older than today's date (${todayISO}), tell the user the data may be outdated. CRITICAL: NEVER calculate, average, or synthesize numbers. Quote ONLY exact numbers that appear verbatim in the source content. If sources show different values, list each with its [Source N] reference. Include a disclaimer that these are from general web search. Include a "Sources" section at the end. Stay on topic — do not change the subject. Do not invent facts.`;
 
   const sourceLabel = allTrusted ? "Trusted Source Results" : "General Web Search Results";
 
@@ -305,7 +352,41 @@ export function buildAskEnergyPrompt(
 
   return {
     system,
-    user: `TODAY'S DATE (reference for freshness): ${todayFormatted} (${todayISO})\n\nUser question: ${question}${priorityContext}\n\n${sourceLabel}:\n\n${sourcesText}\n\n---\n\n${instruction}`,
+    user: `TODAY'S DATE (reference for freshness): ${todayFormatted} (${todayISO})\n\nUser question: ${question}${priorityContext}\n\n${sourceLabel}:\n\n${sourcesText}\n${livePriceData && livePriceData.length > 0 ? buildLivePriceSection(livePriceData) : ""}\n---\n\n${instruction}`,
     noResultsMessage,
   };
+}
+
+/** Format live-fetched price data for the AI prompt */
+function buildLivePriceSection(
+  liveData: { url: string; fetchedAt: string; content: string; extracted: { date?: string; prices?: { label: string; value: string; change?: string }[] } }[]
+): string {
+  let section = "\n═══════════════════════════════════════\n";
+  section += "⚠️ LIVE-FETCHED PRICE DATA (fetched just now — OVERRIDES stale snippets above):\n";
+  section += "═══════════════════════════════════════\n\n";
+
+  for (const d of liveData) {
+    section += `🌐 LIVE PAGE: ${d.url}\n`;
+    section += `   Fetched at: ${d.fetchedAt}\n`;
+    if (d.extracted.date) {
+      section += `   📅 Page date: ${d.extracted.date}\n`;
+    }
+    if (d.extracted.prices && d.extracted.prices.length > 0) {
+      section += `   💰 Extracted prices:\n`;
+      for (const p of d.extracted.prices) {
+        section += `      • ${p.label}: ${p.value}`;
+        if (p.change) section += ` (${p.change})`;
+        section += "\n";
+      }
+    }
+    section += `   📄 Raw content:\n${d.content.slice(0, 2000)}\n\n`;
+  }
+
+  section += "═══════════════════════════════════════\n";
+  section += "CRITICAL: Use the LIVE-FETCHED data above for prices. The search snippets\n";
+  section += "below are INDEX SNAPSHOTS — they may be DAYS or WEEKS stale.\n";
+  section += "ONLY use snippet data if live data is unavailable for that source.\n";
+  section += "═══════════════════════════════════════\n";
+
+  return section;
 }

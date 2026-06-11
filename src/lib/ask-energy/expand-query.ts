@@ -18,6 +18,18 @@ const SPECIFIC_INDICATORS = [
   "cooperation", "partnership", "agreement", "deal", "project",
   "pipeline", "production", "consumption", "forecast", "trend",
   "market", "trade", "infrastructure", "technology",
+  // Time-sensitive: question is clearly about current data → no expansion needed
+  "today", "now", "current", "latest", "live",
+  // Arabic
+  "اليوم", "الآن", "حاليا", "سعر",
+  // French
+  "aujourd'hui", "maintenant", "actuel", "prix",
+  // Spanish
+  "hoy", "ahora", "actual", "precio",
+  // Italian
+  "oggi", "adesso", "attuale", "prezzo",
+  // German
+  "heute", "jetzt", "aktuell", "preis",
 ];
 
 // Energy context keywords that already provide good search context
@@ -84,11 +96,16 @@ export function expandEnergyQuery(userQuestion: string, language?: SupportedLang
     lower.includes(kw)
   );
 
-  // If question is already specific AND has energy terms, don't over-expand
-  if (hasSpecificIntent && hasEnergyContext && wordCount >= 5) {
-    // Just add minimal variants
-    addUnique(`${trimmed} Algeria Europe`);
-    return queries;
+  // If question is already specific AND has energy terms, don't expand
+  if (hasSpecificIntent && hasEnergyContext && wordCount >= 2) {
+    return queries; // just the original question, no expansion
+  }
+
+  // Also skip expansion for clear price/data queries with time context
+  const isPriceQuery = /\b(price|prices?|cost|precio|prezzo|prix|preis|سعر|أسعار)\b/i.test(trimmed);
+  const isTimeContext = /\b(today|now|current|latest|live|hoy|oggi|heute|aujourd'hui|اليوم|الآن|حاليا)\b/i.test(trimmed);
+  if (isPriceQuery && isTimeContext) {
+    return queries; // clear price query → no expansion needed
   }
 
   // If short or missing energy context, expand

@@ -158,6 +158,8 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "carnegieendowment.org",
       // US EIA — key source for energy prices & data
       "eia.gov",
+      // Trading Economics — real-time commodity prices
+      "tradingeconomics.com",
     ],
   },
   {
@@ -211,6 +213,9 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "upstreamonline.com",
       "worldoil.com",
       "oilprice.com",
+      // Additional financial & commodity data platforms
+      "oilmarketcap.com",
+      "oilgasstoragenews.com",
     ],
   },
   {
@@ -221,6 +226,8 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "wsj.com",
       "economist.com",
       "euractiv.com",
+      "businessinsider.com",
+      "markets.businessinsider.com",
     ],
   },
 
@@ -300,6 +307,9 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "horizons.dz",
       "algerie360.com",
       "lechodalgerie.dz",
+      "economictimes.indiatimes.com",
+      "indiatimes.com",
+      "economictimes.com",
     ],
   },
   {
