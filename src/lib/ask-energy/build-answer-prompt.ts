@@ -386,6 +386,9 @@ function buildLivePriceSection(
   section += "CRITICAL: Use the LIVE-FETCHED data above for prices. The search snippets\n";
   section += "below are INDEX SNAPSHOTS — they may be DAYS or WEEKS stale.\n";
   section += "ONLY use snippet data if live data is unavailable for that source.\n";
+  section += "When live-fetched data AND snippet data both exist for the same metric,\n";
+  section += "USE THE LIVE DATA and IGNORE the snippet. Do not average or mix them.\n";
+  section += "Cite the live-fetched page URL as your source, not the snippet.\n";
   section += "═══════════════════════════════════════\n";
 
   return section;

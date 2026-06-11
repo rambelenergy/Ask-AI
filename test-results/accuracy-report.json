@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-06-11T15:25:24.479Z",
+  "liveReference": {
+    "prices": {
+      "WTI": 93.68,
+      "Brent": 95.73,
+      "Louisiana Light": 95.93
+    },
+    "date": "Jun 09, 2026",
+    "source": "EIA live"
+  },
+  "results": [
+    {
+      "id": "Q1.1",
+      "language": "en",
+      "numerical_accuracy": 10,
+      "source_quality": 10,
+      "freshness": 10,
+      "consistency": 5,
+      "completeness": 10,
+      "total": 45,
+      "grade": "🟢 PASS"
+    }
+  ]
+}

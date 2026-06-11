@@ -146,6 +146,7 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
     name: "International Energy & Research Organizations",
     domains: [
       "iea.org",
+      "iea.org/countries",
       "irena.org",
       "worldenergy.org",
       "opec.org",

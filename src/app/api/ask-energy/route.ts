@@ -170,10 +170,19 @@ export async function POST(request: Request): Promise<Response> {
       enqueue({ p: "debug", ...debug });
 
       // ─── Live-fetch dynamic price pages (eia.gov/prices, oilprice.com) ───
-      // Search snippets are indexed snapshots — dynamic pages need live data
-      const livePriceData = await fetchLivePrices(searchResults.map((r) => r.url));
+      // ALWAYS include EIA prices page for price-related queries
+      const allUrls = searchResults.map((r) => r.url);
+      const hasPriceQuery = /\b(price|prices?|cost|today|now|current|latest|سعر|أسعار|اليوم|precio|prix|prezzo|preis)\b/i.test(question);
+      if (hasPriceQuery && !allUrls.some(u => u.includes('eia.gov/todayinenergy/prices.php'))) {
+        allUrls.unshift('https://www.eia.gov/todayinenergy/prices.php');
+      }
+      const livePriceData = await fetchLivePrices(allUrls);
       if (livePriceData.length > 0) {
         debugLog("live price pages fetched", livePriceData.length);
+        enqueue({ p: "live_price", count: livePriceData.length, urls: livePriceData.map(lp => lp.url), extracted: livePriceData.map(lp => ({ url: lp.url, date: lp.extracted.date, prices: lp.extracted.prices })) });
+      } else {
+        debugLog("live price pages", "NONE fetched");
+        enqueue({ p: "live_price", count: 0, input_urls: searchResults.filter(r => r.url.includes('eia.gov')).map(r => r.url) });
       }
 
       // ─── No results from any source ───

@@ -20,11 +20,15 @@ export interface LivePriceData {
 
 /** URLs that should always be live-fetched for price queries */
 const DYNAMIC_PRICE_URLS = [
+  // Crude oil
   "eia.gov/todayinenergy/prices.php",
   "oilprice.com",
   "tradingeconomics.com/commodity",
   "oilmarketcap.com",
   "markets.businessinsider.com/commodities",
+  // Natural gas
+  "eia.gov/naturalgas",
+  "eia.gov/dnav/ng",
 ];
 
 /**
@@ -41,7 +45,7 @@ export function isDynamicPriceUrl(url: string): boolean {
 export async function fetchLivePricePage(url: string): Promise<LivePriceData | null> {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
+    const timeout = setTimeout(() => controller.abort(), 8000);
 
     const response = await fetch(url, {
       signal: controller.signal,
@@ -80,8 +84,23 @@ export async function fetchLivePricePage(url: string): Promise<LivePriceData | n
 export async function fetchLivePrices(
   urls: string[]
 ): Promise<LivePriceData[]> {
-  const targets = urls.filter(isDynamicPriceUrl).slice(0, 4);
-  if (targets.length === 0) return [];
+  // Always include EIA prices page if any EIA URL is present
+  const targets = urls.filter(isDynamicPriceUrl);
+  
+  // Ensure EIA prices.php is always fetched first (highest priority)
+  const eiaPriceUrl = urls.find(u => u.includes("eia.gov/todayinenergy/prices.php"));
+  if (eiaPriceUrl && !targets.includes(eiaPriceUrl)) {
+    targets.unshift(eiaPriceUrl);
+  }
+  
+  // Debug: log what we're about to fetch
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[fetchLivePrices] input URLs:', urls.length, 'matched:', targets.length);
+    console.log('[fetchLivePrices] targets:', targets.slice(0, 5).join('\n  '));
+  }
+  
+  const finalTargets = targets.slice(0, 5);
+  if (finalTargets.length === 0) return [];
 
   const results = await Promise.allSettled(
     targets.map((url) => fetchLivePricePage(url))
@@ -127,24 +146,30 @@ function extractDate(text: string): string | undefined {
   return undefined;
 }
 
-/** Extract price data like "WTI 93.68 +1.9" from text */
+/** Extract price data like "WTI 93.68 +1.9" or "Henry Hub 3.27" from text */
 function extractPrices(text: string): { label: string; value: string; change?: string }[] | undefined {
   const prices: { label: string; value: string; change?: string }[] = [];
 
-  // Pattern: "WTI 93.68 +1.9" or "WTI\r\n93.68\r\n+1.9"
+  // Crude oil
   const crudeSection = text.match(/Crude Oil[\s\S]{0,200}?(WTI|Brent|Louisiana Light)[\s\S]{0,300}?Gasoline/i);
-  const targetText = crudeSection ? crudeSection[0] : text.slice(0, 4000);
-
-  // Match crude oil names followed by price
-  const crudePattern = /(WTI|Brent|Louisiana Light|LLS|Dubai|Oman|Urals)[\s\r\n]*(\d{2,3}\.\d{2})[\s\r\n]*([+-]\d+\.\d+)?/gi;
-  let match;
-  while ((match = crudePattern.exec(targetText)) !== null) {
-    prices.push({
-      label: match[1].trim(),
-      value: `$${match[2]}`,
-      change: match[3] ? `${match[3]}%` : undefined,
-    });
+  const targetText = crudeSection ? crudeSection[0] : text.slice(0, 6000);
+  const crudeRe = /(WTI|Brent|Louisiana Light|LLS|Dubai|Oman|Urals)[\s\r\n]*(\d{2,3}\.\d{2})[\s\r\n]*([+-]\d+\.\d+)?/gi;
+  let cm = crudeRe.exec(targetText);
+  while (cm !== null) {
+    prices.push({ label: cm[1].trim(), value: `$${cm[2]}`, change: cm[3] ? `${cm[3]}%` : undefined });
     if (prices.length >= 10) break;
+    cm = crudeRe.exec(targetText);
+  }
+
+  // Natural gas
+  const gasRe = /(Henry Hub|Natural Gas|Nat Gas|TTF|NBP|JKM)[\s\r\n]*(\d{1,2}\.\d{2})[\s\r\n]*([+-]\d+\.\d+)?/gi;
+  let gm = gasRe.exec(text.slice(0, 6000));
+  while (gm !== null) {
+    if (!prices.some(p => p.label === gm![1].trim())) {
+      prices.push({ label: gm![1].trim(), value: `$${gm![2]}`, change: gm![3] ? `${gm![3]}%` : undefined });
+    }
+    if (prices.length >= 15) break;
+    gm = gasRe.exec(text.slice(0, 6000));
   }
 
   return prices.length > 0 ? prices : undefined;
