@@ -268,6 +268,13 @@ export async function searchTrustedSources(
   const expandedQueries = expandEnergyQuery(question, language);
   const searchQueries = expandedQueries.slice(0, MAX_EXPANDED_QUERIES);
 
+  // ─── Map language to search engine language codes ───
+  const langCodes: Record<string, string> = {
+    English: "en", Arabic: "ar", French: "fr",
+    Spanish: "es", Italian: "it", German: "de",
+  };
+  const searchLang = language ? (langCodes[language] ?? "en") : "en";
+
   // ─── Categorize question for context-aware prioritization ───
   const categoryResult = categorizeQuestion(question, language);
   const { category, confidence, priorityBoost, preferredGroups } = categoryResult;
@@ -294,7 +301,7 @@ export async function searchTrustedSources(
   const bravePromise = (async () => {
     for (const q of searchQueries) {
       try {
-        const braveResults = await searchWithBrave(q, trustedDomains, signal, braveFreshness);
+        const braveResults = await searchWithBrave(q, trustedDomains, signal, braveFreshness, searchLang);
         if (braveResults.length > 0) {
           for (const r of braveResults) {
             braveRaw.push({
@@ -317,7 +324,7 @@ export async function searchTrustedSources(
   const langPromise = (async () => {
     for (const q of searchQueries) {
       try {
-        const langResults = await searchWithLangSearch(q, signal, langFreshness);
+        const langResults = await searchWithLangSearch(q, signal, langFreshness, searchLang);
         if (langResults.length > 0) {
           for (const r of langResults) {
             langRaw.push(r);

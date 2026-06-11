@@ -32,9 +32,20 @@ export function detectFreshness(question: string): string | undefined {
 
   // Strong signals for "right now" data → past day
   const todaySignals = [
+    // English
     "today", "now", "right now", "current price", "live price",
     "latest price", "today's", "todays", "real-time", "real time",
     "at the moment", "as of today",
+    // Arabic
+    "اليوم", "الآن", "حاليا", "السعر الحالي", "السعر الآن",
+    // French
+    "aujourd'hui", "maintenant", "actuellement", "prix actuel",
+    // Spanish
+    "hoy", "ahora", "precio actual", "ahora mismo",
+    // Italian
+    "oggi", "adesso", "ora", "prezzo attuale",
+    // German
+    "heute", "jetzt", "aktueller preis", "derzeit",
   ];
   for (const s of todaySignals) {
     if (q.includes(s)) return "pd";
@@ -42,9 +53,20 @@ export function detectFreshness(question: string): string | undefined {
 
   // Medium signals for recent data → past week
   const recentSignals = [
+    // English
     "price", "prices", "cost", "costs",
     "this week", "recent", "latest", "update",
     "current", "currently",
+    // Arabic
+    "سعر", "أسعار", "تكلفة", "الأسبوع", "أحدث",
+    // French
+    "prix", "coût", "cette semaine", "récent", "récente",
+    // Spanish
+    "precio", "precios", "costo", "esta semana", "reciente",
+    // Italian
+    "prezzo", "prezzi", "costo", "questa settimana", "recente",
+    // German
+    "preis", "preise", "kosten", "diese woche", "kürzlich",
   ];
   for (const s of recentSignals) {
     if (q.includes(s)) return "pw";
@@ -53,6 +75,11 @@ export function detectFreshness(question: string): string | undefined {
   // Month-sensitive queries
   const monthSignals = [
     "this month", "monthly", "last month",
+    "هذا الشهر", "شهري", "الشهر الماضي",
+    "ce mois", "mensuel", "le mois dernier",
+    "este mes", "mensual", "el mes pasado",
+    "questo mese", "mensile", "il mese scorso",
+    "diesen monat", "monatlich", "letzten monat",
   ];
   for (const s of monthSignals) {
     if (q.includes(s)) return "pm";
@@ -102,12 +129,14 @@ function buildQuery(query: string, sites?: string[]): string {
  * @param sites     - Optional trusted domains to restrict search to (uses Brave `site:` operator)
  * @param signal    - AbortSignal for cancellation
  * @param freshness - Optional freshness filter: "pd" (past day), "pw" (past week), "pm" (past month)
+ * @param language  - Optional language code for search_lang (e.g., "en", "ar", "fr")
  */
 export async function searchWithBrave(
   query: string,
   sites?: string[],
   signal?: AbortSignal,
-  freshness?: string
+  freshness?: string,
+  language?: string
 ): Promise<BraveSearchResult[]> {
   const apiKey = process.env.BRAVESEARCH_API_KEY;
 
@@ -120,7 +149,7 @@ export async function searchWithBrave(
   const params = new URLSearchParams({
     q: fullQuery,
     count: "20",
-    search_lang: "en",
+    search_lang: language ?? "en",
   });
 
   if (freshness) {

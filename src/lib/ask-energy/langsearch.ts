@@ -23,7 +23,8 @@ interface LangSearchResponse {
 export async function searchWithLangSearch(
   query: string,
   signal?: AbortSignal,
-  freshness?: string
+  freshness?: string,
+  language?: string
 ): Promise<LangSearchResult[]> {
   const apiKey = process.env.LANGSEARCH_API_KEY;
 

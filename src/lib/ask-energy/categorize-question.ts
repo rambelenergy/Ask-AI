@@ -34,6 +34,10 @@ const CATEGORY_KEYWORDS: Record<QuestionCategory, string[]> = {
     "Sahara", "sahara", "Saharan", "saharan",
     "Hassi", "hassi", "R'mel", "Hassi R'mel",
     "Skikda", "Arzew", "Béthioua",
+    // Arabic
+    "الجزائر", "جزائري", "جزائرية", "الصحراء",
+    "الجزائرية", "سكيكدة", "أرزيو", "حاسي", "حاسي الرمل",
+    "بشار", "ورقلة", "أدرار", "إليزي", "تمنراست", "تندوف",
     // Institutions & leaders
     "Sonatrach", "sonatrach", "SONATRACH",
     "Sonelgaz", "sonelgaz", "SONELGAZ",
@@ -58,8 +62,26 @@ const CATEGORY_KEYWORDS: Record<QuestionCategory, string[]> = {
     "Algerian renewable", "renouvelable algérien",
     "Algerian solar", "solaire algérien",
     "Algerian hydrogen", "hydrogène algérien",
-    "hydrocarbures", "Hydrocarbures",
-    "loi sur les hydrocarbures",
+    // French
+    "Sahara algérien", "gaz algérien", "énergie algérienne",
+    "renouvelable algérien", "solaire algérien", "hydrogène algérien",
+    "hydrocarbures", "Hydrocarbures", "loi sur les hydrocarbures",
+    // Spanish
+    "Argelia", "argelia", "argelino", "argelina", "Sáhara",
+    "gas argelino", "energía argelina", "solar argelino",
+    "hidrógeno argelino", "hidrocarburos",
+    // Italian
+    "Algeria", "algerino", "gas algerino", "energia algerina",
+    "solare algerino", "idrogeno algerino", "idrocarburi",
+    // German
+    "Algerien", "algerien", "algerisch", "algerische",
+    "algerisches Gas", "algerische Energie", "algerischer Solar",
+    "algerischer Wasserstoff", "Kohlenwasserstoffe",
+    // Arabic — energy topics
+    "الغاز الجزائري", "الطاقة الجزائرية", "المحروقات",
+    "الطاقة المتجددة الجزائر", "الهيدروجين الجزائري",
+    "الطاقة الشمسية الجزائر",
+    "غاز", "بترول", "نفط", "أنبوب",
     "Sonelgaz renouvelable",
     "Tassili", "tassili",
     "Timimoun", "timimoun",
@@ -123,6 +145,36 @@ const CATEGORY_KEYWORDS: Record<QuestionCategory, string[]> = {
     "OMV", "omv",
     "Equinor", "equinor",
     "Engie", "engie",
+    // Arabic — European topics
+    "أوروبا", "أوروبي", "أوروبية", "الاتحاد الأوروبي",
+    "إيطاليا", "إسبانيا", "فرنسا", "ألمانيا", "البرتغال",
+    "المتوسط", "البحر المتوسط", "بروكسل",
+    // French — European topics
+    "Union européenne", "union européenne", "européen", "européenne",
+    "Bruxelles", "Commission européenne", "Parlement européen",
+    "Italie", "Italien", "Espagne", "Espagnol", "France", "Français",
+    "Allemagne", "Allemand", "Portugal", "Portugais",
+    "Méditerranée", "méditerranéen", "Corridor Sud",
+    "énergie européenne", "gaz européen", "politique européenne",
+    // Spanish — European topics
+    "Unión Europea", "Europeo", "Europea", "Bruselas",
+    "Comisión Europea", "Parlamento Europeo",
+    "Italia", "Italiano", "España", "Español", "Francia", "Francés",
+    "Alemania", "Alemán", "Portugal", "Portugués",
+    "Mediterráneo", "energía europea", "gas europeo",
+    // Italian — European topics
+    "Unione Europea", "europeo", "europea", "Bruxelles",
+    "Commissione Europea", "Parlamento Europeo",
+    "Italia", "italiano", "Spagna", "spagnolo", "Francia", "francese",
+    "Germania", "tedesco", "Portogallo", "portoghese",
+    "Mediterraneo", "energia europea", "gas europeo",
+    // German — European topics
+    "Europäische Union", "europäisch", "europäische", "Brüssel",
+    "Europäische Kommission", "Europäisches Parlament",
+    "Italien", "italienisch", "Spanien", "spanisch",
+    "Frankreich", "französisch", "Deutschland", "deutsch",
+    "Portugal", "portugiesisch", "Mittelmeer",
+    "europäische Energie", "europäisches Gas",
   ],
 
   international: [
@@ -159,6 +211,26 @@ const CATEGORY_KEYWORDS: Record<QuestionCategory, string[]> = {
     "Carnegie", "carnegie",
     "Oxford Energy", "oxford energy",
     "Bruegel", "bruegel",
+    // Arabic — international
+    "عالمي", "دولي", "أوبك", "منظمة", "أفريقيا",
+    "المغرب العربي", "الساحل", "نيجيريا", "ليبيا", "مصر",
+    "تونس", "المغرب", "موزمبيق", "أنغولا",
+    // French — international
+    "international", "mondial", "Afrique", "Maghreb", "Sahel",
+    "Nigéria", "Libye", "Maroc", "Tunisie", "Égypte",
+    "coopération internationale", "marché mondial", "énergie mondiale",
+    // Spanish — international
+    "internacional", "mundial", "África", "Magreb", "Sahel",
+    "Nigeria", "Libia", "Marruecos", "Túnez", "Egipto",
+    "cooperación internacional", "mercado mundial", "energía mundial",
+    // Italian — international
+    "internazionale", "mondiale", "Africa", "Maghreb", "Sahel",
+    "Nigeria", "Libia", "Marocco", "Tunisia", "Egitto",
+    "cooperazione internazionale", "mercato mondiale", "energia mondiale",
+    // German — international
+    "international", "weltweit", "Afrika", "Maghreb", "Sahel",
+    "Nigeria", "Libyen", "Marokko", "Tunesien", "Ägypten",
+    "internationale Zusammenarbeit", "Weltmarkt", "Weltenergie",
   ],
 
   technical: [
@@ -207,16 +279,60 @@ const CATEGORY_KEYWORDS: Record<QuestionCategory, string[]> = {
     // Data/metrics
     "GW", "MW", "TWh", "bcm", "bcm/y",
     "barrel", "mb/d", "capacity factor",
+    // Arabic — technical energy terms
+    "طاقة", "غاز", "بترول", "نفط", "شمسي", "شمسية",
+    "هيدروجين", "هيدروجين أخضر", "متجددة", "متجدد",
+    "غاز طبيعي", "أنبوب", "خط أنابيب", "تصدير", "استيراد",
+    "إنتاج", "استهلاك", "احتياطي", "كهرباء", "رياح",
+    "تحول الطاقة", "أمن الطاقة", "الحياد الكربوني",
+    "خام", "خام نفط", "برميل", "مصفاة",
+    // French — technical
+    "énergie", "Énergie", "gaz", "Gaz", "pétrole", "Pétrole",
+    "solaire", "Solaire", "hydrogène", "Hydrogène",
+    "éolien", "renouvelable", "gazoduc", "GNL",
+    "production", "consommation", "exportation", "importation",
+    "transition énergétique", "sécurité énergétique",
+    "neutralité carbone", "baril", "raffinerie",
+    // Spanish — technical
+    "energía", "Energía", "gas", "petróleo", "Petróleo",
+    "solar", "hidrógeno", "eólico", "renovable",
+    "gasoducto", "GNL", "producción", "consumo",
+    "exportación", "importación", "transición energética",
+    "seguridad energética", "neutralidad de carbono", "barril", "refinería",
+    // Italian — technical
+    "energia", "Energia", "gas", "petrolio", "Petrolio",
+    "solare", "idrogeno", "eolico", "rinnovabile",
+    "gasdotto", "GNL", "produzione", "consumo",
+    "esportazione", "importazione", "transizione energetica",
+    "sicurezza energetica", "neutralità carbonica", "barile", "raffineria",
+    // German — technical
+    "Energie", "energie", "Gas", "Öl", "Solar", "Wasserstoff",
+    "Wind", "erneuerbar", "Pipeline", "Erdgas", "LNG",
+    "Produktion", "Verbrauch", "Export", "Import",
+    "Energiewende", "Energiesicherheit", "Klimaneutralität",
+    "Barrel", "Raffinerie", "Photovoltaik",
   ],
 
   general: [
     // Catch-all: matched when no other category has strong signal
-    "energy", "Energy", "énergie", "Énergie",
-    "analysis", "Analysis",
-    "report", "Report",
-    "news", "News",
-    "overview", "Overview",
-    "summary", "Summary",
+    // English
+    "energy", "Energy", "analysis", "Analysis",
+    "report", "Report", "news", "News",
+    "overview", "Overview", "summary", "Summary",
+    // French
+    "énergie", "Énergie", "analyse", "Analyse",
+    "rapport", "actualités", "résumé", "aperçu",
+    // Spanish
+    "energía", "Energía", "análisis", "Análisis",
+    "informe", "noticias", "resumen",
+    // Italian
+    "energia", "Energia", "analisi", "Analisi",
+    "rapporto", "notizie", "riassunto",
+    // German
+    "Energie", "Analyse", "Bericht", "Nachrichten",
+    "Übersicht", "Zusammenfassung",
+    // Arabic
+    "طاقة", "تحليل", "تقرير", "أخبار", "ملخص",
   ],
 };
 
