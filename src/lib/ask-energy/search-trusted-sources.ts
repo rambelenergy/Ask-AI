@@ -15,6 +15,8 @@ export interface TrustedSearchResult {
   snippet?: string;
   summary?: string;
   trusted: boolean;
+  /** Age of the result (e.g. "2 days ago", "1 hour ago") from Brave */
+  age?: string;
 }
 
 /** Max results to return after all filtering, deduplication, and reranking */
@@ -68,6 +70,114 @@ function relevanceScore(result: TrustedSearchResult): number {
     if (text.includes(kw)) score += 1;
   }
   return score;
+}
+
+/**
+ * Parse a Brave age string into hours for recency scoring.
+ * Examples: "1 hour ago" → 1, "2 days ago" → 48, "3 weeks ago" → 504
+ * Returns null if unparseable.
+ */
+function parseAgeHours(age?: string): number | null {
+  if (!age) return null;
+  const match = age.match(/^(\d+(?:\.\d+)?)\s*(hour|minute|day|week|month|year)s?\s+ago/i);
+  if (!match) return null;
+  const num = parseFloat(match[1]);
+  const unit = match[2].toLowerCase();
+  const multipliers: Record<string, number> = {
+    minute: 1 / 60,
+    hour: 1,
+    day: 24,
+    week: 24 * 7,
+    month: 24 * 30,
+    year: 24 * 365,
+  };
+  return num * (multipliers[unit] ?? 0);
+}
+
+/**
+ * Recency score: 1.0 for <1 day old, tapering to 0 for >30 days.
+ * Newer content gets a multiplicative boost in sorting.
+ * Also checks content for embedded dates and PENALIZES stale data — especially PDFs.
+ */
+function recencyScore(result: TrustedSearchResult): number {
+  // Primary: Brave age field
+  const hours = parseAgeHours(result.age);
+  let score = 1.0;
+
+  if (hours !== null) {
+    if (hours <= 24) score = 1.0;
+    else if (hours <= 24 * 30) score = 1.0 - 0.15 * ((hours - 24) / (24 * 29));
+    else score = 0.85;
+  }
+
+  // Secondary: check content for embedded old dates
+  const contentText = `${result.title} ${result.snippet ?? ""} ${result.summary ?? ""}`;
+  const contentYear = extractContentYear(contentText);
+  const isPdf = result.url.toLowerCase().endsWith(".pdf");
+
+  if (contentYear !== null) {
+    const currentYear = new Date().getFullYear();
+    if (contentYear < currentYear) {
+      const yearDiff = currentYear - contentYear;
+      if (yearDiff >= 2) {
+        score *= 0.15;  // 2+ years old → near-zero
+      } else if (yearDiff >= 1) {
+        score *= 0.25;  // 1 year old → massive penalty
+      } else if (yearDiff > 0) {
+        score *= 0.5;   // fractional (old month in current year)
+      }
+    }
+  }
+
+  // Tertiary: PDFs → extra penalty (rarely real-time data)
+  if (isPdf) {
+    if (hours === null || hours > 24 * 7) {
+      score *= 0.4;
+    }
+  }
+
+  return score;
+}
+
+/**
+ * Extract a year from content text (e.g., "2025 annual report", "June 2024").
+ * Also detects "data through [Month] [Year]", "as of [date]", "published [date]".
+ * Returns the year or null if no year found or year is in the future.
+ */
+function extractContentYear(text: string): number | null {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1;
+
+  // Match year patterns: 20xx
+  const yearMatches = text.match(/\b(20[0-9]{2})\b/g);
+  if (!yearMatches) return null;
+
+  let latestYear: number | null = null;
+  for (const m of yearMatches) {
+    const y = parseInt(m, 10);
+    if (y <= currentYear + 1 && (latestYear === null || y > latestYear)) {
+      latestYear = y;
+    }
+  }
+
+  // Check for explicit date context: "data through [Month] [Year]", "as of [date]"
+  const monthNames = ["january","february","march","april","may","june",
+    "july","august","september","october","november","december"];
+  const dateCtx = text.match(/data through|as of|updated:|published:|report date|for the week ending/i);
+  if (dateCtx && latestYear !== null) {
+    const monthMatch = text.match(new RegExp(monthNames.join("|"), "i"));
+    if (monthMatch) {
+      const monthNum = monthNames.indexOf(monthMatch[0].toLowerCase()) + 1;
+      if (latestYear < currentYear || (latestYear === currentYear && monthNum < currentMonth - 3)) {
+        // Data is stale — set fractional year for stronger penalty
+        if (latestYear === currentYear) {
+          latestYear = currentYear - 0.5;
+        }
+      }
+    }
+  }
+
+  return latestYear;
 }
 
 /** Deduplicate results by URL, keeping the one with more content (summary > snippet) */
@@ -128,6 +238,7 @@ function mapToTrustedResults(
       snippet: r.snippet,
       summary: r.summary,
       trusted: isApproved,
+      age: r.age,
     };
   });
 }
@@ -190,6 +301,7 @@ export async function searchTrustedSources(
               title: r.title,
               url: r.url,
               snippet: r.snippet ?? r.description,
+              age: r.age,
             });
             domainsFound.add(extractDomain(r.url));
           }
@@ -257,10 +369,17 @@ export async function searchTrustedSources(
   const deduped = deduplicateByUrl(allRaw);
 
   deduped.sort((a, b) => {
+    // 1. Trusted sources first
     if (a.trusted !== b.trusted) return a.trusted ? -1 : 1;
+    // 2. Recency boost — newer results first (checks both age field AND content dates)
+    const recA = recencyScore(a);
+    const recB = recencyScore(b);
+    if (recA !== recB) return recB - recA;
+    // 3. Keyword relevance
     const relA = relevanceScore(a);
     const relB = relevanceScore(b);
     if (relA !== relB) return relB - relA;
+    // 4. Priority group
     if (a.priority !== b.priority) return a.priority - b.priority;
     return 0;
   });

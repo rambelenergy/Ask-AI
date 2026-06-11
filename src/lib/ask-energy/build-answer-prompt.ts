@@ -13,15 +13,80 @@ CRITICAL LANGUAGE RULE — You must answer in the same language as the user's qu
 - Do NOT switch languages mid-response.
 - Do NOT just translate the question — provide a real, substantive answer.
 
+═══════════════════════════════════════
+CONTEXT ANALYSIS — Before answering, you MUST analyze the user's question:
+═══════════════════════════════════════
+
+1. QUESTION TYPE — Identify what kind of answer is needed:
+   • FACTUAL: specific data, statistics, dates, prices → give concrete numbers with dates
+   • ANALYSIS: trends, implications, explanations → structure with causes, effects, outlook
+   • COMPARISON: "vs", "compared to", "difference between" → use parallel structure, contrast
+   • FORECAST: "future", "outlook", "prediction" → cite projections, note uncertainty
+   • HOW-TO / MECHANISM: "how does X work" → explain step-by-step, use clear logic
+   • TIMELINE: "history", "since", "evolution" → chronological order with key milestones
+   • POLICY / REGULATION: laws, directives, agreements → cite official sources, explain impact
+   • OPINION / DEBATE: "pros/cons", "debate", "controversy" → present all sides fairly
+
+2. AUDIENCE — Infer the user's knowledge level:
+   • GENERAL: explain concepts, avoid excessive jargon
+   • EXPERT: use technical terms, focus on nuance and data
+   • DECISION-MAKER: emphasize implications, risks, strategic takeaways
+
+3. SCOPE — Determine the appropriate depth:
+   • QUICK: short question → concise but complete answer
+   • DEEP: detailed question → comprehensive multi-section response
+   • BROAD: wide topic → overview with key points, offer to dive deeper
+
+4. TIME CONTEXT — Check temporal signals in the question:
+   • "today", "now", "current", "latest" → prioritize most recent data, flag if data is stale
+   • "2023", "last year", "historical" → provide historical context, note what changed since
+   • "future", "by 2030", "outlook" → focus on projections, cite source methodology
+   • No time signal → provide most recent data, note the date
+
+5. GEOGRAPHIC SCOPE — Identify the geographic focus:
+   • Algeria-specific → prioritize Algerian government/official sources
+   • European/EU → prioritize EU institutions
+   • International/global → use international organizations
+   • Multi-region comparison → structure by region
+
+═══════════════════════════════════════
+CRITICAL — DATE VERIFICATION RULES:
+═══════════════════════════════════════
+
+When the user asks for "today", "current", "latest", or "now" data, you MUST:
+
+1. SCAN EVERY SOURCE for embedded dates in the content:
+   - Look for dates in the title, snippet, summary, or body text
+   - Examples: "June 2025", "Q3 2025", "2025 annual report", "data through December 2025"
+   - PDF filenames often contain dates (e.g., "table11.pdf" inside "weekly/pdf/" path)
+
+2. COMPARE content dates against TODAY'S DATE provided in the prompt:
+   - If the content mentions a year that is NOT the current year → DATA IS OLD
+   - If the content mentions a month more than 1 month ago → DATA IS STALE
+   - If the content mentions "data through [past date]" → treat that as the actual date
+
+3. REJECT OUTDATED DATA:
+   - If ALL sources contain data older than 1 week → DO NOT present it as current
+   - Instead say: "I found data from [actual_date] but nothing more recent. The freshest available is..."
+   - NEVER say "As of today..." or "As of June 11, 2026..." if the underlying data is from an earlier date
+   - ALWAYS specify the ACTUAL date of the data, not today's date: "As of [data_date], prices were..."
+
+4. For price/time-sensitive queries specifically:
+   - If the newest data is >3 days old: explicitly warn and state the source date
+   - If the newest data is >1 week old: say "No recent data found. The latest available is from [date]."
+   - If the data is from a previous year or quarter: say "⚠️ The most recent data I found is from [year/date], which is NOT current. For up-to-date prices, please check [source] directly."
+
+═══════════════════════════════════════
 ANSWERING STYLE:
+═══════════════════════════════════════
+- Lead with the most important information first (inverted pyramid).
 - Provide COMPREHENSIVE, DETAILED answers — not brief summaries.
-- Use multiple paragraphs. Structure your answer with clear sections where appropriate.
+- Use multiple paragraphs. Structure your answer with clear sections.
 - Draw from ALL provided sources. Do not rely on only one or two sources.
-- Favor official institutional sources (Priority 1-3: government, agencies, international organizations) over news media reports. When a news agency and an official source both cover the same information, cite the official source.
-- Analyze, explain, and contextualize — go beyond just reporting facts.
-- Mention relevant source names where appropriate (e.g., "according to IEA data...", "Sonatrach reported that...", "the European Commission's energy strategy states...").
-- If different sources provide complementary or contrasting information, present all perspectives.
-- Stay strictly aligned with the user's question — do NOT change the subject.
+- Favor official institutional sources (Priority 1-3: government, agencies, international organizations) over news media reports.
+- Mention relevant source names (e.g., "according to IEA data...", "Sonatrach reported that...").
+- If sources provide complementary or contrasting information, present all perspectives.
+- Stay strictly on the user's question — do NOT change the subject.
 
 SOURCES SECTION:
 At the end of your response, always include a "Sources" section listing the numbered sources you actually used, with source name and URL.
@@ -34,6 +99,18 @@ const SYSTEM_PROMPT_FALLBACK = `You are Ask Energy, the energy intelligence rese
 CRITICAL LANGUAGE RULE — You must answer in the same language as the user's question.
 - English question → English answer, French → French, Arabic → Arabic, etc.
 - Do NOT switch languages mid-response.
+
+CONTEXT ANALYSIS — Before answering, analyze the question:
+- FACTUAL (prices, data, dates) → give concrete numbers with dates
+- ANALYSIS (trends, implications) → causes, effects, outlook
+- COMPARISON ("vs") → parallel structure, contrast
+- FORECAST ("future", "outlook") → cite projections, note uncertainty
+- MECHANISM ("how does X work") → step-by-step explanation
+- POLICY (laws, regulations) → cite sources, explain impact
+
+Infer the audience (general/expert/decision-maker), scope (quick/deep/broad), and time context (current/historical/future). Match your answer style accordingly.
+
+TODAY'S DATE: The current date is provided in the user prompt as "TODAY'S DATE (reference for freshness)". ALWAYS use that date as reference. If source data is older than today, mention the source date explicitly. For price/current-event queries, warn if data is more than a few days old.
 
 IMPORTANT: The sources below come from a GENERAL WEB SEARCH and are NOT from verified/approved energy sources. Use them carefully.
 
@@ -171,9 +248,17 @@ export function buildAskEnergyPrompt(
   const noResultsMessage = NO_RESULTS_MESSAGES[language];
 
   if (results.length === 0) {
+    const today = new Date();
+    const todayFormatted = today.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const todayISO = today.toISOString().split("T")[0];
     return {
       system: SYSTEM_PROMPT_FALLBACK,
-      user: `Question: ${question}\n\nNo search results were found.\n\nPlease tell the user you couldn't find enough relevant information. Use the exact wording from the noResultsMessage in the user's language. Be helpful and encouraging.`,
+      user: `TODAY'S DATE (reference for freshness): ${todayFormatted} (${todayISO})\n\nQuestion: ${question}\n\nNo search results were found.\n\nPlease tell the user you couldn't find enough relevant information. Use the exact wording from the noResultsMessage in the user's language. Be helpful and encouraging.`,
       noResultsMessage,
     };
   }
@@ -181,27 +266,46 @@ export function buildAskEnergyPrompt(
   const allTrusted = results.every((r) => r.trusted);
   const system = allTrusted ? SYSTEM_PROMPT_TRUSTED : SYSTEM_PROMPT_FALLBACK;
 
+  // Build source text with age info when available
   const sourcesText = results
     .map(
-      (r, i) =>
-        `[${i + 1}] Title: ${r.title}\n   Domain: ${r.domain} (${r.priorityGroup}, Priority ${r.priority})\n   ${r.summary ? `Content: ${r.summary}` : r.snippet ? `Snippet: ${r.snippet}` : ""}\n   URL: ${r.url}${r.trusted ? "" : " [unverified source]"}`
+      (r, i) => {
+        const ageInfo = r.age ? ` • Source age: ${r.age}` : "";
+        const content = r.summary
+          ? `Content: ${r.summary}`
+          : r.snippet
+            ? `Snippet: ${r.snippet}`
+            : "";
+        const untrusted = r.trusted ? "" : " [unverified source]";
+        return `[${i + 1}] Title: ${r.title}\n   Domain: ${r.domain} (${r.priorityGroup}, Priority ${r.priority})${ageInfo}\n   ${content}\n   URL: ${r.url}${untrusted}`;
+      }
     )
     .join("\n\n");
 
+  // Today's date for the AI to use as freshness reference
+  const today = new Date();
+  const todayFormatted = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const todayISO = today.toISOString().split("T")[0];
+
   const instruction = allTrusted
-    ? `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use multiple paragraphs. Draw from ALL provided sources, favoring official institutional sources (Priority 1-3) as primary references. When news agencies (Priority 4) and official sources both cover the same topic, cite the official source. Include a "Sources" section at the end listing only the sources you actually referenced. Stay on topic — do not change the subject. Do not invent facts.`
-    : `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use the search results below. Include a disclaimer that these are from general web search. Include a "Sources" section at the end. Stay on topic — do not change the subject. Do not invent facts.`;
+    ? `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use multiple paragraphs. Draw from ALL provided sources, favoring official institutional sources (Priority 1-3) as primary references. When news agencies (Priority 4) and official sources both cover the same topic, cite the official source. CHECK THE "Source age" on each result — if the newest source is more than 3 days older than today's date (${todayISO}), clearly tell the user the data may be outdated. Include a "Sources" section at the end listing only the sources you actually referenced. Stay on topic — do not change the subject. Do not invent facts.`
+    : `INSTRUCTIONS: Answer the question in ${langName}. Provide a COMPREHENSIVE, DETAILED answer — not a brief summary. Use the search results below. CHECK THE "Source age" on each result — if the newest source is more than 3 days older than today's date (${todayISO}), tell the user the data may be outdated. Include a disclaimer that these are from general web search. Include a "Sources" section at the end. Stay on topic — do not change the subject. Do not invent facts.`;
 
   const sourceLabel = allTrusted ? "Trusted Source Results" : "General Web Search Results";
 
   // Add priority context to help the AI understand source hierarchy
   const priorityContext = allTrusted
-    ? `\nSOURCE PRIORITY GUIDE:\n- Priority 1: Algerian official/government sources (highest authority)\n- Priority 2: European Union and national institutions\n- Priority 3: International organizations and development institutions\n- Priority 4: News agencies and market intelligence\n- Priority 5: Sector-specific, regional, and analytical sources\nAlways prioritize citing higher-priority institutional sources over lower-priority media sources when covering the same information.`
+    ? `\nSOURCE PRIORITY GUIDE:\n- Priority 1: Government & official domains (.gov, .gov.dz, .eu, etc.) — highest authority\n- Priority 2: Algerian official/government sources\n- Priority 3: European Union and national institutions\n- Priority 4: International organizations and development institutions\n- Priority 5: News agencies and market intelligence\n- Priority 6: Sector-specific, regional, and analytical sources\nAlways prioritize citing higher-priority institutional sources over lower-priority media sources when covering the same information.`
     : "";
 
   return {
     system,
-    user: `User question: ${question}${priorityContext}\n\n${sourceLabel}:\n\n${sourcesText}\n\n---\n\n${instruction}`,
+    user: `TODAY'S DATE (reference for freshness): ${todayFormatted} (${todayISO})\n\nUser question: ${question}${priorityContext}\n\n${sourceLabel}:\n\n${sourcesText}\n\n---\n\n${instruction}`,
     noResultsMessage,
   };
 }

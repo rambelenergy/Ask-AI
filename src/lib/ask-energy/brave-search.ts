@@ -3,12 +3,15 @@ export interface BraveSearchResult {
   url: string;
   snippet?: string;
   description?: string;
+  /** Age string from Brave, e.g. "2 days ago", "1 hour ago" */
+  age?: string;
 }
 
 interface BraveRawResult {
   title?: string;
   url?: string;
   description?: string;
+  age?: string;
 }
 
 interface BraveWebResponse {
@@ -171,6 +174,7 @@ export async function searchWithBrave(
         url: item.url!,
         snippet: item.description,
         description: item.description,
+        age: item.age,
       }));
   } catch (error: unknown) {
     if (error instanceof DOMException && error.name === "AbortError") {

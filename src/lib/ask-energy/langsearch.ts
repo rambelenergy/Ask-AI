@@ -3,6 +3,8 @@ export interface LangSearchResult {
   url: string;
   snippet?: string;
   summary?: string;
+  /** Age of the result (e.g. "2 days ago") — populated from Brave results */
+  age?: string;
 }
 
 interface LangSearchRawItem {

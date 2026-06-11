@@ -156,6 +156,8 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "chathamhouse.org",
       "energyinst.org",
       "carnegieendowment.org",
+      // US EIA — key source for energy prices & data
+      "eia.gov",
     ],
   },
   {
@@ -208,6 +210,7 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
       "bnef.com",
       "upstreamonline.com",
       "worldoil.com",
+      "oilprice.com",
     ],
   },
   {
@@ -303,7 +306,6 @@ export const TRUSTED_SOURCE_GROUPS: TrustedSourceGroup[] = [
     priority: 6,
     name: "Specialized Energy Media & Research",
     domains: [
-      "oilprice.com",
       "rechargenews.com",
       "pv-magazine.com",
       "energymonitor.ai",
