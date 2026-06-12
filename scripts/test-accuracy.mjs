@@ -183,8 +183,8 @@ function extractNumbers(text) {
   let match;
 
   // Pattern A: Label then price — "WTI**: $93.68" or "WTI ... is $93.68"
-  // Match label anywhere, then capture first $XX.XX within next 120 chars
-  const labelThenPrice = /(WTI|Brent|Louisiana Light|Henry Hub|TTF|NBP|JKM)[\s\S]{0,120}?\$?(\d{2,3}\.\d{2})/gi;
+  // Match label anywhere, then capture first $XX.XX (1-3 digits before decimal to handle gas: $3.09) within next 120 chars
+  const labelThenPrice = /(WTI|Brent|Louisiana Light|Henry Hub|TTF|NBP|JKM)[\s\S]{0,120}?\$?(\d{1,3}\.\d{2})/gi;
   while ((match = labelThenPrice.exec(text)) !== null) {
     const label = match[1];
     if (!prices.some(p => p.label?.toLowerCase() === label.toLowerCase())) {
@@ -193,7 +193,7 @@ function extractNumbers(text) {
   }
 
   // Pattern B: Price then label — "$93.68 per barrel for WTI" or "$93.68 (Brent)"
-  const priceThenLabel = /\$(\d{2,3}\.\d{2})[\s\S]{0,60}?(WTI|Brent|Louisiana Light|Henry Hub|TTF|NBP|JKM)/gi;
+  const priceThenLabel = /\$(\d{1,3}\.\d{2})[\s\S]{0,60}?(WTI|Brent|Louisiana Light|Henry Hub|TTF|NBP|JKM)/gi;
   while ((match = priceThenLabel.exec(text)) !== null) {
     const label = match[2];
     if (!prices.some(p => p.label?.toLowerCase() === label.toLowerCase())) {
@@ -201,9 +201,9 @@ function extractNumbers(text) {
     }
   }
 
-  // Pattern C: Any $XX.XX fallback
+  // Pattern C: Any $XX.XX fallback (1-3 digits before decimal for gas prices like $3.09)
   if (prices.length === 0) {
-    const priceRe = /\$(\d{2,3}\.\d{2})/g;
+    const priceRe = /\$(\d{1,3}\.\d{2})/g;
     while ((match = priceRe.exec(text)) !== null) {
       prices.push({ value: parseFloat(match[1]) });
     }
@@ -411,12 +411,45 @@ function scoreAnswer(benchmark, result, liveData, gasRef) {
   } else if (checks.requirePercentChange) {
     scores.completeness = pcts.length > 0 ? 7 : 2;
     notes.push(`% changes: ${pcts.length} found`);
+  } else if (isHistorical) {
+    // Historical: score on date specificity, multiple data points, source count
+    const histDate = extractDate(answer);
+    const hasDate = histDate !== null;
+    const hasMultiplePrices = prices.length >= 3;
+    const hasSources = totalSources >= 2;
+    const hasOldDate = /\d{1,2}\s+\w+\s+20\d{2}/gi.test(answer); // any date in answer
+    let histScore = 4; // base
+    if (hasDate) histScore += 2;
+    if (hasOldDate) histScore += 1;
+    if (hasMultiplePrices) histScore += 2;
+    if (hasSources) histScore += 1;
+    scores.completeness = Math.min(10, histScore);
+    notes.push(`Historical completeness: date=${hasDate}, prices=${prices.length}, sources=${totalSources}`);
+  } else if (isStaticFact) {
+    // Static facts: check unit presence, year references, and source depth
+    const hasUnit = checks.requireUnit ? answer.toLowerCase().includes(checks.requireUnit.toLowerCase()) : true;
+    const hasYear = checks.requireYear ? /\b20\d{2}\b/.test(answer) : true;
+    let factScore = totalSources >= 5 ? 9 : totalSources >= 3 ? 8 : totalSources >= 1 ? 7 : 3;
+    if (!hasUnit || !hasYear) factScore = Math.max(4, factScore - 2);
+    scores.completeness = factScore;
+    notes.push(`Static fact completeness: unit=${hasUnit}, year=${hasYear}, sources=${totalSources}`);
   } else {
     scores.completeness = totalSources > 0 ? 6 : 2;
   }
 
-  // ── Consistency (placeholder for cross-language) ──
-  scores.consistency = 5; // baseline when no cross-language comparison
+  // ── Consistency ──
+  if (isStaticFact || isHistorical) {
+    // Non-price factual questions: score on answer depth and source diversity
+    const answerLength = answer.length;
+    if (answerLength > 500 && totalSources >= 5) scores.consistency = 9;
+    else if (answerLength > 500 && totalSources >= 3) scores.consistency = 8;
+    else if (answerLength > 300 && totalSources >= 2) scores.consistency = 7;
+    else if (totalSources >= 1) scores.consistency = 6;
+    else scores.consistency = 4;
+    notes.push(`Consistency based on length=${answerLength} chars, sources=${totalSources}`);
+  } else {
+    scores.consistency = 5; // baseline for price questions (cross-language test handles consistency)
+  }
 
   const total = Object.values(scores).reduce((a, b) => a + b, 0);
 
