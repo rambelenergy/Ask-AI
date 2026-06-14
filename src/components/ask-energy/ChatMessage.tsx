@@ -21,6 +21,7 @@ interface ChatMessageProps {
   content: string;
   sources?: Source[];
   suggestions?: string[];
+  livePrices?: { source: string; url: string; date: string | undefined; prices: { label: string; value: string; change?: string }[] | undefined; fetchedAt: string }[];
 }
 
 /** Priority badge color */
@@ -83,7 +84,7 @@ function SourceCards({ sources }: { sources: Source[] }) {
   );
 }
 
-export function ChatMessage({ role, content, sources, suggestions }: ChatMessageProps) {
+export function ChatMessage({ role, content, sources, suggestions, livePrices }: ChatMessageProps) {
   if (role === "user") {
     return (
       <div className="mb-4 flex justify-end">
@@ -151,6 +152,9 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
         <div className="prose prose-sm max-w-none text-[var(--navy)]">
           <p className="whitespace-pre-wrap">{content}</p>
         </div>
+        {livePrices && livePrices.length > 0 && (
+          <PriceComparisonInline data={livePrices} />
+        )}
         <SourceCards sources={sources ?? []} />
         {/* Bottom toolbar: copy + summarize */}
         <div className="mt-4 border-t border-[var(--line)] pt-3">
@@ -162,6 +166,85 @@ export function ChatMessage({ role, content, sources, suggestions }: ChatMessage
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PriceComparisonInline({ data }: { data: ChatMessageProps["livePrices"] }) {
+  if (!data || data.length === 0) return null;
+
+  // Collect all unique price labels across sources
+  const allLabels = new Map<string, { label: string; values: Map<string, { value: string; change?: string }> }>();
+  for (const entry of data) {
+    if (!entry.prices) continue;
+    for (const p of entry.prices) {
+      if (!allLabels.has(p.label)) {
+        allLabels.set(p.label, { label: p.label, values: new Map() });
+      }
+      allLabels.get(p.label)!.values.set(entry.source, { value: p.value, change: p.change });
+    }
+  }
+
+  if (allLabels.size === 0) return null;
+
+  const sources = data.map(d => d.source);
+  const priceEntries = Array.from(allLabels.values());
+
+  return (
+    <div className="mt-4 border-t border-[var(--line)] pt-4">
+      <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+        📊 Live Price Comparison
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr className="border-b border-[var(--line)]">
+              <th className="text-left py-1.5 pr-3 font-semibold text-[var(--muted)]">Commodity</th>
+              {sources.map((src) => (
+                <th key={src} className="text-right py-1.5 px-2 font-semibold text-[var(--muted)]">
+                  {src}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {priceEntries.map((entry) => (
+              <tr key={entry.label} className="border-b border-[var(--line)]/50">
+                <td className="py-1.5 pr-3 font-medium text-[var(--navy)]">{entry.label}</td>
+                {sources.map((src) => {
+                  const v = entry.values.get(src);
+                  if (!v) return <td key={src} className="text-right py-1.5 px-2 text-[var(--muted-soft)]">—</td>;
+                  const isUp = v.change && !v.change.startsWith("-") && v.change !== "0%";
+                  const isDown = v.change && v.change.startsWith("-");
+                  return (
+                    <td key={src} className="text-right py-1.5 px-2">
+                      <span className="font-semibold text-[var(--navy)]">{v.value}</span>
+                      {v.change && (
+                        <span className={`ml-1 text-[9px] font-medium ${
+                          isUp ? "text-[var(--green)]" : isDown ? "text-red-500" : "text-[var(--muted)]"
+                        }`}>
+                          {isUp ? "▲" : isDown ? "▼" : ""}{v.change}
+                        </span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-2 text-[9px] text-[var(--muted-soft)]">
+        Sources: {sources.map((s, i) => (
+          <span key={s}>
+            {i > 0 && " · "}
+            <a href={data[i]?.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-[var(--green)]">
+              {s === "EIA" ? "eia.gov" : s === "OilPrice" ? "oilprice.com" : s === "TradingEconomics" ? "tradingeconomics.com" : s}
+            </a>
+          </span>
+        ))}
+        {data[0]?.date && ` · ${data[0].date}`}
+      </p>
     </div>
   );
 }

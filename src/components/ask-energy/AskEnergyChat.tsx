@@ -23,12 +23,21 @@ interface ErrorWithSuggestions {
   suggestions?: string[];
 }
 
+interface LivePriceEntry {
+  source: string;
+  url: string;
+  date: string | undefined;
+  prices: { label: string; value: string; change?: string }[] | undefined;
+  fetchedAt: string;
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant" | "error";
   content: string;
   sources?: Source[];
   suggestions?: string[];
+  livePrices?: LivePriceEntry[];
 }
 
 export function AskEnergyChat() {
@@ -38,6 +47,8 @@ export function AskEnergyChat() {
   const [streamingContent, setStreamingContent] = useState("");
   const [loadingText, setLoadingText] = useState("Searching trusted energy sources...");
   const [progressSteps, setProgressSteps] = useState<{ text: string; done: boolean; active: boolean }[]>([]);
+  const [livePrices, setLivePrices] = useState<LivePriceEntry[] | null>(null);
+  const livePricesRef = useRef<LivePriceEntry[] | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -97,6 +108,8 @@ export function AskEnergyChat() {
       setInput("");
       setLoading(true);
       setStreamingContent("");
+      setLivePrices(null);
+      livePricesRef.current = null;
       setLoadingText("Searching trusted energy sources...");
       setProgressSteps([]);
 
@@ -147,9 +160,12 @@ export function AskEnergyChat() {
                       role: "assistant",
                       content: fullContent,
                       sources: streamedSources ?? undefined,
+                      livePrices: livePricesRef.current ?? undefined,
                     },
                   ]);
                   setStreamingContent("");
+                  livePricesRef.current = null;
+                  setLivePrices(null);
                   setLoading(false);
                   return;
                 }
@@ -174,6 +190,11 @@ export function AskEnergyChat() {
                         { text: "No data from trusted sources", done: true, active: false },
                         { text: "Searching alternative sources", done: false, active: true },
                       ]);
+                    } else if (parsed.p === "live_price") {
+                      if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 0) {
+                        livePricesRef.current = parsed.data;
+                        setLivePrices(parsed.data);
+                      }
                     }
                   }
 
@@ -215,10 +236,13 @@ export function AskEnergyChat() {
                   role: "assistant",
                   content: fullContent,
                   sources: streamedSources ?? undefined,
+                  livePrices: livePricesRef.current ?? undefined,
                 },
               ]);
             }
             setStreamingContent("");
+            livePricesRef.current = null;
+            setLivePrices(null);
             setLoading(false);
             return;
           }
@@ -385,6 +409,7 @@ export function AskEnergyChat() {
             content={msg.content}
             sources={msg.sources}
             suggestions={msg.suggestions}
+            livePrices={msg.livePrices}
           />
         ))}
 

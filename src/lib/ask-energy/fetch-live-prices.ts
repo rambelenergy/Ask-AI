@@ -20,10 +20,15 @@ export interface LivePriceData {
 
 /** URLs that should always be live-fetched for price queries */
 const DYNAMIC_PRICE_URLS = [
-  // Crude oil
+  // Primary crude oil comparison sources (always fetched for price queries)
   "eia.gov/todayinenergy/prices.php",
-  "oilprice.com",
+  "tradingeconomics.com/commodity/crude-oil",
+  "tradingeconomics.com/commodity/brent-crude-oil",
+  // oilprice.com main page is JS-rendered; use RSS feed for price extraction
+  "oilprice.com/rss/main",
+  // Other dynamic sources
   "tradingeconomics.com/commodity",
+  "oilprice.com",
   "oilmarketcap.com",
   "markets.businessinsider.com/commodities",
   // Natural gas
@@ -87,10 +92,21 @@ export async function fetchLivePrices(
   // Always include EIA prices page if any EIA URL is present
   const targets = urls.filter(isDynamicPriceUrl);
   
-  // Ensure EIA prices.php is always fetched first (highest priority)
-  const eiaPriceUrl = urls.find(u => u.includes("eia.gov/todayinenergy/prices.php"));
-  if (eiaPriceUrl && !targets.includes(eiaPriceUrl)) {
-    targets.unshift(eiaPriceUrl);
+  // Ensure all three primary comparison sources are included for price queries
+  const PRIMARY_COMPARISON_SOURCES = [
+    "eia.gov/todayinenergy/prices.php",
+    "tradingeconomics.com/commodity/crude-oil",
+    "oilprice.com/rss/main",
+  ];
+  
+  for (const source of PRIMARY_COMPARISON_SOURCES) {
+    if (!targets.some(t => t.includes(source))) {
+      // Wait until we find a matching URL from search results, or use default
+      const match = urls.find(u => u.includes(source));
+      if (match) {
+        targets.unshift(match);
+      }
+    }
   }
   
   // Debug: log what we're about to fetch
@@ -103,7 +119,7 @@ export async function fetchLivePrices(
   if (finalTargets.length === 0) return [];
 
   const results = await Promise.allSettled(
-    targets.map((url) => fetchLivePricePage(url))
+    finalTargets.map((url) => fetchLivePricePage(url))
   );
 
   return results
@@ -146,19 +162,48 @@ function extractDate(text: string): string | undefined {
   return undefined;
 }
 
-/** Extract price data like "WTI 93.68 +1.9" or "Henry Hub 3.27" from text */
+/** Extract price data like "WTI 93.68 +1.9" or "fell to 84.88 USD/Bbl" from text */
 function extractPrices(text: string): { label: string; value: string; change?: string }[] | undefined {
   const prices: { label: string; value: string; change?: string }[] = [];
 
-  // Crude oil
-  const crudeSection = text.match(/Crude Oil[\s\S]{0,200}?(WTI|Brent|Louisiana Light)[\s\S]{0,300}?Gasoline/i);
-  const targetText = crudeSection ? crudeSection[0] : text.slice(0, 6000);
+  // Pattern 1: Standard label + price format (EIA: "WTI 93.68 +1.2")
   const crudeRe = /(WTI|Brent|Louisiana Light|LLS|Dubai|Oman|Urals)[\s\r\n]*(\d{2,3}\.\d{2})[\s\r\n]*([+-]\d+\.\d+)?/gi;
-  let cm = crudeRe.exec(targetText);
+  let cm = crudeRe.exec(text.slice(0, 8000));
   while (cm !== null) {
-    prices.push({ label: cm[1].trim(), value: `$${cm[2]}`, change: cm[3] ? `${cm[3]}%` : undefined });
+    const label = cm[1].trim();
+    if (!prices.some(p => p.label === label)) {
+      prices.push({ label, value: `$${cm[2]}`, change: cm[3] ? `${cm[3]}%` : undefined });
+    }
     if (prices.length >= 10) break;
-    cm = crudeRe.exec(targetText);
+    cm = crudeRe.exec(text.slice(0, 8000));
+  }
+
+  // Pattern 2: "fell to 84.88 USD/Bbl" or "to $84.88 per barrel" (TradingEconomics style)
+  const priceContextRe = /(?:fell|dropped|rose|trading|at|to|around)\s+(?:to\s+)?\$?(\d{2,3}\.\d{2})\s*(?:USD\/Bbl|per barrel|\$)/gi;
+  const contextCrudeRe = /(WTI|Brent|Crude Oil|Crude|West Texas)[\s\S]{0,100}?(?:fell|dropped|rose|trading|at|to|around)\s+(?:to\s+)?\$?(\d{2,3}\.\d{2})\s*(?:USD\/Bbl|per barrel)/gi;
+  let cm2 = contextCrudeRe.exec(text.slice(0, 8000));
+  while (cm2 !== null) {
+    let label = cm2[1].trim();
+    if (label === 'Crude Oil' || label === 'Crude') label = 'WTI';
+    if (label === 'West Texas') label = 'WTI';
+    if (!prices.some(p => p.label === label)) {
+      prices.push({ label, value: `$${cm2[2]}`, change: undefined });
+    }
+    if (prices.length >= 10) break;
+    cm2 = contextCrudeRe.exec(text.slice(0, 8000));
+  }
+
+  // Pattern 3: "Brent crude slipped below $90 per barrel... WTI fell to roughly $85–$87" (RSS/News style)
+  const rssRe = /(Brent|WTI)\s+(?:crude\s+)?(?:slipped|fell|rose|trading|priced)\s+(?:below\s+)?\$?(\d{2,3})(?:[–-]\$?\d{2,3})?/gi;
+  let cm3 = rssRe.exec(text.slice(0, 8000));
+  while (cm3 !== null) {
+    const label = cm3[1].trim();
+    if (!prices.some(p => p.label === label)) {
+      // RSS prices are approximate (single number like 90), add .00 for consistency
+      prices.push({ label, value: `~$${cm3[2]}.00`, change: undefined });
+    }
+    if (prices.length >= 10) break;
+    cm3 = rssRe.exec(text.slice(0, 8000));
   }
 
   // Natural gas

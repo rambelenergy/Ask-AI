@@ -169,20 +169,45 @@ export async function POST(request: Request): Promise<Response> {
       // Send debug info to frontend for diagnostics
       enqueue({ p: "debug", ...debug });
 
-      // ─── Live-fetch dynamic price pages (eia.gov/prices, oilprice.com) ───
-      // ALWAYS include EIA prices page for price-related queries
+      // ─── Live-fetch dynamic price pages for multi-source comparison ───
+      // ALWAYS include all three primary sources (EIA, OilPrice, TradingEcon) for price queries
       const allUrls = searchResults.map((r) => r.url);
-      const hasPriceQuery = /\b(price|prices?|cost|today|now|current|latest|سعر|أسعار|اليوم|precio|prix|prezzo|preis)\b/i.test(question);
-      if (hasPriceQuery && !allUrls.some(u => u.includes('eia.gov/todayinenergy/prices.php'))) {
-        allUrls.unshift('https://www.eia.gov/todayinenergy/prices.php');
+      const hasPriceQuery = /\b(price|prices?|cost|today|now|current|latest|harga|minyak|petroleum|precio|prix|prezzo|preis|سعر|أسعار|سعر\s+النفط)/i.test(question);
+      if (hasPriceQuery) {
+        const primarySources = [
+          'https://www.eia.gov/todayinenergy/prices.php',
+          'https://tradingeconomics.com/commodity/crude-oil',
+          'https://tradingeconomics.com/commodity/brent-crude-oil',
+          'https://oilprice.com/rss/main',
+        ];
+        for (const src of primarySources) {
+          // Only skip if the EXACT URL is already present
+          if (!allUrls.some(u => u === src)) {
+            allUrls.unshift(src);
+          }
+        }
       }
       const livePriceData = await fetchLivePrices(allUrls);
       if (livePriceData.length > 0) {
         debugLog("live price pages fetched", livePriceData.length);
-        enqueue({ p: "live_price", count: livePriceData.length, urls: livePriceData.map(lp => lp.url), extracted: livePriceData.map(lp => ({ url: lp.url, date: lp.extracted.date, prices: lp.extracted.prices })) });
+        enqueue({
+          p: "live_price",
+          count: livePriceData.length,
+          data: livePriceData.map(lp => ({
+            source: lp.url.includes('eia.gov') ? 'EIA' :
+                    lp.url.includes('oilprice.com/rss') ? 'OilPrice' :
+                    lp.url.includes('oilprice.com') ? 'OilPrice' :
+                    lp.url.includes('tradingeconomics') ? 'TradingEconomics' :
+                    new URL(lp.url).hostname,
+            url: lp.url,
+            date: lp.extracted.date,
+            prices: lp.extracted.prices,
+            fetchedAt: lp.fetchedAt,
+          })),
+        });
       } else {
         debugLog("live price pages", "NONE fetched");
-        enqueue({ p: "live_price", count: 0, input_urls: searchResults.filter(r => r.url.includes('eia.gov')).map(r => r.url) });
+        enqueue({ p: "live_price", count: 0 });
       }
 
       // ─── No results from any source ───
