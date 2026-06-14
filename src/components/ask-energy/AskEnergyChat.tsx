@@ -153,6 +153,7 @@ export function AskEnergyChat() {
                 const payload = trimmed.slice(6);
 
                 if (payload === "[DONE]") {
+                  const capturedLivePrices = livePricesRef.current;
                   setMessages((prev) => [
                     ...prev,
                     {
@@ -160,7 +161,7 @@ export function AskEnergyChat() {
                       role: "assistant",
                       content: fullContent,
                       sources: streamedSources ?? undefined,
-                      livePrices: livePricesRef.current ?? undefined,
+                      livePrices: capturedLivePrices ?? undefined,
                     },
                   ]);
                   setStreamingContent("");
@@ -229,6 +230,7 @@ export function AskEnergyChat() {
             }
 
             if (fullContent) {
+              const capturedLivePrices = livePricesRef.current;
               setMessages((prev) => [
                 ...prev,
                 {
@@ -236,7 +238,7 @@ export function AskEnergyChat() {
                   role: "assistant",
                   content: fullContent,
                   sources: streamedSources ?? undefined,
-                  livePrices: livePricesRef.current ?? undefined,
+                  livePrices: capturedLivePrices ?? undefined,
                 },
               ]);
             }

@@ -187,7 +187,7 @@ function PriceComparisonInline({ data }: { data: ChatMessageProps["livePrices"] 
 
   if (allLabels.size === 0) return null;
 
-  const sources = data.map(d => d.source);
+  const sources = [...new Set(data.map(d => d.source))];
   const priceEntries = Array.from(allLabels.values());
 
   return (
@@ -200,8 +200,8 @@ function PriceComparisonInline({ data }: { data: ChatMessageProps["livePrices"] 
           <thead>
             <tr className="border-b border-[var(--line)]">
               <th className="text-left py-1.5 pr-3 font-semibold text-[var(--muted)]">Commodity</th>
-              {sources.map((src) => (
-                <th key={src} className="text-right py-1.5 px-2 font-semibold text-[var(--muted)]">
+              {sources.map((src, si) => (
+                <th key={si} className="text-right py-1.5 px-2 font-semibold text-[var(--muted)]">
                   {src}
                 </th>
               ))}
@@ -211,13 +211,13 @@ function PriceComparisonInline({ data }: { data: ChatMessageProps["livePrices"] 
             {priceEntries.map((entry) => (
               <tr key={entry.label} className="border-b border-[var(--line)]/50">
                 <td className="py-1.5 pr-3 font-medium text-[var(--navy)]">{entry.label}</td>
-                {sources.map((src) => {
+                {sources.map((src, si) => {
                   const v = entry.values.get(src);
-                  if (!v) return <td key={src} className="text-right py-1.5 px-2 text-[var(--muted-soft)]">—</td>;
+                  if (!v) return <td key={si} className="text-right py-1.5 px-2 text-[var(--muted-soft)]">—</td>;
                   const isUp = v.change && !v.change.startsWith("-") && v.change !== "0%";
                   const isDown = v.change && v.change.startsWith("-");
                   return (
-                    <td key={src} className="text-right py-1.5 px-2">
+                    <td key={si} className="text-right py-1.5 px-2">
                       <span className="font-semibold text-[var(--navy)]">{v.value}</span>
                       {v.change && (
                         <span className={`ml-1 text-[9px] font-medium ${
@@ -236,7 +236,7 @@ function PriceComparisonInline({ data }: { data: ChatMessageProps["livePrices"] 
       </div>
       <p className="mt-2 text-[9px] text-[var(--muted-soft)]">
         Sources: {sources.map((s, i) => (
-          <span key={s}>
+          <span key={i}>
             {i > 0 && " · "}
             <a href={data[i]?.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-[var(--green)]">
               {s === "EIA" ? "eia.gov" : s === "OilPrice" ? "oilprice.com" : s === "TradingEconomics" ? "tradingeconomics.com" : s}
