@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RamBelEnergy — Feature Demo: Live Prices & Algeria Projects Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+/* ══════════════════════════════════════
+   DESIGN TOKENS — from globals.css
+   ══════════════════════════════════════ */
+:root {
+  --bg: #fafaf8;       --fg: #0f1923;
+  --navy: #071a2e;     --navy-soft: #0f2940;  --navy-light: #eef2f7;
+  --green: #11594b;    --green-soft: #edf5f2;  --green-muted: #d4e5df;
+  --gold: #b48842;     --gold-soft: #faf6ef;
+  --line: #e2e5e0;     --line-soft: #edefe9;
+  --muted: #5b646e;    --muted-soft: #88909a;
+  --paper: #fffefc;    --surface: #f5f6f3;
+  --red: #c53030;      --amber: #c05621;       --blue: #2b6cb0;
+  --red-soft: #fef2f2; --amber-soft: #fffaf0;  --blue-soft: #ebf4ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background:var(--bg); color:var(--fg); line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{ font-family: Georgia, 'Times New Roman', serif; }
+.container{ max-width:1240px; margin:0 auto; padding:0 2rem; }
+@media(max-width:768px){ .container{padding:0 1rem} }
+
+/* ── Header ── */
+.header{
+  position:sticky; top:0; z-index:100; background:rgba(250,250,248,0.92);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{
+  max-width:1240px; margin:0 auto; padding:0 2rem;
+  display:flex; align-items:center; justify-content:space-between; height:60px;
+}
+.header-logo{ display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+.header-logo .mark{ width:32px; height:32px; background:var(--navy); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-weight:800; font-size:0.85rem; }
+.header-logo .name{ font-weight:700; font-size:1rem; color:var(--navy); }
+.header-nav{ display:flex; gap:1.5rem; list-style:none; align-items:center; }
+.header-nav a{ text-decoration:none; font-size:0.82rem; font-weight:500; color:var(--muted); padding:0.2rem 0; border-bottom:2px solid transparent; transition:all 0.2s; }
+.header-nav a:hover,.header-nav a.active{ color:var(--navy); border-bottom-color:var(--green); }
+.header-actions{ display:flex; align-items:center; gap:0.8rem; font-size:0.75rem; color:var(--muted); }
+.menu-btn{ display:none; background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--navy); }
+@media(max-width:768px){
+  .header-nav{ display:none; }
+  .header-nav.open{ display:flex; flex-direction:column; position:absolute; top:60px; left:0; right:0; background:var(--paper); border-bottom:1px solid var(--line); padding:1rem 2rem; gap:0.6rem; }
+  .menu-btn{ display:block; }
+}
+
+/* ── Sections ── */
+.section{ padding:5rem 0; }
+.section-navy{ background:var(--navy); color:#fff; }
+.section-light{ background:var(--bg); }
+.section-surface{ background:var(--surface); }
+@media(max-width:768px){ .section{ padding:3rem 0; } }
+
+/* ── Typography ── */
+.eyebrow{ font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; color:var(--green); }
+.eyebrow-gold{ font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.18em; color:var(--gold); }
+h1.xl{ font-size:clamp(2.5rem,5vw,3.75rem); font-weight:800; line-height:1.07; letter-spacing:-0.04em; color:var(--navy); }
+h2.lg{ font-size:clamp(2rem,4vw,2.75rem); font-weight:700; line-height:1.12; letter-spacing:-0.035em; color:var(--navy); }
+h3.md{ font-size:1.5rem; font-weight:700; line-height:1.2; color:var(--navy); }
+h4.sm{ font-size:1.1rem; font-weight:700; color:var(--navy); }
+.body-lg{ font-size:1.1rem; line-height:1.75; color:var(--muted); }
+.body-base{ font-size:1rem; line-height:1.7; color:var(--muted); }
+.body-sm{ font-size:0.85rem; line-height:1.65; color:var(--muted); }
+.section-navy h1,.section-navy h2,.section-navy h3,.section-navy h4{ color:#fff; }
+.section-navy .body-lg,.section-navy .body-base{ color:rgba(255,255,255,0.7); }
+.breadcrumb{ font-size:0.78rem; color:var(--muted); margin-bottom:1.5rem; }
+.breadcrumb a{ color:var(--muted); text-decoration:none; }
+.breadcrumb span{ color:var(--navy); }
+
+/* ── Cards ── */
+.card{
+  background:var(--paper); border:1px solid var(--line); border-radius:0.5rem;
+  transition:all 0.3s cubic-bezier(0.22,0.61,0.36,1);
+}
+.card:hover{ transform:translateY(-2px); border-color:rgba(17,89,75,0.25); box-shadow:0 4px 20px rgba(7,26,46,0.06); }
+.card-accent{ border-left:3px solid var(--green); border-radius:0 0.5rem 0.5rem 0; }
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex; align-items:center; gap:0.4rem; padding:0.6rem 1.4rem;
+  border-radius:0.4rem; font-size:0.85rem; font-weight:600; cursor:pointer;
+  border:none; text-decoration:none; transition:all 0.2s;
+}
+.btn-primary{ background:var(--green); color:#fff; }
+.btn-primary:hover{ background:#0e4a3e; }
+.btn-outline{ background:transparent; border:1.5px solid var(--line); color:var(--navy); }
+.btn-outline:hover{ border-color:var(--navy); }
+.btn-ghost{ background:transparent; color:var(--green); }
+.btn-ghost:hover{ background:var(--green-soft); }
+.btn-sm{ padding:0.35rem 0.85rem; font-size:0.78rem; }
+.btn-xs{ padding:0.2rem 0.55rem; font-size:0.68rem; border-radius:0.25rem; }
+.btn-white{ background:#fff; color:var(--navy); }
+.btn-gold{ background:var(--gold); color:#fff; }
+
+/* ── Badges ── */
+.badge{ display:inline-block; padding:0.15rem 0.6rem; border-radius:10px; font-size:0.68rem; font-weight:600; }
+.bg-green{ background:var(--green-soft); color:var(--green); }
+.bg-amber{ background:var(--amber-soft); color:var(--amber); }
+.bg-blue{ background:var(--blue-soft); color:var(--blue); }
+.bg-red{ background:var(--red-soft); color:var(--red); }
+.bg-gold{ background:var(--gold-soft); color:var(--gold); }
+.bg-navy{ background:var(--navy-light); color:var(--navy); }
+.bg-gray{ background:var(--surface); color:var(--muted); }
+
+/* ── Grid ── */
+.g2{ display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+.g3{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.g4{ display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; }
+.g23{ display:grid; grid-template-columns:2fr 3fr; gap:2rem; }
+.g32{ display:grid; grid-template-columns:3fr 2fr; gap:2rem; }
+.g-aside{ display:grid; grid-template-columns:1fr 380px; gap:2rem; }
+@media(max-width:992px){ .g3{ grid-template-columns:1fr 1fr; } .g4{ grid-template-columns:1fr 1fr; } .g-aside,.g32,.g23{ grid-template-columns:1fr; } }
+@media(max-width:640px){ .g2,.g3,.g4{ grid-template-columns:1fr; } }
+
+/* ══════════════════════════════════════
+   FEATURE 1 — LIVE PRICE TICKER (homepage)
+   ══════════════════════════════════════ */
+.ticker-section{
+  background:linear-gradient(135deg, var(--green), #0e4a3e);
+  padding:0.9rem 0; overflow:hidden; position:relative;
+}
+.ticker-section::after{
+  content:''; position:absolute; right:0; top:0; bottom:0; width:60px;
+  background:linear-gradient(to right, transparent, var(--green));
+  z-index:2; pointer-events:none;
+}
+.ticker-wrap{ display:flex; gap:2.5rem; animation:ticker 50s linear infinite; }
+@keyframes ticker{ 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.ticker-item{
+  display:flex; align-items:center; gap:0.5rem; white-space:nowrap; flex-shrink:0;
+  color:#fff; font-size:0.8rem; font-variant-numeric:tabular-nums; cursor:pointer;
+}
+.ticker-item:hover{ opacity:0.8; }
+.ticker-star{ color:var(--gold); font-weight:800; }
+.ticker-label{ opacity:0.7; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; }
+.ticker-value{ font-weight:700; font-size:0.9rem; }
+.ticker-change{ font-size:0.68rem; font-weight:600; }
+.ticker-up{ color:#a7f3d0; } .ticker-down{ color:#fecaca; }
+.ticker-dot{ width:5px; height:5px; border-radius:50%; background:#a7f3d0; animation:pulse 1.5s infinite; }
+@keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:0.3} }
+.ticker-footer{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0.3rem 2rem; font-size:0.65rem; color:rgba(255,255,255,0.6);
+}
+
+/* ══════════════════════════════════════
+   FEATURE 1 — PRICE CARDS
+   ══════════════════════════════════════ */
+.primary-price-card{
+  background:var(--paper); border:2px solid var(--green); border-radius:0.75rem;
+  padding:2rem; position:relative; cursor:pointer;
+  transition:all 0.3s; grid-column:1/-1;
+}
+.primary-price-card:hover{ box-shadow:0 8px 32px rgba(7,26,46,0.1); }
+.primary-price-card .star-badge{
+  position:absolute; top:-12px; left:2rem; background:var(--green); color:#fff;
+  padding:0.2rem 0.9rem; border-radius:12px; font-size:0.7rem; font-weight:700;
+  letter-spacing:0.05em;
+}
+.primary-price-card .price-large{ font-size:3.5rem; font-weight:800; color:var(--navy); line-height:1; }
+.primary-price-card .price-change-lg{ font-size:1.1rem; font-weight:600; }
+.primary-price-card .meta-row{
+  display:flex; flex-wrap:wrap; gap:1rem; margin-top:0.5rem;
+  font-size:0.75rem; color:var(--muted);
+}
+
+.price-card{
+  background:var(--paper); border:1px solid var(--line); border-radius:0.5rem;
+  padding:1.25rem; cursor:pointer; transition:all 0.3s;
+}
+.price-card:hover{ border-color:var(--green); box-shadow:0 4px 16px rgba(7,26,46,0.06); }
+.price-card .icon{ font-size:1.2rem; margin-bottom:0.5rem; }
+.price-card .name{ font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:600; }
+.price-card .value{ font-size:1.75rem; font-weight:800; color:var(--navy); margin:0.2rem 0; }
+.price-card .change{ font-size:0.8rem; font-weight:600; }
+.price-card .change.up{ color:var(--green); } .price-card .change.down{ color:var(--red); }
+.price-card .meta{ font-size:0.65rem; color:var(--muted-soft); margin-top:0.3rem; }
+
+/* ── Source status bar ── */
+.source-bar{
+  display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center; padding:0.75rem 1.25rem;
+  background:var(--surface); border:1px solid var(--line); border-radius:0.5rem;
+  font-size:0.75rem;
+}
+.source-dot{ width:6px; height:6px; border-radius:50%; display:inline-block; }
+.source-ok{ background:var(--green); } .source-warn{ background:var(--amber); }
+
+/* ══════════════════════════════════════
+   FEATURE 1 — INTELLIGENCE PAGE
+   ══════════════════════════════════════ */
+.intel-header{
+  background:var(--paper); border:1px solid var(--line); border-radius:0.75rem;
+  padding:1.5rem 2rem;
+}
+.intel-chart-box{ min-height:280px; }
+.intel-section{
+  background:var(--paper); border:1px solid var(--line); border-radius:0.5rem;
+  padding:1.5rem; margin-bottom:1.5rem;
+}
+
+/* ══════════════════════════════════════
+   FEATURE 2 — PROJECTS PAGE
+   ══════════════════════════════════════ */
+.filter-pills{ display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.75rem; }
+.filter-pill{
+  padding:0.4rem 1rem; border:1px solid var(--line); border-radius:20px;
+  font-size:0.78rem; cursor:pointer; background:var(--paper); transition:all 0.2s;
+  font-weight:500;
+}
+.filter-pill.active{ background:var(--green); color:#fff; border-color:var(--green); }
+.filter-pill:hover:not(.active){ border-color:var(--muted-soft); }
+.filter-row{ display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; }
+.filter-select{
+  border:1px solid var(--line); border-radius:0.4rem; padding:0.4rem 0.75rem;
+  font-size:0.8rem; background:var(--paper); color:var(--fg);
+}
+.search-input{
+  border:1px solid var(--line); border-radius:0.4rem; padding:0.4rem 0.75rem;
+  font-size:0.8rem; background:var(--paper); min-width:200px;
+}
+
+.project-card{
+  background:var(--paper); border:1px solid var(--line); border-radius:0.5rem;
+  padding:1.25rem; transition:all 0.3s;
+}
+.project-card:hover{ border-color:var(--green); box-shadow:0 4px 16px rgba(7,26,46,0.06); }
+.project-card .p-status{ margin-bottom:0.4rem; }
+.project-card .p-category{ font-size:0.68rem; color:var(--muted-soft); }
+.project-card .p-title{ font-size:1rem; font-weight:700; color:var(--navy); margin:0.3rem 0; }
+.project-card .p-route{ font-size:0.78rem; color:var(--muted); margin-bottom:0.3rem; }
+.project-card .p-capacity{ font-size:0.85rem; font-weight:600; color:var(--navy); margin-bottom:0.3rem; }
+.project-card .p-operators{ font-size:0.75rem; color:var(--muted-soft); margin-bottom:0.5rem; }
+.project-card .p-source{ font-size:0.68rem; color:var(--muted-soft); }
+.project-card .p-source a{ color:var(--green); text-decoration:none; }
+
+/* ══════════════════════════════════════
+   FEATURE 2 — LEAFLET MAP
+   ══════════════════════════════════════ */
+#algeriaMap{
+  height:480px; width:100%; border-radius:0.75rem;
+  border:1px solid var(--line); z-index:1;
+}
+.leaflet-container{ font-family:inherit; border-radius:0.75rem; }
+.map-legend{
+  position:absolute; bottom:20px; right:20px; background:var(--paper);
+  border:1px solid var(--line); border-radius:0.4rem; padding:0.6rem 0.8rem;
+  font-size:0.68rem; z-index:1000; box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.leaflet-popup-content{ font-family:inherit; font-size:0.8rem; }
+.leaflet-popup-content strong{ color:var(--navy); }
+
+/* ══════════════════════════════════════
+   ADMIN REVIEW
+   ══════════════════════════════════════ */
+.admin-bar{ background:var(--navy); color:rgba(255,255,255,0.6); padding:0.4rem 1.5rem; font-size:0.7rem; text-align:center; }
+.review-tabs{ display:flex; gap:0; border-bottom:2px solid var(--line); margin-bottom:1.5rem; }
+.review-tab{
+  padding:0.6rem 1.25rem; font-size:0.8rem; font-weight:600; cursor:pointer;
+  color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-2px;
+  transition:all 0.2s;
+}
+.review-tab.active{ color:var(--navy); border-bottom-color:var(--green); }
+.review-tab .count{ font-size:0.65rem; padding:1px 6px; border-radius:8px; margin-left:0.3rem; }
+.review-tab .count.amber{ background:var(--amber-soft); color:var(--amber); }
+.review-tab .count.blue{ background:var(--blue-soft); color:var(--blue); }
+.review-tab .count.red{ background:var(--red-soft); color:var(--red); }
+
+.review-card{
+  background:var(--paper); border:1px solid var(--line); border-radius:0.5rem;
+  padding:1.25rem; margin-bottom:0.75rem;
+}
+.review-card .r-header{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem; }
+.review-card .r-title{ font-size:1rem; font-weight:700; color:var(--navy); }
+.review-card .r-source{ font-size:0.7rem; color:var(--muted-soft); }
+.review-card .r-fields{ display:flex; flex-wrap:wrap; gap:0.6rem; margin-bottom:0.75rem; font-size:0.8rem; color:var(--muted); }
+.review-card .r-actions{ display:flex; gap:0.5rem; flex-wrap:wrap; }
+.review-card .r-diff{ background:var(--gold-soft); padding:0.3rem 0.6rem; border-radius:0.3rem; font-size:0.72rem; color:var(--gold); }
+
+/* ── Project Detail Modal ── */
+.modal-overlay{
+  display:none; position:fixed; inset:0; background:rgba(7,26,46,0.6);
+  backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center;
+  padding:1rem;
+}
+.modal-overlay.open{ display:flex; animation:fadeIn 0.2s ease; }
+.modal{
+  background:var(--paper); border:1px solid var(--line); border-radius:0.75rem;
+  max-width:720px; width:100%; max-height:85vh; overflow-y:auto;
+  box-shadow:0 20px 60px rgba(7,26,46,0.2);
+}
+.modal-header{
+  padding:1.5rem 1.5rem 0; display:flex; justify-content:space-between;
+  align-items:flex-start; gap:0.75rem;
+}
+.modal-close{
+  background:none; border:none; font-size:1.5rem; cursor:pointer;
+  color:var(--muted); line-height:1; padding:0.25rem; flex-shrink:0;
+}
+.modal-close:hover{ color:var(--navy); }
+.modal-body{ padding:0 1.5rem 1.5rem; }
+.modal-field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+.modal-field{ padding:0.6rem 0.75rem; background:var(--surface); border-radius:0.4rem; }
+.modal-field .f-label{ font-size:0.65rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted-soft); }
+.modal-field .f-value{ font-size:0.85rem; font-weight:600; color:var(--navy); margin-top:0.1rem; }
+.modal-section{ margin-top:1.25rem; }
+.modal-sync-item{ padding:0.35rem 0; border-bottom:1px solid var(--line-soft); font-size:0.75rem; color:var(--muted); }
+
+/* ── Slogan Banner ── */
+.slogan-banner{
+  background:var(--navy); text-align:center; padding:4rem 0;
+  position:relative; overflow:hidden;
+}
+.slogan-banner .gold-line{
+  height:2px; background:linear-gradient(to right, transparent, var(--gold), transparent);
+  max-width:180px; margin:0 auto;
+}
+.slogan-banner .text{ font-size:clamp(1.6rem,4vw,2.4rem); font-weight:300; line-height:1.4; color:#fff; max-width:600px; margin:1.5rem auto; }
+.slogan-banner .text .gold{ color:var(--gold); }
+.slogan-banner .sub{ font-size:0.9rem; text-transform:uppercase; letter-spacing:0.2em; opacity:0.45; }
+
+/* ── Page switching ── */
+.page{ display:none; }
+.page.active{ display:block; animation:fadeIn 0.3s ease; }
+@keyframes fadeIn{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── Misc ── */
+hr.divider{ border:none; border-top:1px solid var(--line); margin:2rem 0; }
+.mt-6{ margin-top:1.5rem; } .mt-8{ margin-top:2rem; } .mt-12{ margin-top:3rem; }
+.mb-4{ margin-bottom:1rem; } .mb-6{ margin-bottom:1.5rem; } .mb-8{ margin-bottom:2rem; }
+.text-green{ color:var(--green); } .text-red{ color:var(--red); }
+.font-bold{ font-weight:700; }
+
+/* ── Confidence + Source pills ── */
+.src-pill{
+  display:inline-flex; align-items:center; gap:0.3rem; padding:0.1rem 0.45rem;
+  border-radius:3px; font-size:0.63rem; font-weight:600;
+}
+.conf-bar{ height:4px; border-radius:2px; background:var(--line-soft); overflow:hidden; width:60px; }
+.conf-fill{ height:100%; border-radius:2px; }
+.conf-high{ background:var(--green); } .conf-med{ background:var(--amber); } .conf-low{ background:var(--red); }
+
+/* ── Table ── */
+.data-table{ width:100%; border-collapse:collapse; font-size:0.85rem; }
+.data-table th{ text-align:left; padding:0.7rem 1rem; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); border-bottom:2px solid var(--line); background:var(--surface); }
+.data-table td{ padding:0.7rem 1rem; border-bottom:1px solid var(--line-soft); }
+.data-table tr:hover td{ background:var(--green-soft); }
+.text-right{ text-align:right; }
+
+/* ── Footer ── */
+.footer{ background:var(--navy); color:rgba(255,255,255,0.55); padding:2.5rem 0; font-size:0.8rem; border-top:2px solid var(--gold); }
+.footer-inner{ max-width:1240px; margin:0 auto; padding:0 2rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; }
+
+/* ── Demo nav (bottom sticky) ── */
+.demo-nav{
+  position:fixed; bottom:0; left:0; right:0; background:var(--paper);
+  border-top:1px solid var(--line); padding:0.5rem 1rem;
+  display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;
+  z-index:200; font-size:0.75rem; box-shadow:0 -2px 12px rgba(0,0,0,0.05);
+}
+.demo-nav button{
+  padding:0.4rem 0.9rem; border:1px solid var(--line); border-radius:6px;
+  background:var(--paper); cursor:pointer; font-size:0.72rem; font-weight:500;
+  color:var(--muted); transition:all 0.2s;
+}
+.demo-nav button.active{ background:var(--green); color:#fff; border-color:var(--green); }
+.demo-nav button:hover:not(.active){ border-color:var(--navy); color:var(--navy); }
+body{ padding-bottom:50px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     HEADER
+     ══════════════════════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <a href="#" class="header-logo" onclick="navTo('home');return false;">
+      <div class="mark">RB</div>
+      <span class="name">RamBelEnergy</span>
+    </a>
+    <button class="menu-btn" onclick="document.querySelector('.header-nav').classList.toggle('open')">☰</button>
+    <nav>
+      <ul class="header-nav" id="headerNav">
+        <li><a href="#" data-p="home" class="active" onclick="navTo('home');return false;">Home</a></li>
+        <li><a href="#" data-p="prices" onclick="navTo('prices');return false;">Energy Prices</a></li>
+        <li><a href="#" data-p="intelligence" onclick="navTo('intelligence');return false;">Intelligence</a></li>
+        <li><a href="#" data-p="projects" onclick="navTo('projects');return false;">Projects</a></li>
+        <li><a href="#" data-p="admin" onclick="navTo('admin');return false;" style="opacity:0.5;">Admin</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <span>🔍</span><span>🌐 EN</span><span>🌙</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     GLOBAL LIVE PRICE TICKER (visible on all pages)
+     ══════════════════════════════════════ -->
+<div class="ticker-section" id="globalTicker">
+  <div class="ticker-wrap" id="ticker">
+    <div class="ticker-item" onclick="navTo('intelligence')"><span class="ticker-star">★</span> <span class="ticker-label">Saharan Blend</span> <span class="ticker-value">$94.20</span> <span class="ticker-change ticker-down">▼0.9%</span> <span style="font-size:0.6rem;opacity:0.5;">Platts·RT·High</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">Brent</span> <span class="ticker-value">$93.68</span> <span class="ticker-change ticker-down">▼1.2%</span> <span style="font-size:0.6rem;opacity:0.5;">Platts·RT·High</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">WTI</span> <span class="ticker-value">$89.45</span> <span class="ticker-change ticker-up">▲0.3%</span> <span style="font-size:0.6rem;opacity:0.5;">EIA·15min·High</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">OPEC Basket</span> <span class="ticker-value">$92.10</span> <span class="ticker-change ticker-down">▼0.8%</span> <span style="font-size:0.6rem;opacity:0.5;">OPEC·Daily</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">Murban</span> <span class="ticker-value">$91.55</span> <span class="ticker-change ticker-down">▼0.5%</span> <span style="font-size:0.6rem;opacity:0.5;">Platts·RT</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">TTF</span> <span class="ticker-value">€28.40</span> <span class="ticker-change ticker-up">▲1.8%</span> <span style="font-size:0.6rem;opacity:0.5;">ICE·30min</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">Henry Hub</span> <span class="ticker-value">$3.15</span> <span class="ticker-change ticker-down">▼0.7%</span> <span style="font-size:0.6rem;opacity:0.5;">EIA·Daily</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item" onclick="navTo('intelligence')"><span class="ticker-star">★</span> <span class="ticker-label">Saharan Blend</span> <span class="ticker-value">$94.20</span> <span class="ticker-change ticker-down">▼0.9%</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">Brent</span> <span class="ticker-value">$93.68</span> <span class="ticker-change ticker-down">▼1.2%</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">WTI</span> <span class="ticker-value">$89.45</span> <span class="ticker-change ticker-up">▲0.3%</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">OPEC Basket</span> <span class="ticker-value">$92.10</span> <span class="ticker-change ticker-down">▼0.8%</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">Murban</span> <span class="ticker-value">$91.55</span> <span class="ticker-change ticker-down">▼0.5%</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">TTF</span> <span class="ticker-value">€28.40</span> <span class="ticker-change ticker-up">▲1.8%</span></div>
+    <div class="ticker-item" onclick="navTo('intelligence')"> <span class="ticker-label">Henry Hub</span> <span class="ticker-value">$3.15</span> <span class="ticker-change ticker-down">▼0.7%</span></div>
+  </div>
+  <div class="ticker-footer">
+    <span>Live Energy Markets ● Auto-updates every 5 min</span>
+    <span style="cursor:pointer;" onclick="navTo('prices')">View All Prices →</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: HOME
+     ══════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- Hero -->
+  <section class="section-light section" style="padding-bottom:3rem;">
+    <div class="container">
+      <div class="g2" style="align-items:center;">
+        <div>
+          <p class="eyebrow mb-4">Real-Time Energy Intelligence</p>
+          <h1 class="xl">Strategic Energy<br>Research & Analysis</h1>
+          <p class="body-lg mt-6" style="max-width:460px;">
+            Independent, data-driven intelligence covering oil, gas, renewables, and energy geopolitics with a focus on Algeria, Africa, and Euro-Mediterranean cooperation.
+          </p>
+          <div style="display:flex; gap:0.75rem; margin-top:2rem; flex-wrap:wrap;">
+            <a href="#" class="btn btn-primary" onclick="navTo('intelligence');return false;">Explore Intelligence →</a>
+            <a href="#" class="btn btn-outline" onclick="navTo('prices');return false;">View Live Prices</a>
+          </div>
+        </div>
+        <div class="g2" style="align-content:start;">
+          <div class="card" style="padding:1rem; text-align:center;">
+            <div style="font-size:0.65rem; text-transform:uppercase; color:var(--muted-soft);">Brent Crude</div>
+            <div style="font-size:1.5rem; font-weight:800; color:var(--navy);">$93.68</div>
+            <div style="font-size:0.75rem; color:var(--red); font-weight:600;">▼ 1.2%</div>
+            <svg viewBox="0 0 120 30" style="width:100%;height:28px;margin-top:0.3rem;"><path d="M0,20 L20,22 L40,18 L60,15 L80,12 L100,10 L120,8" stroke="#c53030" stroke-width="1.5" fill="none"/></svg>
+          </div>
+          <div class="card" style="padding:1rem; text-align:center;">
+            <div style="font-size:0.65rem; text-transform:uppercase; color:var(--muted-soft);">TTF Natural Gas</div>
+            <div style="font-size:1.5rem; font-weight:800; color:var(--navy);">€28.40</div>
+            <div style="font-size:0.75rem; color:var(--green); font-weight:600;">▲ 1.8%</div>
+            <svg viewBox="0 0 120 30" style="width:100%;height:28px;margin-top:0.3rem;"><path d="M0,18 L20,15 L40,12 L60,14 L80,10 L100,11 L120,9" stroke="#11594b" stroke-width="1.5" fill="none"/></svg>
+          </div>
+          <div class="card" style="padding:1rem; text-align:center;">
+            <div style="font-size:0.65rem; text-transform:uppercase; color:var(--muted-soft);">WTI Crude</div>
+            <div style="font-size:1.5rem; font-weight:800; color:var(--navy);">$89.45</div>
+            <div style="font-size:0.75rem; color:var(--green); font-weight:600;">▲ 0.3%</div>
+            <svg viewBox="0 0 120 30" style="width:100%;height:28px;margin-top:0.3rem;"><path d="M0,15 L20,14 L40,10 L60,12 L80,8 L100,6 L120,5" stroke="#11594b" stroke-width="1.5" fill="none"/></svg>
+          </div>
+          <div class="card" style="padding:1rem; text-align:center;">
+            <div style="font-size:0.65rem; text-transform:uppercase; color:var(--muted-soft);">Carbon EUA</div>
+            <div style="font-size:1.5rem; font-weight:800; color:var(--navy);">€72.30</div>
+            <div style="font-size:0.75rem; color:var(--red); font-weight:600;">▼ 1.4%</div>
+            <svg viewBox="0 0 120 30" style="width:100%;height:28px;margin-top:0.3rem;"><path d="M0,10 L20,12 L40,15 L60,18 L80,20 L100,22 L120,24" stroke="#c53030" stroke-width="1.5" fill="none"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slogan Banner -->
+  <div class="slogan-banner">
+    <div class="gold-line"></div>
+    <p class="text">Connecting Algeria,<br><span class="gold">Europe and Africa</span></p>
+    <p class="sub">Through Energy</p>
+    <div class="gold-line"></div>
+  </div>
+
+  <!-- Stats -->
+  <section class="section-light section">
+    <div class="container">
+      <div class="g4">
+        <div class="card" style="padding:1.5rem; text-align:center;"><div style="font-size:2rem; font-weight:800; color:var(--navy);">1,247</div><div class="body-sm">Energy Projects Tracked</div><div style="color:var(--green); font-size:0.75rem; font-weight:600;">+38 this month</div></div>
+        <div class="card" style="padding:1.5rem; text-align:center;"><div style="font-size:2rem; font-weight:800; color:var(--navy);">89</div><div class="body-sm">Countries Covered</div><div class="body-sm">Global reach</div></div>
+        <div class="card" style="padding:1.5rem; text-align:center;"><div style="font-size:2rem; font-weight:800; color:var(--navy);">5,420</div><div class="body-sm">Intelligence Reports</div><div style="color:var(--green); font-size:0.75rem; font-weight:600;">Updated daily</div></div>
+        <div class="card" style="padding:1.5rem; text-align:center;"><div style="font-size:2rem; font-weight:800; color:var(--navy);">98.7%</div><div class="body-sm">Data Accuracy</div><div style="color:var(--green); font-size:0.75rem; font-weight:600;">AI-verified</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-navy section" style="text-align:center;">
+    <div class="container" style="max-width:600px;">
+      <p class="eyebrow-gold mb-4">Research & Collaboration</p>
+      <h2 class="lg" style="margin-bottom:1rem;">Research, Media & Strategic Energy Collaboration</h2>
+      <p class="body-base" style="margin-bottom:2rem;">For research inquiries, institutional discussions, or strategic energy collaboration, contact RamBelEnergy.</p>
+      <a href="#" class="btn btn-gold">Contact →</a>
+    </div>
+  </section>
+
+</div><!-- /home -->
+
+<!-- ══════════════════════════════════════
+     PAGE: ENERGY PRICES (per PRD §3.2.2)
+     ══════════════════════════════════════ -->
+<div class="page" id="page-prices">
+
+  <section class="section-light" style="border-bottom:1px solid var(--line); padding-top:2.5rem; padding-bottom:2rem;">
+    <div class="container">
+      <div class="breadcrumb"><a href="#" onclick="navTo('home');return false;">Home</a> › <span>Energy Prices</span></div>
+      <h1 class="xl">Energy Intelligence Platform</h1>
+      <p class="body-lg" style="margin-top:0.5rem;">Real-time energy commodity prices from authoritative sources. Updated every 5 minutes. <strong>Last update: 2026-06-22 11:30 UTC</strong></p>
+    </div>
+  </section>
+
+  <section class="section-light section">
+    <div class="container">
+
+      <!-- PRIMARY BENCHMARK CARD (Saharan Blend — large, highlighted) -->
+      <div class="primary-price-card" style="margin-bottom:2rem;" onclick="navTo('intelligence')">
+        <div class="star-badge">★ PRIMARY BENCHMARK</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:2rem;">
+          <div>
+            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); font-weight:600;">Saharan Blend</div>
+            <div style="font-size:0.7rem; color:var(--gold); font-weight:600; margin-top:0.15rem;">★ Algerian Crude Benchmark</div>
+            <div class="price-large" style="margin:0.5rem 0;">$94.20</div>
+            <div class="price-change-lg text-red">▼ 0.89% &nbsp; −$0.85</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="meta-row" style="justify-content:flex-end;">
+              <span>Source: <strong>Platts</strong></span>
+              <span>·</span>
+              <span><span style="color:var(--green);">●</span> Real-time</span>
+              <span>·</span>
+              <span>●●● High confidence</span>
+            </div>
+            <div style="font-size:0.7rem; color:var(--muted-soft); margin-top:0.25rem;">Last updated: 2026-06-22 11:30 UTC</div>
+            <div style="margin-top:1rem;">
+              <span class="btn btn-ghost btn-sm">View Intelligence →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Standard Price Cards Grid (2x3) -->
+      <div class="g3" style="margin-bottom:2rem;">
+        <div class="price-card" onclick="navTo('intelligence')">
+          <div class="icon">🛢️</div>
+          <div class="name">Brent</div>
+          <div class="value">$93.68</div>
+          <div class="change down">▼1.2% &nbsp; −$1.14</div>
+          <div class="meta">Platts · ● Real-time · ●●● High</div>
+          <div style="margin-top:0.5rem; font-size:0.7rem; color:var(--green);">Intelligence →</div>
+        </div>
+        <div class="price-card" onclick="navTo('intelligence')">
+          <div class="icon">🛢️</div>
+          <div class="name">WTI</div>
+          <div class="value">$89.45</div>
+          <div class="change up">▲0.3% &nbsp; +$0.27</div>
+          <div class="meta">EIA · ◐ 15min delay · ●●○ Med</div>
+          <div style="margin-top:0.5rem; font-size:0.7rem; color:var(--green);">Intelligence →</div>
+        </div>
+        <div class="price-card" onclick="navTo('intelligence')">
+          <div class="icon">📊</div>
+          <div class="name">OPEC Basket</div>
+          <div class="value">$92.10</div>
+          <div class="change down">▼0.8% &nbsp; −$0.74</div>
+          <div class="meta">OPEC · ○ Daily · ●●○ Med</div>
+          <div style="font-size:0.6rem; color:var(--blue); margin-top:0.2rem;">Validation Reference</div>
+        </div>
+        <div class="price-card" onclick="navTo('intelligence')">
+          <div class="icon">🛢️</div>
+          <div class="name">Murban</div>
+          <div class="value">$91.55</div>
+          <div class="change down">▼0.5% &nbsp; −$0.46</div>
+          <div class="meta">Platts · ● Real-time · ●●● High</div>
+        </div>
+        <div class="price-card" onclick="navTo('intelligence')">
+          <div class="icon">🔥</div>
+          <div class="name">TTF Natural Gas</div>
+          <div class="value">€28.40</div>
+          <div class="change up">▲1.8% &nbsp; +€0.50</div>
+          <div class="meta">ICE · ◐ 30min delay · ●●○ Med</div>
+        </div>
+        <div class="price-card" onclick="navTo('intelligence')">
+          <div class="icon">🔥</div>
+          <div class="name">Henry Hub</div>
+          <div class="value">$3.15</div>
+          <div class="change down">▼0.7% &nbsp; −$0.02</div>
+          <div class="meta">EIA · ○ Daily · ●●○ Med</div>
+        </div>
+      </div>
+
+      <!-- Source Status Bar -->
+      <div class="source-bar">
+        <span style="font-weight:600; color:var(--navy);">Source Status:</span>
+        <span><span class="source-dot source-ok"></span> Platts ✓</span>
+        <span><span class="source-dot source-warn"></span> Argus ⚠</span>
+        <span><span class="source-dot source-ok"></span> OPEC ✓</span>
+        <span><span class="source-dot source-ok"></span> EIA ✓</span>
+        <span><span class="source-dot source-ok"></span> OilPrice ✓</span>
+        <span style="margin-left:auto; font-size:0.7rem; color:var(--amber);">⚠ Saharan Blend temporarily unavailable — Brent shown as primary. OPEC Basket shown for validation.</span>
+      </div>
+
+      <!-- Historical Table -->
+      <div class="card mt-8" style="padding:0; overflow:hidden;">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Brent</th><th>WTI</th><th>Saharan Blend</th><th>TTF</th><th>Henry Hub</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Jun 22, 2026</strong></td><td class="text-right">$93.68</td><td class="text-right">$89.45</td><td class="text-right"><strong>$94.20</strong></td><td class="text-right">€28.40</td><td class="text-right">$3.15</td></tr>
+            <tr><td>Jun 19, 2026</td><td class="text-right">$94.82</td><td class="text-right">$89.18</td><td class="text-right">$95.05</td><td class="text-right">€27.90</td><td class="text-right">$3.17</td></tr>
+            <tr><td>Jun 18, 2026</td><td class="text-right">$94.10</td><td class="text-right">$88.90</td><td class="text-right">$94.50</td><td class="text-right">€27.45</td><td class="text-right">$3.20</td></tr>
+            <tr><td>Jun 17, 2026</td><td class="text-right">$95.20</td><td class="text-right">$89.50</td><td class="text-right">$95.40</td><td class="text-right">€26.80</td><td class="text-right">$3.22</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+</div><!-- /prices -->
+
+<!-- ══════════════════════════════════════
+     PAGE: INTELLIGENCE (per PRD §3.2.3)
+     ══════════════════════════════════════ -->
+<div class="page" id="page-intelligence">
+
+  <section class="section-light" style="border-bottom:1px solid var(--line); padding-top:2.5rem; padding-bottom:2rem;">
+    <div class="container">
+      <div class="breadcrumb"><a href="#" onclick="navTo('prices');return false;">Energy Prices</a> › <span>Saharan Blend Intelligence</span></div>
+
+      <!-- Intel Price Header -->
+      <div class="intel-header">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); font-weight:600;">★ Saharan Blend</div>
+            <div style="font-size:2.5rem; font-weight:800; color:var(--navy);">$94.20 <span style="font-size:1rem; color:var(--red);">▼0.9%</span></div>
+          </div>
+          <div style="text-align:right; font-size:0.75rem; color:var(--muted);">
+            <div>· Platts · ● Real-time · ●●● High confidence</div>
+            <div>Algerian crude benchmark — last updated 11:30 UTC</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-light section">
+    <div class="container">
+      <div class="g-aside">
+
+        <!-- Main content -->
+        <div>
+
+          <!-- Historical Trend + AI Analysis (side by side) -->
+          <div class="g2" style="margin-bottom:1.5rem;">
+            <div class="intel-section intel-chart-box">
+              <h4 class="sm" style="margin-bottom:1rem;">Historical Trend</h4>
+              <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+                <span class="badge bg-green">7d</span>
+                <span class="badge bg-navy">30d</span>
+                <span class="badge bg-gray">90d</span>
+                <span class="badge bg-gray">1y</span>
+              </div>
+              <!-- SVG chart -->
+              <svg viewBox="0 0 400 180" style="width:100%; height:180px;">
+                <line x1="40" y1="30" x2="390" y2="30" stroke="#e2e5e0" stroke-width="0.5"/><line x1="40" y1="80" x2="390" y2="80" stroke="#e2e5e0" stroke-width="0.5"/>
+                <line x1="40" y1="130" x2="390" y2="130" stroke="#e2e5e0" stroke-width="1"/>
+                <text x="35" y="34" text-anchor="end" font-size="9" fill="#88909a">$96</text><text x="35" y="84" text-anchor="end" font-size="9" fill="#88909a">$95</text><text x="35" y="134" text-anchor="end" font-size="9" fill="#0f1923" font-weight="600">$94</text>
+                <path d="M50,110 L100,100 L150,85 L200,90 L250,70 L300,65 L350,75 L390,80" fill="none" stroke="#11594b" stroke-width="2.5"/>
+                <path d="M50,110 L100,100 L150,85 L200,90 L250,70 L300,65 L350,75 L390,80 L390,170 L50,170Z" fill="#11594b" opacity="0.06"/>
+                <circle cx="390" cy="80" r="5" fill="#11594b"/>
+              </svg>
+            </div>
+            <div class="intel-section">
+              <h4 class="sm" style="margin-bottom:1rem;">AI Market Analysis</h4>
+              <p class="body-sm" style="margin-bottom:0.75rem;">Saharan Blend declined 0.9% today, driven by broader crude market weakness following OPEC+ signals of potential production increases in Q3 2026. The Algerian benchmark is trading at a slight premium to Brent, reflecting strong Mediterranean demand.</p>
+              <div style="font-size:0.7rem; color:var(--muted-soft);">
+                <strong>Sources used:</strong> OPEC MOMR (Jun 2026), Platts Crude Oil Marketwire (Jun 22, 2026), Sonatrach PR (Jun 15, 2026)
+              </div>
+              <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--green); cursor:pointer;">Expand Analysis →</div>
+            </div>
+          </div>
+
+          <!-- Related News -->
+          <div class="intel-section">
+            <h4 class="sm" style="margin-bottom:1rem;">Related News & Analysis</h4>
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+              <div style="padding:0.5rem 0; border-bottom:1px solid var(--line-soft);">
+                <div style="font-size:0.85rem; color:var(--navy); font-weight:600; cursor:pointer;">Sonatrach announces new production targets for Hassi Messaoud field</div>
+                <div style="font-size:0.7rem; color:var(--muted-soft);">sonatrach.com · 2 days ago</div>
+              </div>
+              <div style="padding:0.5rem 0; border-bottom:1px solid var(--line-soft);">
+                <div style="font-size:0.85rem; color:var(--navy); font-weight:600; cursor:pointer;">OPEC+ maintains output cuts through Q3 2026</div>
+                <div style="font-size:0.7rem; color:var(--muted-soft);">reuters.com · 3 days ago</div>
+              </div>
+              <div style="padding:0.5rem 0;">
+                <div style="font-size:0.85rem; color:var(--navy); font-weight:600; cursor:pointer;">Algerian crude exports to Europe rise 2.3% in May</div>
+                <div style="font-size:0.7rem; color:var(--muted-soft);">energy.gov.dz · 5 days ago</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Production & Country Context -->
+          <div class="intel-section">
+            <h4 class="sm" style="margin-bottom:1rem;">Production & Country Context</h4>
+            <div class="g2">
+              <div class="body-sm">Algeria crude production: <strong style="color:var(--navy);">~960,000 bpd</strong> (OPEC MOMR Jun 2026)</div>
+              <div class="body-sm">Main export destinations: <strong style="color:var(--navy);">Italy, France, Spain, Netherlands</strong></div>
+              <div class="body-sm">Key infrastructure: <strong style="color:var(--navy);">MEDGAZ Pipeline, TransMed Pipeline</strong></div>
+              <div class="body-sm">API gravity: ~45° · Sulfur: ~0.10%</div>
+            </div>
+            <div style="margin-top:1rem;">
+              <a href="#" class="btn btn-ghost btn-sm" onclick="navTo('projects');return false;">View Algeria Energy Projects →</a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+          <!-- Related Benchmarks -->
+          <div class="intel-section" style="margin-bottom:1rem;">
+            <h4 class="sm" style="margin-bottom:0.75rem;">Related Benchmarks</h4>
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+              <div style="display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid var(--line-soft); font-size:0.8rem; cursor:pointer;">
+                <span>🛢️ Brent</span><span><strong>$93.68</strong> <span style="color:var(--red);">▼1.2%</span></span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid var(--line-soft); font-size:0.8rem; cursor:pointer;">
+                <span>📊 OPEC Basket</span><span><strong>$92.10</strong> <span style="color:var(--red);">▼0.8%</span></span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:0.4rem 0; font-size:0.8rem; cursor:pointer;">
+                <span>🛢️ Murban</span><span><strong>$91.55</strong> <span style="color:var(--red);">▼0.5%</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sources & References -->
+          <div class="intel-section">
+            <h4 class="sm" style="margin-bottom:0.75rem;">Sources & References</h4>
+            <div style="font-size:0.72rem; color:var(--muted);">
+              <p style="font-weight:600; margin-bottom:0.5rem; color:var(--navy);">AI analysis used:</p>
+              <div style="display:flex; flex-direction:column; gap:0.3rem; margin-bottom:0.75rem;">
+                <div>• OPEC Monthly Oil Market Report (June 2026)</div>
+                <div>• Platts Crude Oil Marketwire (June 22, 2026)</div>
+                <div>• Sonatrach press release (June 15, 2026)</div>
+              </div>
+              <p style="font-weight:600; margin-bottom:0.5rem; color:var(--navy);">Official reports & publications:</p>
+              <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <div>• IEA Oil Market Report — June 2026</div>
+                <div>• EIA Short-Term Energy Outlook — June 2026</div>
+                <div>• Algeria Ministry of Energy — Production Statistics 2025</div>
+                <div>• Platts Crude Oil Marketwire — daily</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div><!-- /intelligence -->
+
+<!-- ══════════════════════════════════════
+     PAGE: ALGERIA ENERGY PROJECTS (per PRD §3.3)
+     ══════════════════════════════════════ -->
+<div class="page" id="page-projects">
+
+  <section class="section-light" style="border-bottom:1px solid var(--line); padding-top:2.5rem; padding-bottom:2rem;">
+    <div class="container">
+      <div class="breadcrumb"><a href="#" onclick="navTo('home');return false;">Home</a> › <span>Algeria Energy Projects</span></div>
+      <h1 class="xl">Algeria Energy Projects Database</h1>
+      <p class="body-lg" style="margin-top:0.5rem;">Comprehensive, self-updating database of energy infrastructure projects across Algeria. Sourced from 19 official channels. <strong>Last sync: 2 hours ago.</strong></p>
+      <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--green); cursor:pointer;">How This Works ↓</div>
+    </div>
+  </section>
+
+  <section class="section-light section">
+    <div class="container">
+
+      <!-- FILTERS (per PRD: pills + dropdowns + search) -->
+      <div class="filter-pills">
+        <span class="filter-pill active">All</span>
+        <span class="filter-pill">🛢️ Oil & Gas</span>
+        <span class="filter-pill">☀️ Renewable</span>
+        <span class="filter-pill">🔥 LNG</span>
+        <span class="filter-pill">⚡ Power</span>
+        <span class="filter-pill">💧 Hydrogen</span>
+      </div>
+      <div class="filter-row">
+        <span style="font-size:0.8rem; color:var(--muted);">Status:</span>
+        <select class="filter-select"><option>All</option><option>Operational</option><option>Under Construction</option><option>Planned</option></select>
+        <span style="font-size:0.8rem; color:var(--muted);">Wilaya:</span>
+        <select class="filter-select"><option>All</option><option>Algiers</option><option>Laghouat</option><option>Ouargla</option><option>Skikda</option></select>
+        <input class="search-input" type="text" placeholder="🔍 Search projects...">
+        <span style="font-size:0.75rem; color:var(--muted-soft);">12 projects shown</span>
+      </div>
+
+      <!-- PROJECT CARDS GRID (3-col per PRD) -->
+      <div class="g3" style="margin-bottom:2rem;">
+        <!-- Card 1 -->
+        <div class="project-card">
+          <div class="p-status"><span class="badge bg-green">🟢 Operational</span> <span class="p-category">📦 Pipeline</span></div>
+          <div class="p-title">Medgaz Gas Pipeline</div>
+          <div class="p-route">Algeria → Spain (Almería)</div>
+          <div class="p-capacity">10 bcm/year capacity</div>
+          <div class="p-operators">Sonatrach · Naturgy</div>
+          <div class="p-source">📎 Source: <a href="#">sonatrach.com</a> · 🕐 Updated: 2026-06-19</div>
+          <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--green); cursor:pointer;" onclick="openProjectModal('medgaz')">View Details →</div>
+        </div>
+        <!-- Card 2 -->
+        <div class="project-card">
+          <div class="p-status"><span class="badge bg-amber">🟡 Under Construction</span> <span class="p-category">☀️ Renewable</span></div>
+          <div class="p-title">Solar 15 GW Programme</div>
+          <div class="p-route">National renewable rollout</div>
+          <div class="p-capacity">15 GW target capacity</div>
+          <div class="p-operators">Sonelgaz · Sonatrach</div>
+          <div class="p-source">📎 Source: <a href="#">energy.gov.dz</a> · 🕐 Updated: 2026-06-16</div>
+          <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--green); cursor:pointer;" onclick="openProjectModal('solar15gw')">View Details →</div>
+        </div>
+        <!-- Card 3 -->
+        <div class="project-card">
+          <div class="p-status"><span class="badge bg-blue">🔵 Planned</span> <span class="p-category">📦 Pipeline</span></div>
+          <div class="p-title">Trans-Saharan Gas Pipeline (TSGP)</div>
+          <div class="p-route">Nigeria → Algeria → Europe</div>
+          <div class="p-capacity">30 bcm/year planned</div>
+          <div class="p-operators">Sonatrach · NNPC · Niger</div>
+          <div class="p-source">📎 Source: <a href="#">energy.gov.dz</a> · 🕐 Updated: 2026-06-10</div>
+          <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--green); cursor:pointer;" onclick="openProjectModal('tsgp')">View Details →</div>
+        </div>
+        <!-- Card 4 -->
+        <div class="project-card">
+          <div class="p-status"><span class="badge bg-green">🟢 Operational</span> <span class="p-category">🔥 LNG</span></div>
+          <div class="p-title">Skikda LNG Terminal</div>
+          <div class="p-route">Mediterranean export hub</div>
+          <div class="p-capacity">Multiple trains</div>
+          <div class="p-operators">Sonatrach</div>
+          <div class="p-source">📎 Source: <a href="#">sonatrach.com</a> · 🕐 Updated: 2026-06-15</div>
+          <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--green); cursor:pointer;" onclick="openProjectModal('skikda')">View Details →</div>
+        </div>
+        <!-- Card 5 -->
+        <div class="project-card">
+          <div class="p-status"><span class="badge bg-blue">🔵 Planned</span> <span class="p-category">💧 Hydrogen</span></div>
+          <div class="p-title">SoutH2 Corridor</div>
+          <div class="p-route">Algeria → Tunisia → Italy → EU</div>
+          <div class="p-capacity">4 Mt/year planned</div>
+          <div class="p-operators">Sonatrach · Snam · Eni</div>
+          <div class="p-source">📎 Source: <a href="#">eni.com</a> · 🕐 Updated: 2026-06-08</div>
+          <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--green); cursor:pointer;" onclick="openProjectModal('south2')">View Details →</div>
+        </div>
+        <!-- Card 6 -->
+        <div class="project-card">
+          <div class="p-status"><span class="badge bg-amber">🟡 Under Construction</span> <span class="p-category">⚡ Power</span></div>
+          <div class="p-title">ELMED Interconnection</div>
+          <div class="p-route">Algeria → Tunisia → Italy</div>
+          <div class="p-capacity">600 MW</div>
+          <div class="p-operators">Sonelgaz · Terna</div>
+          <div class="p-source">📎 Source: <a href="#">sonelgaz.dz</a> · 🕐 Updated: 2026-06-12</div>
+          <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--green); cursor:pointer;" onclick="openProjectModal('elmed')">View Details →</div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE MAP (per PRD §3.3.1) — Leaflet + OpenStreetMap -->
+      <hr class="divider">
+      <h3 class="md" style="text-align:center; margin-bottom:1.5rem;">Interactive Project Map</h3>
+      <div style="position:relative;">
+        <div id="algeriaMap"></div>
+        <div class="map-legend">
+          <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem;"><span style="width:10px;height:10px;background:#11594b;border-radius:50%;"></span> Operational</div>
+          <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem;"><span style="width:10px;height:10px;background:#c05621;border-radius:50%;"></span> Under Construction</div>
+          <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem;"><span style="width:10px;height:10px;background:#2b6cb0;border-radius:50%;"></span> Planned</div>
+          <div style="display:flex; align-items:center; gap:0.4rem;"><span style="width:10px;height:10px;background:#88909a;border-radius:50%;"></span> Proposed</div>
+        </div>
+      </div>
+      <p style="text-align:center; font-size:0.7rem; color:var(--muted-soft); margin-top:0.5rem;">Click marker → Show project popup with name, status, capacity</p>
+
+    </div>
+  </section>
+
+</div><!-- /projects -->
+
+<!-- ══════════════════════════════════════
+     PAGE: ADMIN REVIEW (per PRD §3.3.3)
+     ══════════════════════════════════════ -->
+<div class="page" id="page-admin">
+
+  <div class="admin-bar">⚙️ Admin Panel — Content Review Workflow</div>
+
+  <section style="padding-top:2.5rem; padding-bottom:2rem; border-bottom:1px solid var(--line);">
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h1 class="xl" style="font-size:2rem;">Projects — Review Queue</h1>
+          <p class="body-base">12 pending items</p>
+        </div>
+        <button class="btn btn-primary">+ New Project</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-light section">
+    <div class="container">
+
+      <!-- Tabs (per PRD) -->
+      <div class="review-tabs">
+        <div class="review-tab active">🟡 New <span class="count amber">5</span></div>
+        <div class="review-tab">🔵 Changes <span class="count blue">4</span></div>
+        <div class="review-tab">🔴 Conflicts <span class="count red">3</span></div>
+      </div>
+
+      <!-- Review Card 1: New Project -->
+      <div class="review-card" style="border-left:3px solid var(--amber);">
+        <div class="r-header">
+          <div>
+            <div class="r-title">Hassi R'Mel Solar Plant</div>
+            <div class="r-source">Sonatrach · 2h ago</div>
+          </div>
+          <span class="badge bg-amber">🟡 New Project</span>
+        </div>
+        <div class="r-fields">
+          <span><strong>Sector:</strong> Renewable</span>
+          <span><strong>Type:</strong> Solar</span>
+          <span><strong>Wilaya:</strong> Laghouat</span>
+          <span><strong>Capacity:</strong> 150 MW</span>
+          <span><strong>Status:</strong> Under Construction</span>
+          <span><strong>Operator:</strong> Sonelgaz</span>
+        </div>
+        <div class="body-sm" style="margin-bottom:0.75rem;">New solar PV plant at Hassi R'Mel site, part of national renewable energy programme. Expected completion 2028.</div>
+        <div style="font-size:0.72rem; color:var(--muted-soft); margin-bottom:0.75rem;">📎 Source: sonatrach.com/press/hassi-rmel-solar · Confidence: <span style="color:var(--green); font-weight:600;">High (8/18 fields high confidence)</span></div>
+        <div class="r-actions">
+          <button class="btn btn-primary btn-sm">✓ Approve</button>
+          <button class="btn btn-outline btn-sm">✎ Edit</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red);">✗ Reject</button>
+        </div>
+      </div>
+
+      <!-- Review Card 2: Changes Detected -->
+      <div class="review-card" style="border-left:3px solid var(--blue);">
+        <div class="r-header">
+          <div>
+            <div class="r-title">Medgaz Pipeline Expansion</div>
+            <div class="r-source">Eni · 5h ago</div>
+          </div>
+          <span class="badge bg-blue">🔵 Changes Detected</span>
+        </div>
+        <div style="margin-bottom:0.75rem;">
+          <div class="r-diff" style="margin-bottom:0.3rem;">Capacity: 8 bcm/year → <strong>10 bcm/year</strong></div>
+          <div class="r-diff">Status: Operational → Operational (unchanged)</div>
+        </div>
+        <div style="font-size:0.72rem; color:var(--muted-soft); margin-bottom:0.75rem;">📎 Source: eni.com/media/press-release/medgaz-expansion</div>
+        <div class="r-actions">
+          <button class="btn btn-primary btn-sm">✓ Approve Change</button>
+          <button class="btn btn-outline btn-sm">✕ Dismiss</button>
+          <button class="btn btn-ghost btn-sm">✎ Edit</button>
+        </div>
+      </div>
+
+      <!-- Review Card 3: Conflict -->
+      <div class="review-card" style="border-left:3px solid var(--red);">
+        <div class="r-header">
+          <div>
+            <div class="r-title">TSGP Pipeline — Status Discrepancy</div>
+            <div class="r-source">Reuters · 1 day ago</div>
+          </div>
+          <span class="badge bg-red">🔴 Conflict</span>
+        </div>
+        <div style="margin-bottom:0.75rem;">
+          <div style="display:flex; gap:1rem; flex-wrap:wrap; font-size:0.8rem;">
+            <div><span class="src-pill" style="background:var(--green-soft);color:var(--green);">Tier 1</span> Sonatrach: <strong>Planned</strong></div>
+            <div><span class="src-pill" style="background:var(--blue-soft);color:var(--blue);">Tier 3</span> Reuters: <strong>Under Discussion</strong></div>
+            <div><span class="src-pill" style="background:var(--green-soft);color:var(--green);">Tier 1</span> JORADP: <strong>Proposed</strong></div>
+            <div><span class="src-pill" style="background:var(--blue-soft);color:var(--blue);">Tier 4</span> Eni: <strong>Planned</strong></div>
+          </div>
+        </div>
+        <div class="r-actions">
+          <button class="btn btn-primary btn-sm">Keep Sonatrach (Planned)</button>
+          <button class="btn btn-outline btn-sm">Accept Reuters (Under Discussion)</button>
+          <button class="btn btn-ghost btn-sm">Manual Resolve →</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div><!-- /admin -->
+
+<!-- ══════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div><strong style="color:#fff;">RamBelEnergy</strong><br>Research & Strategic Intelligence<br>Algeria • Europe • Africa</div>
+    <div>© 2026 RamBelEnergy. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     DEMO NAVIGATION BAR (fixed bottom)
+     ══════════════════════════════════════ -->
+<nav class="demo-nav" id="demoNav">
+  <button class="active" data-p="home" onclick="navTo('home')">🏠 Home + Ticker</button>
+  <button data-p="prices" onclick="navTo('prices')">📊 Energy Prices</button>
+  <button data-p="intelligence" onclick="navTo('intelligence')">🧠 Intelligence</button>
+  <button data-p="projects" onclick="navTo('projects')">🗺️ Projects + Map</button>
+  <button data-p="admin" onclick="navTo('admin')">⚙️ Admin Review</button>
+</nav>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ══════════════════════════════════════
+   LEAFLET MAP — Algeria Projects
+   ══════════════════════════════════════ */
+let algeriaMap = null;
+
+const projects = [
+  { id:'medgaz',  name:'Medgaz Pipeline', lat:35.3, lng:-1.45, status:'operational', sector:'Pipeline', capacity:'10 bcm/year', operators:'Sonatrach · Naturgy', source:'sonatrach.com' },
+  { id:'hassirmel',name:'Hassi R\'Mel Gas Field', lat:32.93, lng:3.28, status:'operational', sector:'Upstream', capacity:'~100 bcm/year', operators:'Sonatrach', source:'sonatrach.com' },
+  { id:'skikda',  name:'Skikda LNG Terminal', lat:36.88, lng:6.91, status:'operational', sector:'LNG', capacity:'Multiple trains', operators:'Sonatrach', source:'sonatrach.com' },
+  { id:'arzew',   name:'Arzew LNG Complex', lat:35.86, lng:-0.31, status:'operational', sector:'LNG', capacity:'Various', operators:'Sonatrach', source:'sonatrach.com' },
+  { id:'solar15gw',name:'Solar 15 GW Programme', lat:27.07, lng:2.47, status:'under_construction', sector:'Renewable', capacity:'15 GW target', operators:'Sonelgaz · Sonatrach', source:'energy.gov.dz' },
+  { id:'elmed',   name:'ELMED Interconnection', lat:36.9, lng:7.77, status:'under_construction', sector:'Power', capacity:'600 MW', operators:'Sonelgaz · Terna', source:'sonelgaz.dz' },
+  { id:'tsgp',    name:'Trans-Saharan Gas Pipeline', lat:23.11, lng:5.55, status:'planned', sector:'Pipeline', capacity:'30 bcm/year', operators:'Sonatrach · NNPC', source:'energy.gov.dz' },
+  { id:'south2',  name:'SoutH2 Corridor', lat:30.27, lng:2.29, status:'planned', sector:'Hydrogen', capacity:'4 Mt/year', operators:'Sonatrach · Snam · Eni', source:'eni.com' },
+];
+
+const statusColors = { operational:'#11594b', under_construction:'#c05621', planned:'#2b6cb0', proposed:'#88909a' };
+const statusLabels = { operational:'🟢 Operational', under_construction:'🟡 Under Construction', planned:'🔵 Planned', proposed:'⚪ Proposed' };
+
+function initMap() {
+  if (algeriaMap) return;
+  algeriaMap = L.map('algeriaMap', { scrollWheelZoom:true, zoomControl:true }).setView([28.03, 2.65], 5);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom:18
+  }).addTo(algeriaMap);
+
+  projects.forEach(p => {
+    const color = statusColors[p.status] || '#88909a';
+    const marker = L.circleMarker([p.lat, p.lng], {
+      radius:8, fillColor:color, color:'#fff', weight:2.5, opacity:1, fillOpacity:0.85
+    }).addTo(algeriaMap);
+
+    marker.bindPopup(
+      '<div style="min-width:195px;">' +
+      '<span style="font-size:0.65rem;font-weight:600;color:' + color + ';">' + (statusLabels[p.status] || '') + '</span>' +
+      '<br><strong>' + p.name + '</strong>' +
+      '<br><span style="font-size:0.7rem;color:#5b646e;">' + p.sector + ' · ' + p.capacity + '</span>' +
+      '<br><span style="font-size:0.65rem;color:#88909a;">' + p.operators + '</span>' +
+      '<br><span style="font-size:0.6rem;color:#11594b;">📎 ' + p.source + '</span>' +
+      (p.id ? '<br><span style="display:inline-block;margin-top:0.4rem;font-size:0.7rem;font-weight:600;color:#11594b;cursor:pointer;border-bottom:1px solid #11594b;" onclick="event.stopPropagation();openProjectModal(\'' + p.id + '\');">View Details →</span>' : '') +
+      '</div>'
+    );
+  });
+}
+
+/* ══════════════════════════════════════
+   PROJECT DETAIL DATA + MODAL
+   ══════════════════════════════════════ */
+const projectDetails = {
+  medgaz: {
+    name:'Medgaz Gas Pipeline', status:'operational', category:'Pipeline',
+    description:'Direct subsea natural gas pipeline connecting the Hassi R\'Mel field in Algeria to Almería, Spain. Operational since 2011, recently expanded from 8 bcm/year to 10 bcm/year capacity. Strategic infrastructure for Algerian gas exports to Southern Europe.',
+    fields:{'Location':'Beni Saf, Aïn Témouchent → Almería, Spain','Wilaya':'Aïn Témouchent','Capacity':'10 bcm/year (expanded from 8)','Operator':'Sonatrach','Partners':'Naturgy (Spain), Sonatrach (Algeria)','Start Date':'2008','Completed':'2011','Investment':'~€900 million','GPS':'35.30°N, 1.45°W'},
+    sources:['sonatrach.com/press/medgaz-expansion-2026','eni.com/media/press-release/medgaz','naturgy.com'],
+    sync:[{date:'2026-06-19',action:'Capacity updated: 8 → 10 bcm/year',src:'sonatrach.com'},{date:'2026-06-15',action:'Status confirmed: Operational',src:'eni.com'},{date:'2026-06-10',action:'Project created',src:'sonatrach.com'}]
+  },
+  solar15gw: {
+    name:'Solar 15 GW Programme', status:'under_construction', category:'Renewable',
+    description:'National renewable energy rollout programme targeting 15 GW of solar photovoltaic capacity by 2035. Part of Algeria\'s National Renewable Energy and Energy Efficiency Development Plan. Includes multiple lots across 11 wilayas with 50-200 MW per installation.',
+    fields:{'Location':'11 Wilayas (National)','Capacity':'15 GW target','Operator':'Sonelgaz','Partners':'Sonatrach, SHAEMS, International EPC','Start Date':'2024','Expected Completion':'2035','Investment':'~$3.2 billion','Phase 1':'Solar 1,000 MW (ongoing)','Phase 2':'Solar 2,000 MW (planned)'},
+    sources:['energy.gov.dz','sonelgaz.dz','sonatrach.com'],
+    sync:[{date:'2026-06-16',action:'Status verified: Under Construction',src:'energy.gov.dz'},{date:'2026-05-20',action:'Phase 1 capacity updated',src:'sonelgaz.dz'},{date:'2026-04-12',action:'Project created',src:'energy.gov.dz'}]
+  },
+  tsgp: {
+    name:'Trans-Saharan Gas Pipeline (TSGP)', status:'planned', category:'Pipeline',
+    description:'Proposed 4,128 km natural gas pipeline from Warri, Nigeria through Niger to Hassi R\'Mel, Algeria, connecting to existing Trans-Mediterranean pipelines to Europe. Designed capacity of 30 bcm/year. Project under discussion with multiple stakeholder nations.',
+    fields:{'Route':'Warri (Nigeria) → Niger → Hassi R\'Mel (Algeria) → Europe','Length':'4,128 km','Capacity':'30 bcm/year planned','Operator':'Sonatrach','Partners':'NNPC (Nigeria), Niger Government','Status':'Planned / Under Discussion','Investment':'~$13 billion estimated'},
+    sources:['energy.gov.dz','sonatrach.com','reuters.com'],
+    sync:[{date:'2026-06-10',action:'Status reviewed: Planned',src:'energy.gov.dz'},{date:'2026-05-01',action:'Project created',src:'sonatrach.com'}]
+  },
+  skikda: {
+    name:'Skikda LNG Terminal', status:'operational', category:'LNG',
+    description:'Major LNG export terminal on Algeria\'s Mediterranean coast. Multiple liquefaction trains with combined capacity serving European and Asian markets. Recently underwent modernization to improve efficiency and throughput.',
+    fields:{'Location':'Skikda, Algeria','Wilaya':'Skikda','Capacity':'Multiple trains (various)','Operator':'Sonatrach','Export Markets':'Europe, Asia','Status':'Operational','GPS':'36.88°N, 6.91°E'},
+    sources:['sonatrach.com','sonatrach.com/press/skikda-modernization'],
+    sync:[{date:'2026-06-15',action:'Status confirmed: Operational',src:'sonatrach.com'},{date:'2026-04-20',action:'Modernization update',src:'sonatrach.com'},{date:'2026-03-05',action:'Project created',src:'sonatrach.com'}]
+  },
+  south2: {
+    name:'SoutH2 Corridor', status:'planned', category:'Hydrogen',
+    description:'Major hydrogen pipeline corridor connecting North Africa to Europe. Algeria segment runs from Hassi R\'Mel production hub to the Tunisia border. Part of the European Hydrogen Backbone initiative. Target capacity of 4 million tonnes per year of green hydrogen.',
+    fields:{'Route':'Hassi R\'Mel → Tunisia border → Italy → Austria → Germany','Length':'~3,300 km total','Capacity':'4 Mt/year planned','Operator':'Sonatrach','Partners':'Snam (Italy), Eni (Italy), VERBUND (Austria)','Start Date':'2028 (planned)','Expected Completion':'2035+','Investment':'~€3-4 billion (Algeria segment)'},
+    sources:['eni.com','sonatrach.com','south2corridor.net'],
+    sync:[{date:'2026-06-08',action:'Status verified: Planned',src:'eni.com'},{date:'2026-05-15',action:'Feasibility study update',src:'sonatrach.com'},{date:'2026-04-01',action:'Project created',src:'eni.com'}]
+  },
+  elmed: {
+    name:'ELMED Interconnection', status:'under_construction', category:'Power',
+    description:'600 MW submarine power cable connecting Algeria to Italy via Tunisia. First electrical interconnection between Algeria and Europe. Strengthens energy cooperation and enables renewable electricity export from North Africa to the European grid.',
+    fields:{'Route':'Algeria → Tunisia → Sicily (Italy)','Capacity':'600 MW','Operator':'Sonelgaz','Partners':'Terna (Italy), STEG (Tunisia)','Start Date':'2023','Expected Completion':'2027','Investment':'~€600 million','Cable Length':'~220 km submarine'},
+    sources:['sonelgaz.dz','terna.it'],
+    sync:[{date:'2026-06-12',action:'Construction progress update',src:'sonelgaz.dz'},{date:'2026-05-01',action:'Status verified: Under Construction',src:'terna.it'},{date:'2026-02-15',action:'Project created',src:'sonelgaz.dz'}]
+  },
+  hassirmel: {
+    name:'Hassi R\'Mel Gas Field', status:'operational', category:'Upstream',
+    description:'Algeria\'s largest natural gas field, located in the Sahara Desert south of Algiers. One of the largest gas fields in the world, serving as the central hub for Algeria\'s gas production and pipeline network, feeding both domestic consumption and export pipelines to Europe.',
+    fields:{'Location':'Laghouat Wilaya, Central Algeria','Wilaya':'Laghouat','Capacity':'~100 bcm/year','Operator':'Sonatrach','Reserves':'~2.4 trillion m³ (original)','GPS':'32.93°N, 3.28°E','Discovered':'1956','First Production':'1961'},
+    sources:['sonatrach.com','opec.org'],
+    sync:[{date:'2026-06-01',action:'Production data verified',src:'sonatrach.com'},{date:'2026-05-10',action:'Project created',src:'sonatrach.com'}]
+  },
+  arzew: {
+    name:'Arzew LNG Complex', status:'operational', category:'LNG',
+    description:'Major LNG liquefaction and export complex near Oran on Algeria\'s Mediterranean coast. Comprises multiple trains (GL1Z, GL2Z, GL3Z) with combined capacity serving European and Atlantic markets. One of the oldest and largest LNG facilities in Africa.',
+    fields:{'Location':'Arzew (near Oran), Algeria','Wilaya':'Oran','Capacity':'Multiple trains (various)','Operator':'Sonatrach','Export Markets':'Europe, Atlantic Basin','GPS':'35.86°N, 0.31°W'},
+    sources:['sonatrach.com','sonatrach.com/press/arzew'],
+    sync:[{date:'2026-06-10',action:'Status confirmed: Operational',src:'sonatrach.com'},{date:'2026-04-15',action:'Project created',src:'sonatrach.com'}]
+  }
+};
+
+const _statusLabels = { operational:'🟢 Operational', under_construction:'🟡 Under Construction', planned:'🔵 Planned', proposed:'⚪ Proposed' };
+
+function openProjectModal(id) {
+  const p = projectDetails[id]; if (!p) return;
+  const statusColor = { operational:'#11594b', under_construction:'#c05621', planned:'#2b6cb0', proposed:'#88909a' }[p.status]||'#88909a';
+  document.getElementById('modalStatus').innerHTML = '<span class="badge" style="background:'+statusColor+'15;color:'+statusColor+';">'+_statusLabels[p.status]+'</span> <span style="font-size:0.7rem;color:var(--muted-soft);">'+p.category+'</span>';
+  document.getElementById('modalTitle').textContent = p.name;
+  document.getElementById('modalDesc').textContent = p.description;
+  let fieldsHTML = '';
+  Object.entries(p.fields).forEach(([k,v]) => { fieldsHTML += '<div class="modal-field"><div class="f-label">'+k+'</div><div class="f-value">'+v+'</div></div>'; });
+  document.getElementById('modalFields').innerHTML = fieldsHTML;
+  document.getElementById('modalSources').innerHTML = p.sources.map(s => '<div style="margin-bottom:0.2rem;">📎 <a href="#" style="color:var(--green);text-decoration:none;">'+s+'</a></div>').join('');
+  document.getElementById('modalSync').innerHTML = p.sync.map(s => '<div class="modal-sync-item"><strong>'+s.date+'</strong> — '+s.action+' <span style="color:var(--muted-soft);">('+s.src+')</span></div>').join('');
+  document.getElementById('projectModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('projectModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+/* ══════════════════════════════════════
+   PAGE NAVIGATION
+   ══════════════════════════════════════ */
+function navTo(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) { page.classList.add('active'); page.classList.remove('fadeIn'); void page.offsetWidth; page.style.animation = 'none'; page.offsetHeight; page.style.animation = ''; }
+
+  document.querySelectorAll('#headerNav a').forEach(a => a.classList.remove('active'));
+  const hlink = document.querySelector('#headerNav a[data-p="' + name + '"]');
+  if (hlink) hlink.classList.add('active');
+
+  document.querySelectorAll('#demoNav button').forEach(b => b.classList.remove('active'));
+  const dbtn = document.querySelector('#demoNav button[data-p="' + name + '"]');
+  if (dbtn) dbtn.classList.add('active');
+
+  document.querySelector('.header-nav').classList.remove('open');
+  window.scrollTo(0,0);
+}
+
+// Wrap navTo to init Leaflet map when projects page opens
+const _origNavTo = navTo;
+navTo = function(name) {
+  _origNavTo(name);
+  if (name === 'projects') { setTimeout(initMap, 200); }
+  // Hide global ticker on admin page
+  var ticker = document.getElementById('globalTicker');
+  if (ticker) ticker.style.display = (name === 'admin') ? 'none' : '';
+};
+
+// Init map on load if projects page is already active
+if (document.getElementById('page-projects').classList.contains('active')) {
+  setTimeout(initMap, 300);
+}
+</script>
+
+<!-- ══════════════════════════════════════
+     PROJECT DETAIL MODAL
+     ══════════════════════════════════════ -->
+<div class="modal-overlay" id="projectModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div id="modalStatus"></div>
+        <h3 class="md" id="modalTitle" style="margin-top:0.25rem;"></h3>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="body-sm" id="modalDesc" style="margin-bottom:1.25rem;"></div>
+      <div class="modal-field-grid" id="modalFields"></div>
+      <hr class="divider">
+      <div class="modal-section">
+        <h4 class="sm" style="margin-bottom:0.5rem;">Sources</h4>
+        <div class="body-sm" id="modalSources"></div>
+      </div>
+      <div class="modal-section">
+        <h4 class="sm" style="margin-bottom:0.5rem;">Sync History</h4>
+        <div id="modalSync"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
